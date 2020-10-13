@@ -1,5 +1,5 @@
 [
-    ///// Add some "bookmark" commands.
+    ////// Add some "bookmark" commands.
     {
         "id": "goto",
         "children":
@@ -18,25 +18,7 @@
         ]
     },
 
-    ///// Add to existing Tools menu: "tools"
-    // {
-    //     "id": "tools",
-    //     "children":
-    //     [
-    //         {
-    //             "caption": "stpt Add Tools",
-    //             "mnemonic": "s",
-    //             "id": "stpt",
-    //             "children":
-    //             [
-    //                 { "caption": "ListSelect", "command": "stpt_list_select" },
-    //                 { "caption": "-" },
-    //             ]
-    //         },
-    //     ]
-    // },
-
-    ///// Add to existing Preferences menu for package-settings.
+    ////// Add to existing Preferences menu for package-settings.
     {
         "id": "preferences",
         "children":
@@ -74,13 +56,25 @@
         ]
     },
 
-    ///// New top level menu. For some reason this needs to be after the preceding sections.
-    // {
-    //     "caption": "SublimeBagOfTricks",
-    //     "id": "st_bot",
-    //     "children":
-    //     [
-    //         { "command": "get_number" },
-    //     ]
-    // },
+    ////// New top level menu. For some reason this needs to be after the preceding sections.
+    {
+        "caption": "Examples",
+        "id": "sbot_ex",
+        "children":
+        [
+            { "command": "sbot_ex_menu" },
+            { "command": "sbot_ex_get_number" },
+            { "command": "sbot_ex_user_input" },
+            { "command": "sbot_ex_list_select" },
+            {
+                "caption": "Context Dropdown",
+                "id": "sbot_ex_dropdown",
+                "children":
+                [
+                    { "command": "sbot_ex_msg_box" },
+                    { "command": "sbot_ex_get_number" },
+                ]
+            }
+        ]
+    },
 ]

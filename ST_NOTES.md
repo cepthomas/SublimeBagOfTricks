@@ -25,7 +25,7 @@ Accumulated notes that will eventually go away.
 Nearly all of the interesting files for users live under `%data_dir%`.
 
 Zipped packages (*.sublime-package) may be stored in:
-- `%executable_dir\Packages`: Usually just ST shipped packages.%
+- `%executable_dir%\Packages`: Usually just ST shipped packages.
 - `%data_dir%\Installed Packages`: User packages, incl via package control.
 
 Loose packages are stored in:
@@ -106,8 +106,10 @@ Sublime Text has seven menus that may be customized:
 
 ## API
 
-### CORE COMPONENTS - in sublime Module
-- sublime.Window Class: desc?
+### Core Components
+These are in sublime Module.
+
+- sublime.Window Class: One instance of app/window.
 - sublime.Sheet Class: Represents a content container, i.e. a tab, within a window. Sheets may contain a View, or an image preview.
 - sublime.View Class: Represents a view into a text buffer. Note that multiple views may refer to the same buffer, but they have their own unique selection and geometry.
 - sublime.Selection Class: Maintains a set of Regions, ensuring that none overlap. The regions are kept in sorted order.
@@ -117,10 +119,12 @@ Sublime Text has seven menus that may be customized:
 - sublime.Edit Class: Edit objects have no functions, they exist to group buffer modifications.
 - sublime.Settings Class:
 
-### PLUGIN EXTENSION POINTS - in sublime_plugin Module
+### Plugin Extension Points
+These are in sublime_plugin Module.
+
 - sublime_plugin.EventListener Class: Note that many of these events are triggered by the buffer underlying the view, and thus the method is only called once, with the first view as the parameter.
 - sublime_plugin.ViewEventListener Class: A class that provides similar event handling to EventListener, but bound to a specific view. Provides class method-based filtering to control what views objects are created for.
-- sublime_plugin.ApplicationCommand Class: dexc?
+- sublime_plugin.ApplicationCommand Class: 
 - sublime_plugin.WindowCommandClass: WindowCommands are instantiated once per window. The Window object may be retrieved via self.window
 - sublime_plugin.TextCommand Class: TextCommands are instantiated once per view. The View object may be retrieved via self.view
 - sublime_plugin.TextInputHandler Class: TextInputHandlers can be used to accept textual input in the Command Palette. Return a subclass of this from the input() method of a command.
@@ -129,9 +133,9 @@ Sublime Text has seven menus that may be customized:
 
 > if you are going to interact with the current view, use TextCommand, otherwise use WindowCommand. I have yet to see a use case for ApplicationCommand, but I guess if you need to interact with all windows.
 
-### TYPES
-- location: a tuple of (str, str, (int, int)) that contains information about a location of a symbol. The first string is the absolute file path, the second is the file path relative to the project, the third element is a two-element tuple of the row and column.
-- point: an int that represents the offset from the beginning of the editor buffer. The View methods text_point() and rowcol() allow converting to and from this format.
-- value: any of the Python data types bool, int, float, str, list or dict.
-- dip: a float that represents a device-independent pixel.
-- vector: a tuple of (dip, dip) representing x and y coordinates.
+### Types
+- `location`: a tuple of (str, str, (int, int)) that contains information about a location of a symbol. The first string is the absolute file path, the second is the file path relative to the project, the third element is a two-element tuple of the row and column.
+- `point`: an int that represents the offset from the beginning of the editor buffer. The View methods text_point() and rowcol() allow converting to and from this format.
+- `value`: any of the Python data types bool, int, float, str, list or dict.
+- `dip`: a float that represents a device-independent pixel.
+- `vector`: a tuple of (dip, dip) representing x and y coordinates.

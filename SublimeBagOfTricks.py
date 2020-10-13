@@ -188,6 +188,7 @@ class WindowEvent(sublime_plugin.EventListener):
             sbot_projects[id] = SbotProject(fn)
 
     def on_deactivated(self, view):
+        # Also crude, but on_close is not reliable. (Fixed in ST4)
         v = view
         dump_view('EventListener.on_deactivated', v)
         sbot_project = get_project(v)
@@ -317,7 +318,7 @@ class PrevSignetCommand(sublime_plugin.TextCommand): #TODOC
 
 
  #-----------------------------------------------------------------------------------
-class ClearSignetsCommand(sublime_plugin.TextCommand): #TODOC
+class ClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         sproj = get_project(self.view)
@@ -352,15 +353,7 @@ class RenderHtmlCommand(sublime_plugin.TextCommand):
         has_selection = len(v.sel()[0]) > 0
         selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-        # TODOC But have a look on view.split_by_newlines() and its processing time as an example. Why is it so much slower than doing
-        # the work manually? Interpreting the output of cProfile stats shows, that view.split_by_lines() seems to call view.lines()
-        # internally (creating thouthands of Region objects by python) followed by iterating them to create the list of strings.
-        # Each item of the string list seems to be extracted from the buffer by the region boundaries. This is wiered and too
-        # complicated. Why not just passing the request to the core, doing the splitting by C with the line endings as python does
-        # with splitlines(), internally create the list object and return it back to the API.
-        # >>>> view.substr().splitlines()
-
-        for line_region in v.split_by_newlines(selreg):
+        for line_region in v.split_by_newlines(selreg): # TODOC Optimize? python splitlines()
             # line_num += 1
             line_tokens = [] # (Region, scope)
 
