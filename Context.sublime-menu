@@ -1,0 +1,54 @@
+
+[
+    { "caption": "-" },
+
+    { "command": "test_test_test" },
+
+    { "caption": "-" },
+
+    { "command": "toggle_signet" },
+    { "command": "next_signet" },
+    { "command": "prev_signet" },
+    { "command": "clear_signets" },
+
+    { "caption": "-" },
+
+    { "command": "show_scopes" },
+
+    { "command": "split_view" },
+
+    { "command": "render_html" },
+
+    { "command": "render_markdown" },
+
+    { "command": "show_scopes" },
+
+    { "caption": "-" },
+
+    { "command": "highlight_text" },
+    { "command": "clear_highlight" },
+    { "command": "clear_all_highlight" },
+
+
+
+    // { "caption": "stpt Context Set Mark", "command": "set_mark" },
+    // { "caption": "stpt Context Clear Marks", "command": "clear_bookmarks", "args": {"name": "mark"} },
+    // { "caption": "-" },
+    // { "caption": "stpt Context Menu", "command": "stpt_menu" },
+    // { "caption": "-" },
+    // { "caption": "stpt Context GetNumber", "command": "stpt_get_number" },
+    // { "caption": "stpt Context UserInput", "command": "stpt_user_input" },
+    // { "caption": "stpt Context ListSelect", "command": "stpt_list_select" },
+    // { "caption": "stpt Context Popup", "command": "stpt_popup" },
+    // { "caption": "-" },
+    // {
+    //     "caption": "stpt Context Dropdown",
+    //     "id": "stpt_dropdown",
+    //     "children":
+    //     [
+    //         { "caption": "stpt Context Dropdown MsgBox", "command": "stpt_msg_box" },
+    //         { "caption": "stpt Context Dropdown GetNumber", "command": "stpt_get_number" },
+    //     ]
+    // }
+    
+]

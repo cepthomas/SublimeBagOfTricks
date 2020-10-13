@@ -1,0 +1,86 @@
+[
+    ///// Add some "bookmark" commands.
+    {
+        "id": "goto",
+        "children":
+        [
+            {
+                "id": "signets",
+                "caption": "Signets",
+                "children":
+                [
+                    { "command": "toggle_signet" },
+                    { "command": "next_signet" },
+                    { "command": "prev_signet" },
+                    { "command": "clear_signets" },
+                ]
+            },
+        ]
+    },
+
+    ///// Add to existing Tools menu: "tools"
+    // {
+    //     "id": "tools",
+    //     "children":
+    //     [
+    //         {
+    //             "caption": "stpt Add Tools",
+    //             "mnemonic": "s",
+    //             "id": "stpt",
+    //             "children":
+    //             [
+    //                 { "caption": "ListSelect", "command": "stpt_list_select" },
+    //                 { "caption": "-" },
+    //             ]
+    //         },
+    //     ]
+    // },
+
+    ///// Add to existing Preferences menu for package-settings.
+    {
+        "id": "preferences",
+        "children":
+        [
+            {
+                "id": "package-settings",
+                "children":
+                [
+                    {
+                        "caption": "SublimeBagOfTricks",
+                        "children":
+                        [
+                            {
+                                "caption": "Settings – Default",
+                                "command": "open_file",
+                                "args": {"file": "${packages}/SublimeBagOfTricks/SublimeBagOfTricks.sublime-settings"}
+                            },
+                            {
+                                "caption": "Settings – User",
+                                "command": "open_file",
+                                "args": {"file": "${packages}/User/SublimeBagOfTricks.sublime-settings"}
+                            },
+                            {
+                                "caption": "-"
+                            },
+                            {
+                                "caption": "Documentation",
+                                "command": "open_site",
+                                "args": { "url": "https://github.com/cepthomas/SublimeBagOfTricks/blob/master/README.md"  }
+                            },
+                        ]
+                    }
+                ]
+            },
+        ]
+    },
+
+    ///// New top level menu. For some reason this needs to be after the preceding sections.
+    // {
+    //     "caption": "SublimeBagOfTricks",
+    //     "id": "st_bot",
+    //     "children":
+    //     [
+    //         { "command": "get_number" },
+    //     ]
+    // },
+]

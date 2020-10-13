@@ -1,0 +1,12 @@
+[
+    // These are stolen from bookmarks because you probably don't need both.
+    { "keys": ["ctrl+f2"], "command": "toggle_signet" },
+    { "keys": ["f2"], "command": "next_signet" },
+    { "keys": ["shift+f2"], "command": "prev_signet" },
+    { "keys": ["ctrl+shift+f2"], "command": "clear_signets" },
+
+
+    // {"keys": ["alt+1"], "command": "stpt_user_input"},
+    // {"keys": ["alt+2"], "command": "stpt_get_number"},
+    
+]
