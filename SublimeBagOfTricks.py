@@ -11,6 +11,7 @@ import logging
 from html import escape
 import sublime
 import sublime_plugin
+import Default.goto_line
 
 
 ### Defs.
@@ -81,7 +82,7 @@ def plugin_loaded():
     global settings
 
     # Init logging.
-    ddir = r'{0}\STBagOfTricks'.format(sublime.packages_path())
+    ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
     logf = ddir + r'\sbot_log.txt'
     logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
     logging.basicConfig(filename=logf, filemode='a', format=logformat, level=logging.INFO) ### mode a/w
@@ -89,7 +90,7 @@ def plugin_loaded():
     logging.info("========================================================================================");
     logging.info("ddir:" + ddir);
 
-    settings = sublime.load_settings('STBagOfTricks.sublime-settings')
+    settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
 
 #-----------------------------------------------------------------------------------
@@ -635,7 +636,7 @@ class HighlightTextCommand(sublime_plugin.TextCommand): #TODOC persist these.
             mark_scopes = settings.get('mark_scopes')
             scope = mark_scopes[which]
             v.erase_regions(HIGHLIGHT_REGION_NAME % which) # does this work?
-            v.add_regions(HIGHLIGHT_REGION_NAME % which, mark_regions, scope) #, 'dot', sublime.DRAW_NO_OUTLINE) #"Packages/Default/Icon.png")
+            v.add_regions(HIGHLIGHT_REGION_NAME % which, mark_regions, scope)
 
 
 #-----------------------------------------------------------------------------------
@@ -745,59 +746,125 @@ class OpenSiteCommand(sublime_plugin.ApplicationCommand):
 
 
 #-----------------------------------------------------------------------------------
-#    { "command": "delete_current_file" },
-class DeleteCurrentFileCommand(sublime_plugin.TextCommand): #TODOC fix this, make it safe.
-    #https://github.com/yaworsw/Sublime-DeleteCurrentFile
+# Holding tank for a bunch of examples and extras.
+#-----------------------------------------------------------------------------------
+class SbotExUserInputCommand(sublime_plugin.TextCommand):
+    ''' Command: Get input from user. sbot_ex_user_input
+    When a command with arguments is called without them, but it defines an input() method, Sublime will call
+    the input() method to see if there is an input handler that can be used to gather the arguments instead.
+    Every input handler represents an argument to the command, and once the entire chain of them is finished, 
+    Sublime re-invokes the command with the arguments that it gathered.
+    '''
 
-    # sideebar: { "caption": "Delete File", "command": "delete_file", "args": {"files": []} },
-    # class DeleteFileCommand(sublime_plugin.WindowCommand):
-    #     def run(self, files):
-    #         # Import send2trash on demand, to avoid initialising ctypes for as long as possible
-    #         import Default.send2trash as send2trash
-    #         for f in files:
-    #             v = self.window.find_open_file(f)
-    #             if v is not None and not v.close():
-    #                 return
+    def run(self, edit, my_example):
+        # print("!!!StptUserInputCommand.run() name:{0} my_example:{1}".format(self.name(), my_example)) # self.name is "sbot_ex_user_input"
+        for i in range(len(self.view.sel())):
+            sel = self.view.sel()[i]
+            data = self.view.substr(sel)
+            # print("*** sel:{0} data:{1}".format(sel, data))
+            # replace selected text.
+            self.view.replace(edit, sel, my_example)
 
-    #             send2trash.send2trash(f)
-
-    #     def is_visible(self, files):
-    #         return len(files) > 0
+    def input(self, args):
+        # print("!!!StptUserInputCommand.input() " + str(args))
+        return SbotExInputHandler(self.view)
 
 
-    def run(self, edit, prompt_before_delete=None, auto_close_buffer=None, move_to_trash=None):
+#-----------------------------------------------------------------------------------
+class SbotExGetNumberCommand(sublime_plugin.WindowCommand):
+    ''' A window command. sbot_ex_get_number '''
 
-        # global settings
+    def run(self):
+        # Bottom input area.
+        self.window.show_input_panel("Give me a number:", "", self.on_done, None, None)
 
-        if prompt_before_delete is None:
-            prompt_before_delete = settings.get('prompt_before_delete', False)
+    def on_done(self, text):
+        try:
+            line = int(text)
+            if self.window.active_view():
+                self.window.active_view().run_command("goto_line", {"line": line})
+                self.window.active_view().run_command("expand_selection", {"to": "line"})
+        except ValueError:
+            pass
 
-        if auto_close_buffer is None:
-            auto_close_buffer = settings.get('auto_close_buffer', True)
 
-        if move_to_trash is None:
-            move_to_trash = settings.get('move_to_trash', False)
+#-----------------------------------------------------------------------------------
+class SbotExMsgBoxCommand(sublime_plugin.TextCommand):
+    ''' Command: Simple message box. sbot_ex_msg_box '''
 
-        window = sublime.active_window()
-        view = sublime.Window.active_view(window)
-        file_name = view.file_name()
-        message = "Are you sure you want to move '{}' to the trash?" if move_to_trash else "delete '{}'?"
-        message = message.format(file_name)
+    def run(self, edit, cmd=None):
+        # print("MsgBox! {0} {1}".format(self.name(), edit))
+        sublime.ok_cancel_dialog("Hi there from StptMsgBoxCommand") # ok_cancel_dialog
 
-        if prompt_before_delete:
-            if not sublime.ok_cancel_dialog(message):
-                return
 
-        if view.is_dirty():
-            view.set_scratch(True)
+#-----------------------------------------------------------------------------------
+class SbotExListSelectCommand(sublime_plugin.TextCommand):
+    ''' Command: Select from list. sbot_ex_list_select '''
 
-        if auto_close_buffer:
-            window.run_command('close_file')
+    def run(self, edit, cmd=None):
+        # print("ListSelect! {0} {1}".format(self.name(), edit))
+        self.panel_items = ["Duck", "Cat", "Banana"]
+        # self.window.show_quick_panel(self.panel_items, self.on_done_panel)
+        self.view.window().show_quick_panel(self.panel_items, self.on_done_panel)
 
-        if (file_name is not None and os.path.isfile(file_name)):
-            if move_to_trash:
-                # Import send2trash on demand, to avoid initialising ctypes for as long as possible
-                from Default.send2trash import send2trash
-                send2trash(file_name)
+    def on_done_panel(self, choice):
+        if choice >= 0:
+            print("You picked {0}".format(self.panel_items[choice]))
+            os.startfile(ddir + r"\test1.txt")
+
+
+#-----------------------------------------------------------------------------------
+class SbotExMenuCommand(sublime_plugin.TextCommand):
+    ''' Container for other menu items. sbot_ex_menu '''
+
+    def run(self, edit, cmd=None):
+        # Individual menu items.
+        CMD1 = {'text': 'UserInput',  'command' : 'sbot_ex_user_input'}
+        CMD2 = {'text': 'GetNumber',  'command' : 'sbot_ex_get_number'}
+        CMD3 = {'text': 'MsgBox',     'command' : 'sbot_ex_msg_box'}
+        CMD4 = {'text': 'ListSelect', 'command' : 'sbot_ex_list_select'}
+
+        menu_items = [CMD1, CMD2, CMD3, CMD4]
+
+        def on_done(index):
+            if index >= 0:
+                self.view.run_command(menu_items[index]['command'], {'cmd': cmd})
+
+        self.view.window().show_quick_panel([item['text'] for item in menu_items], on_done)
+
+
+#-----------------------------------------------------------------------------------
+class SbotExInputHandler(sublime_plugin.TextInputHandler):
+    ''' Generic user input handler. '''
+
+    def __init__(self, view):
+        # print("SbotExInputHandler.__init__")
+        self.view = view
+
+    def placeholder(self):
+        return "placeholder - optional"
+
+    def description(self, sdef):
+        return "description for SbotExInputHandler"
+
+    def initial_text(self):
+        # for r in self.view.sel():
+        #     print(r)
+        # Check if something selected.
+        if len(self.view.sel()) > 0:
+            if(self.view.sel()[0].size() == 0):
+                return "default initial contents"
             else:
-                os.remove(file_name)
+                return self.view.substr(self.view.sel()[0])
+        else:
+            return "wtf?"
+
+    def preview(self, my_example):
+        # Optional peek at current value.
+        # print("SbotExInputHandler.preview() name:{0} my_example:{1}".format(self.name(), my_example))
+        return my_example
+
+    def validate(self, my_example):
+        # Is it ok?
+        # print("SbotExInputHandler.validate() name:{0} my_example:{1}".format(self.name(), my_example))
+        return True
