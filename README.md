@@ -16,7 +16,7 @@ associated with each scope.
 | clear_highlight     | blabla      |
 | clear_all_highlight | blabla      |
 | show_scopes         | blabla      |
-|
+
 
 ## Render To Html For Printing
 Simple render to html with styles for printing.
@@ -25,7 +25,7 @@ Simple render to html with styles for printing.
 |:--------            |:-------     |
 | render_html         | blabla      |
 | render_markdown     | blabla      |
-|
+
 
 ## Bookmarks
 - Enhanced bookmarks: Persistence, next/prev across files.
@@ -40,14 +40,14 @@ Simple render to html with styles for printing.
 | next_signet         | blabla      |
 | prev_signet         | blabla      |
 | clear_signets       | blabla      |
-|
+
 
 ## Split view
 
 | Command             | Description |
 |:--------            |:-------     |
 | split_view          | blabla      |
-|
+
 
 ## Examples
 
@@ -58,4 +58,3 @@ Simple render to html with styles for printing.
 | sbot_ex_user_input  | blabla      |
 | sbot_ex_list_select | blabla      |
 | sbot_ex_msg_box     | blabla      |
-|

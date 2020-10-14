@@ -7,8 +7,8 @@
     { "caption": "-" },
 
     { "command": "toggle_signet" },
-    { "command": "next_signet" },
-    { "command": "prev_signet" },
+    { "command": "next_signet", },
+    { "command": "previous_signet", },
     { "command": "clear_signets" },
 
     { "caption": "-" },

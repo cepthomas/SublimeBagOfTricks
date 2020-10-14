@@ -12,6 +12,7 @@ from html import escape
 import sublime
 import sublime_plugin
 import Default.goto_line
+import time
 
 
 ### Defs.
@@ -19,7 +20,8 @@ HIGHLIGHT_REGION_NAME = 'highlight_%d'
 SIGNET_REGION_NAME = 'signet'
 NUM_HIGHLIGHTS = 10
 WHITESPACE = '_ws'
-SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
+# SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
+SIGNET_ICON = 'bookmark'
 SBOT_PROJECT_EXT = '.sbot-project'
 
 ### Vars.
@@ -28,12 +30,20 @@ views_inited = set()
 highlight_slots = set()
 sbot_projects = {} # {window_id:SbotProject}
 
+#TODOC clean up sidebar/enhancements: open explorer here (reveal), open cmd prompt here (open/run)
 
 
 #-----------------------------------------------------------------------------------
 class TestTestTestCommand(sublime_plugin.TextCommand):
     def run(self, edit, all=False):
-        save_sbot_projects()
+        # save_sbot_projects()
+        v = self.view
+        w = self.view.window()
+        # for sheet in w.sheets():
+        #     print('sheet:', sheet)
+        for view in w.views(): # These are in order L -> R.
+            print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
+        get_project(v).dump() # These are not ordered like file.
 
 
 #-----------------------------------------------------------------------------------
@@ -48,8 +58,8 @@ class SbotProject(object):
         try:
             with open(self.fn, 'r') as fp:
                 values = json.load(fp)
-                for bm in values['signets']:
-                    self.signets[bm['filename']] = bm['rows']
+                for sig in values['signets']:
+                    self.signets[sig['filename']] = sig['rows']
             inited = True
         except FileNotFoundError as e:
             # Assumes new file.
@@ -61,19 +71,24 @@ class SbotProject(object):
 
     def save(self):
         try:
-            bms = []
+            sigs = []
             for filename, rows in self.signets.items():
                 if len(rows) > 0:
-                    bms.append({'filename': filename, 'rows': rows})
+                    sigs.append({'filename': filename, 'rows': rows})
+#TODOC test for os.path.exists(path)
 
             values = {}
-            values['signets'] = bms
+            values['signets'] = sigs
 
             with open(self.fn + '.xxx', 'w') as fp: # TODOC fix this
                 json.dump(values, fp, indent=4)
         except:
             e,v,t = sys.exc_info()[0] #(type, value, traceback)
             sublime.error_message('bad thing!', e, t)
+
+    def dump(self):
+        for filename, rows in self.signets.items():
+            print('signet file:', filename, len(rows))
 
 
 #-----------------------------------------------------------------------------------
@@ -87,7 +102,7 @@ def plugin_loaded():
     logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
     logging.basicConfig(filename=logf, filemode='a', format=logformat, level=logging.INFO) ### mode a/w
     # logging.info("cwd:" + os.getcwd());
-    logging.info("========================================================================================");
+    logging.info("=============================== log start =========================================================");
     logging.info("ddir:" + ddir);
 
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
@@ -138,13 +153,34 @@ def get_project(view):
 
 
 #-----------------------------------------------------------------------------------
+def get_signet_rows(view):
+    ''' Get all the signet row numbers in the view. Returns a sorted list. '''
+    # Current signets in this view.
+    sig_rows = []
+    for reg in view.get_regions('signet'):
+        row, _ = view.rowcol(reg.a)
+        sig_rows.append(row)
+    sig_rows.sort()
+    return sig_rows
+
+
+#-----------------------------------------------------------------------------------
+def wait_load_file(view, line):
+    ''' Helper. '''
+    if view.is_loading():
+        sublime.set_timeout(lambda: wait_load_file(view, line), 10) #TODOC not forever...
+    else:
+        view.run_command("goto_line", {"line": line})
+
+
+#-----------------------------------------------------------------------------------
 class ViewEvent(sublime_plugin.ViewEventListener):
 
     def on_activated(self): # When focus/tab changes
         v = self.view
         dump_view('ViewEventListener.on_activated', v)
 
-        # If this is the first time through and proj has signets for this file, set them all.
+        # If this is the first time through and project has signets for this file, set them all.
         if not v.id() in views_inited:
             sproj = get_project(v)
             if sproj is not None and v.file_name() in sproj.signets:
@@ -154,7 +190,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
                     pt = v.text_point(r - 1, 0) # Adjust to 0-based
                     regions.append(sublime.Region(pt, pt))
                 v.add_regions(SIGNET_REGION_NAME, regions, 'comment', SIGNET_ICON)
-            views_inited.add(v.id())
+            views_inited.add(v.id()) # Tag as initialized.
 
     # def on_deactivated(self):
     #     dump_view('ViewEventListener.on_deactivated', v)
@@ -195,8 +231,7 @@ class WindowEvent(sublime_plugin.EventListener):
 
         sig_lines = []
 
-        for reg in v.get_regions(SIGNET_REGION_NAME):
-            row, col = v.rowcol(reg.a)
+        for row in get_signet_rows(v):
             sig_lines.append(row + 1) # Adjust to 1-based
 
         if len(sig_lines) > 0:
@@ -229,12 +264,10 @@ class ToggleSignetCommand(sublime_plugin.TextCommand):
         # Current location.
         sel_row, _ = v.rowcol(v.sel()[0].a)
 
-        # Current.
         signet_rows = []
 
         existing = False
-        for reg in v.get_regions(SIGNET_REGION_NAME):
-            row, _ = v.rowcol(reg.a)
+        for row in get_signet_rows(v):
             if sel_row == row:
                 existing = True
             else:
@@ -253,71 +286,147 @@ class ToggleSignetCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class NextSignetCommand(sublime_plugin.TextCommand): #TODOC
-    ''' Next signet in whole collection. '''
+class NextSignetCommand(sublime_plugin.TextCommand):
+    ''' Navigate to signet in whole collection. '''
 
-    def run(self, edit, all=False):
+    def run(self, edit):
+        # TODOC enable only if there are any signets in views or project.
         v = self.view
-        # Get project data for this view.
-        sproj = sbot_projects[v.window().id()]
+        w = self.view.window()
+        done = False
+        sel_row, _ = v.rowcol(v.sel()[0].a) # current sel
 
-        # Current location.
-        sel_point = v.sel()[0].a
-        sel_line = v.full_line(sel_point)
-        sel_row, _ = v.rowcol(sel_point)
-        last_row, _ = v.rowcol(v.size())
+        # 1) If there's another bookmark below >>> goto it
+        if not done:
+            sig_rows = get_signet_rows(v)
+            for sr in sig_rows:
+                if sr > sel_row:
+                    w.active_view().run_command("goto_line", {"line": sr + 1})
+                    done = True
+                    break
+
+        # 2) Else if there's an open signet file to the right of this tab >>> focus tab, goto first signet
+        if not done:
+            view_index = w.get_view_index(v)[1] + 1
+
+            while not done and view_index < len(w.views()):
+                vv = w.views()[view_index]
+                sig_rows = get_signet_rows(vv)
+                if(len(sig_rows) > 0):
+                    w.focus_view(vv)
+                    vv.run_command("goto_line", {"line": sig_rows[0] + 1})
+                    done = True
+                else:
+                    view_index += 1
+
+        # 3) Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet
+        if not done:
+            sig_files = []
+            sproj = get_project(self.view)
+            if sproj is not None:
+                for sig_fn, sig_rows in sproj.signets.items():
+                    if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
+                        vv = w.open_file(sig_fn)
+                        sublime.set_timeout(lambda: wait_load_file(vv, sig_rows[0]), 10) # already 1-based in file
+                        w.focus_view(vv)
+                        done = True
+                        break
+
+        # 4) Else >>> find first tab/file with signets, focus tab, goto first signet
+        if not done:
+            view_index = 0
+            while not done and view_index < len(w.views()):
+                vv = w.views()[view_index]
+                sig_rows = get_signet_rows(vv)
+                if(len(sig_rows) > 0):
+                    w.focus_view(vv)
+                    vv.run_command("goto_line", {"line": sig_rows[0] + 1})
+                    done = True
+                else:
+                    view_index += 1
 
 
-
-        # Is there a signet ahead of us?
-        next_sig_pos = None
-
-        # Current signets in this view.
-        sig_regs = v.get_regions('signet')
-
-        for reg in sig_regs:
-            row, _ = v.rowcol(reg.a)
-            if row > sel_row:
-                next_sig_pos = reg.a
-                break
+        logging.info(">>> done");
 
 
+    # def wait_load_file(self, view, line):
+    #     ''' Helper. '''
+    #     if view.is_loading():
+    #         sublime.set_timeout(lambda: self.wait_load_file(view, line), 10) #TODOC not forever...
+    #     else:
+    #         view.run_command("goto_line", {"line": line})
+       
 
-        #sigx = None
-        #sig_region_name = ''
+#-----------------------------------------------------------------------------------
+class PreviousSignetCommand(sublime_plugin.TextCommand): #TODOC
+    ''' Navigate to signet in whole collection. '''
 
-        ## Existing?
-        #for k, v in sproj.signets:
-        #    sigregs = v.get_regions(k)
-        #    if sigregs is not None and len(sigregs) > 0:
-        #        # Does it hold the loc?
-        #        if sigregs[0].contains(selpoint):
-        #            sigx = sigregs[0]
-        #            sig_region_name = k
-        #            break;
+    def run(self, edit):
+        # TODOC enable only if there are any signets in views or project.
+        v = self.view
+        w = self.view.window()
+        done = False
+        sel_row, _ = v.rowcol(v.sel()[0].a) # current sel
 
-        #if sigx is None:
-        #    # A new signet.
-        #    sig_region_name = 'signet_' + str(uuid.uuid1())
-        #    sig_region = v.line(selpoint)
-        #    v.add_regions(sig_region_name, sig_region, "mark", 'bookmark')
-        #    sproj.signets(sig_region_name, sig_region)
 
-        #else:
-        #    # Existing signet - remove
-        #    sproj.signets.delete(sig_region_name)
-        #    view.erase_regions(sig_region_name)
+        # 1) If there's another bookmark above >>> goto it
+        if not done:
+            sig_rows = get_signet_rows(v) #<<<  10 r 20  30     30  20 r 10 
+            for sr in sig_rows:
+                if sr > sel_row: #<<<
+                    w.active_view().run_command("goto_line", {"line": sr + 1})
+                    done = True
+                    break
+
+        ### 2) Else if there's an open signet file to the right of this tab >>> focus tab, goto first signet
+        if not done:
+            view_index = w.get_view_index(v)[1] + 1 #<<<
+
+            while not done and view_index < len(w.views()): #<<<
+                vv = w.views()[view_index]
+                sig_rows = get_signet_rows(vv)
+                if(len(sig_rows) > 0):
+                    w.focus_view(vv)
+                    vv.run_command("goto_line", {"line": sig_rows[0] + 1})
+                    done = True
+                else:
+                    view_index += 1 #<<<
+
+        # 3) Else if there is a file in the project that is not open >>> open it, focus tab, goto last signet
+        if not done:
+            sig_files = []
+            sproj = get_project(self.view)
+            if sproj is not None:
+                for sig_fn, sig_rows in sproj.signets.items():
+                    if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
+                        vv = w.open_file(sig_fn)
+                        sublime.set_timeout(lambda: self.wait_load_file(vv, sig_rows[0]), 10) # already 1-based in file #<<<
+                        w.focus_view(vv)
+                        done = True
+                        break
+
+        # 4) Else >>> find last tab/file with signets, focus tab, goto last signet
+        if not done:
+            view_index = 0 #<<<
+            while not done and view_index < len(w.views()): #<<<
+                vv = w.views()[view_index]
+                sig_rows = get_signet_rows(vv)
+                if(len(sig_rows) > 0):
+                    w.focus_view(vv)
+                    vv.run_command("goto_line", {"line": sig_rows[0] + 1}) #<<<
+                    done = True
+                else:
+                    view_index += 1 #<<<
+
+    def wait_load_file(self, view, line):
+        ''' Helper. '''
+        if view.is_loading():
+            sublime.set_timeout(lambda: self.wait_load_file(view, line), 10) #TODOC not forever...
+        else:
+            view.run_command("goto_line", {"line": line})
 
 
 #-----------------------------------------------------------------------------------
-class PrevSignetCommand(sublime_plugin.TextCommand): #TODOC
-    ''' Previous signet in whole collection. '''
-
-    def run(self, edit, all=False):
-        pass
-
-
- #-----------------------------------------------------------------------------------
 class ClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
