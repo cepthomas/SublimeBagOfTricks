@@ -30,7 +30,6 @@ views_inited = set()
 highlight_slots = set()
 sbot_projects = {} # {window_id:SbotProject}
 
-#TODOC clean up sidebar/enhancements: open explorer here (reveal), open cmd prompt here (open/run)
 
 
 #-----------------------------------------------------------------------------------
@@ -74,13 +73,12 @@ class SbotProject(object):
             sigs = []
             for filename, rows in self.signets.items():
                 if len(rows) > 0:
-                    sigs.append({'filename': filename, 'rows': rows})
-#TODOC test for os.path.exists(path)
-
+                    if os.path.exists(filename): # last check
+                        sigs.append({'filename': filename, 'rows': rows})
             values = {}
             values['signets'] = sigs
 
-            with open(self.fn + '.xxx', 'w') as fp: # TODOC fix this
+            with open(self.fn, 'w') as fp:
                 json.dump(values, fp, indent=4)
         except:
             e,v,t = sys.exc_info()[0] #(type, value, traceback)
@@ -168,8 +166,8 @@ def get_signet_rows(view):
 def wait_load_file(view, line):
     ''' Helper. '''
     if view.is_loading():
-        sublime.set_timeout(lambda: wait_load_file(view, line), 10) #TODOC not forever...
-    else:
+        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # TODOF not forever...
+    else: # good to go
         view.run_command("goto_line", {"line": line})
 
 
@@ -214,7 +212,7 @@ class WindowEvent(sublime_plugin.EventListener):
     def on_activated(self, view): # When focus/tab changes
         dump_view('EventListener.on_activated', view) # Sometimes gets valid view with None file_name
 
-        # This is kind of crude but there is no project_loaded event (TODOC ST4 does though...)
+        # This is kind of crude but there is no project_loaded event (ST4 does though...)
         global sbot_projects
         id = view.window().id()
         # Check for already loaded.
@@ -287,10 +285,10 @@ class ToggleSignetCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class NextSignetCommand(sublime_plugin.TextCommand):
-    ''' Navigate to signet in whole collection. '''
+    ''' Navigate to signet in whole collection. TODOC Probably combine next and previous since they are similar. '''
 
     def run(self, edit):
-        # TODOC enable only if there are any signets in views or project.
+        # TODOF Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
@@ -344,55 +342,44 @@ class NextSignetCommand(sublime_plugin.TextCommand):
                     done = True
                 else:
                     view_index += 1
-
-
-        logging.info(">>> done");
-
-
-    # def wait_load_file(self, view, line):
-    #     ''' Helper. '''
-    #     if view.is_loading():
-    #         sublime.set_timeout(lambda: self.wait_load_file(view, line), 10) #TODOC not forever...
-    #     else:
-    #         view.run_command("goto_line", {"line": line})
        
 
 #-----------------------------------------------------------------------------------
-class PreviousSignetCommand(sublime_plugin.TextCommand): #TODOC
+class PreviousSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        # TODOC enable only if there are any signets in views or project.
+        # TODOF Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
         sel_row, _ = v.rowcol(v.sel()[0].a) # current sel
 
-
         # 1) If there's another bookmark above >>> goto it
         if not done:
-            sig_rows = get_signet_rows(v) #<<<  10 r 20  30     30  20 r 10 
+            sig_rows = get_signet_rows(v)
+            sig_rows.reverse()
             for sr in sig_rows:
-                if sr > sel_row: #<<<
+                if sr < sel_row:
                     w.active_view().run_command("goto_line", {"line": sr + 1})
                     done = True
                     break
 
-        ### 2) Else if there's an open signet file to the right of this tab >>> focus tab, goto first signet
+        # 2) Else if there's an open signet file to the left of this tab >>> focus tab, goto last signet
         if not done:
-            view_index = w.get_view_index(v)[1] + 1 #<<<
+            view_index = w.get_view_index(v)[1] - 1
 
-            while not done and view_index < len(w.views()): #<<<
+            while not done and view_index >= 0:
                 vv = w.views()[view_index]
                 sig_rows = get_signet_rows(vv)
                 if(len(sig_rows) > 0):
                     w.focus_view(vv)
-                    vv.run_command("goto_line", {"line": sig_rows[0] + 1})
+                    vv.run_command("goto_line", {"line": sig_rows[-1] + 1})
                     done = True
                 else:
-                    view_index += 1 #<<<
+                    view_index -= 1
 
-        # 3) Else if there is a file in the project that is not open >>> open it, focus tab, goto last signet
+        # 3) Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet
         if not done:
             sig_files = []
             sproj = get_project(self.view)
@@ -400,30 +387,23 @@ class PreviousSignetCommand(sublime_plugin.TextCommand): #TODOC
                 for sig_fn, sig_rows in sproj.signets.items():
                     if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
                         vv = w.open_file(sig_fn)
-                        sublime.set_timeout(lambda: self.wait_load_file(vv, sig_rows[0]), 10) # already 1-based in file #<<<
+                        sublime.set_timeout(lambda: wait_load_file(vv, sig_rows[-1]), 10) # already 1-based in file
                         w.focus_view(vv)
                         done = True
                         break
 
         # 4) Else >>> find last tab/file with signets, focus tab, goto last signet
         if not done:
-            view_index = 0 #<<<
-            while not done and view_index < len(w.views()): #<<<
+            view_index = len(w.views()) - 1
+            while not done and view_index >= 0:
                 vv = w.views()[view_index]
                 sig_rows = get_signet_rows(vv)
                 if(len(sig_rows) > 0):
                     w.focus_view(vv)
-                    vv.run_command("goto_line", {"line": sig_rows[0] + 1}) #<<<
+                    vv.run_command("goto_line", {"line": sig_rows[-1] + 1})
                     done = True
                 else:
-                    view_index += 1 #<<<
-
-    def wait_load_file(self, view, line):
-        ''' Helper. '''
-        if view.is_loading():
-            sublime.set_timeout(lambda: self.wait_load_file(view, line), 10) #TODOC not forever...
-        else:
-            view.run_command("goto_line", {"line": line})
+                    view_index -= 1
 
 
 #-----------------------------------------------------------------------------------
@@ -462,7 +442,7 @@ class RenderHtmlCommand(sublime_plugin.TextCommand):
         has_selection = len(v.sel()[0]) > 0
         selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-        for line_region in v.split_by_newlines(selreg): # TODOC Optimize? python splitlines()
+        for line_region in v.split_by_newlines(selreg): # TODOF Optimize y using python splitlines()?
             # line_num += 1
             line_tokens = [] # (Region, scope)
 
