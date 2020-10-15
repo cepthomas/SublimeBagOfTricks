@@ -18,5 +18,8 @@
     "html_line_numbers": true,
 
     // Scopes for marking text.
-    "mark_scopes": [ "string", "constant.language", "comment", "markup.list.numbered", "variable.parameter", "invalid" ]
+    "mark_scopes": [ "string", "constant.language", "comment", "markup.list.numbered", "variable.parameter", "invalid" ],
+
+    // Scope for gutter signet icon.
+    "signet_scope": "keyword"
 }

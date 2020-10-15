@@ -13,6 +13,7 @@ import sublime
 import sublime_plugin
 import Default.goto_line
 import time
+from collections import defaultdict
 
 
 ### Defs.
@@ -20,8 +21,8 @@ HIGHLIGHT_REGION_NAME = 'highlight_%d'
 SIGNET_REGION_NAME = 'signet'
 NUM_HIGHLIGHTS = 10
 WHITESPACE = '_ws'
-# SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
 SIGNET_ICON = 'bookmark'
+# SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
 
 ### Vars.
@@ -50,23 +51,22 @@ class SbotProject(object):
     ''' Container for persistence. '''
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
-        # From the project file. After the file/view is opened, they are marked and this is removed.
-        self.signets = {} # {filename:[row]} # persisted row is 1-based, internally is 0-based (like ST)
-        self.inited = False
+
+        # Unpack into our convenience collections.
+        self.signets = {} # {filename:[signet_rows]} # persisted row is 1-based, internally is 0-based (like ST)
+        self.highlights = {} # {filename:[{"token":"abc", "wholeword":true, "scope":"xyz"}]}
 
         try:
             with open(self.fn, 'r') as fp:
                 values = json.load(fp)
                 for sig in values['signets']:
                     self.signets[sig['filename']] = sig['rows']
-            inited = True
         except FileNotFoundError as e:
             # Assumes new file.
-            print('New sbot project file')
-            inited = True
+            sublime.status_message('Creating new sbot project file')
         except:
-            e,v,t = sys.exc_info()[0] #(type, value, traceback)
-            sublime.error_message('bad thing!', e, t)
+            e, v, t = sys.exc_info() # (type, value, traceback)
+            sublime.error_message('bad thing! {} {} {}'.format(e, v, t))
 
     def save(self):
         try:
@@ -78,11 +78,11 @@ class SbotProject(object):
             values = {}
             values['signets'] = sigs
 
-            with open(self.fn, 'w') as fp:
+            with open(self.fn+'xxx', 'w') as fp:
                 json.dump(values, fp, indent=4)
         except:
-            e,v,t = sys.exc_info()[0] #(type, value, traceback)
-            sublime.error_message('bad thing!', e, t)
+            e, v, t = sys.exc_info() # (type, value, traceback)
+            sublime.error_message('bad thing! {} {} {}'.format(e, v, t))
 
     def dump(self):
         for filename, rows in self.signets.items():
@@ -166,7 +166,7 @@ def get_signet_rows(view):
 def wait_load_file(view, line):
     ''' Helper. '''
     if view.is_loading():
-        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # TODOF not forever...
+        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # TODOC not forever...
     else: # good to go
         view.run_command("goto_line", {"line": line})
 
@@ -182,12 +182,13 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         if not v.id() in views_inited:
             sproj = get_project(v)
             if sproj is not None and v.file_name() in sproj.signets:
+                scope = settings.get('signet_scope', 'comment')
                 regions = []
                 for r in sproj.signets.get(v.file_name(), []):
                     # A new signet.
                     pt = v.text_point(r - 1, 0) # Adjust to 0-based
                     regions.append(sublime.Region(pt, pt))
-                v.add_regions(SIGNET_REGION_NAME, regions, 'comment', SIGNET_ICON)
+                v.add_regions(SIGNET_REGION_NAME, regions, scope, SIGNET_ICON)
             views_inited.add(v.id()) # Tag as initialized.
 
     # def on_deactivated(self):
@@ -222,23 +223,26 @@ class WindowEvent(sublime_plugin.EventListener):
             sbot_projects[id] = SbotProject(fn)
 
     def on_deactivated(self, view):
-        # Also crude, but on_close is not reliable. (Fixed in ST4)
+        # Save to file. Also crude, but on_close is not reliable. (Fixed in ST4)
         v = view
         dump_view('EventListener.on_deactivated', v)
         sbot_project = get_project(v)
 
-        sig_lines = []
+        if sbot_project is not None:
 
-        for row in get_signet_rows(v):
-            sig_lines.append(row + 1) # Adjust to 1-based
+            sig_lines = []
+            highlights = [] # TODOC
 
-        if len(sig_lines) > 0:
-            sbot_project.signets[v.file_name()] = sig_lines
-        elif v.file_name() in sbot_project.signets:
-            del sbot_project.signets[v.file_name()]
+            for row in get_signet_rows(v):
+                sig_lines.append(row + 1) # Adjust to 1-based
 
-        # Save the project file.
-        sbot_project.save()
+            if len(sig_lines) > 0:
+                sbot_project.signets[v.file_name()] = sig_lines
+            elif v.file_name() in sbot_project.signets:
+                del sbot_project.signets[v.file_name()]
+
+            # Save the project file.
+            sbot_project.save()
 
     # def on_new(self, view): # When creating new window -> ctrl-shift-n
     #     dump_view('EventListener.on_new', view)
@@ -288,7 +292,7 @@ class NextSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. TODOC Probably combine next and previous since they are similar. '''
 
     def run(self, edit):
-        # TODOF Probably should enable only if there are any signets in views or project.
+        # TODOC Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
@@ -349,7 +353,7 @@ class PreviousSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        # TODOF Probably should enable only if there are any signets in views or project.
+        # TODOC Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
@@ -411,9 +415,10 @@ class ClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         sproj = get_project(self.view)
+        # clear persistence
         if sproj is not None:
             sproj.signets.clear()
-
+        # clear visual
         for vv in self.view.window().views():
             vv.erase_regions(SIGNET_REGION_NAME)
 
@@ -442,7 +447,7 @@ class RenderHtmlCommand(sublime_plugin.TextCommand):
         has_selection = len(v.sel()[0]) > 0
         selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-        for line_region in v.split_by_newlines(selreg): # TODOF Optimize y using python splitlines()?
+        for line_region in v.split_by_newlines(selreg): # TODOC Optimize using python splitlines()?
             # line_num += 1
             line_tokens = [] # (Region, scope)
 

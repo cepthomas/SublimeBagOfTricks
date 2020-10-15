@@ -140,4 +140,5 @@ dmypy.json
 *.sublime-workspace
 *.pyproj
 *.sln
+.vs
 
