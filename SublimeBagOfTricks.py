@@ -35,6 +35,7 @@ sbot_projects = {} # {window_id:SbotProject}
 
 #-----------------------------------------------------------------------------------
 class TestTestTestCommand(sublime_plugin.TextCommand):
+
     def run(self, edit, all=False):
         # save_sbot_projects()
         v = self.view
@@ -49,12 +50,25 @@ class TestTestTestCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 class SbotProject(object):
     ''' Container for persistence. '''
+
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
 
         # Unpack into our convenience collections.
         self.signets = {} # {filename:[signet_rows]} # persisted row is 1-based, internally is 0-based (like ST)
         self.highlights = {} # {filename:[{"token":"abc", "wholeword":true, "scope":"xyz"}]}
+
+    # "highlights": [
+    #     {
+    #         "filename": "C:\\Users\\cepth\\AppData\\Roaming\\Sublime Text 3\\Packages\\SublimeBagOfTricks\\test\\tt.cs",
+    #         "tokens": [
+    #             { "token":"int", "wholeword":true, "scope":"xyz" },
+    #             { "token":"void", "wholeword":true, "scope":"xyz" },
+    #         ]
+    #     }
+    # ]
+
+
 
         try:
             with open(self.fn, 'r') as fp:
@@ -93,7 +107,6 @@ class SbotProject(object):
 def plugin_loaded():
     ''' Initialize module stuff. '''
     global settings
-
     # Init logging.
     ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
     logf = ddir + r'\sbot_log.txt'
@@ -136,6 +149,7 @@ def dump_view(preamble, view):
 
 #-----------------------------------------------------------------------------------
 def save_sbot_projects():
+    ''' For rent. '''
     for id in list(sbot_projects):
         sbot_projects[id].save()
 
@@ -166,15 +180,17 @@ def get_signet_rows(view):
 def wait_load_file(view, line):
     ''' Helper. '''
     if view.is_loading():
-        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # TODOC not forever...
+        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # TODOC2 not forever...
     else: # good to go
         view.run_command("goto_line", {"line": line})
 
 
 #-----------------------------------------------------------------------------------
 class ViewEvent(sublime_plugin.ViewEventListener):
+    ''' Listener. '''
 
-    def on_activated(self): # When focus/tab changes
+    def on_activated(self):
+        ''' When focus/tab received. '''
         v = self.view
         dump_view('ViewEventListener.on_activated', v)
 
@@ -209,10 +225,11 @@ class ViewEvent(sublime_plugin.ViewEventListener):
 
 #-----------------------------------------------------------------------------------
 class WindowEvent(sublime_plugin.EventListener):
+    ''' Listener. '''
 
-    def on_activated(self, view): # When focus/tab changes
+    def on_activated(self, view):
+        ''' When focus/tab received. '''
         dump_view('EventListener.on_activated', view) # Sometimes gets valid view with None file_name
-
         # This is kind of crude but there is no project_loaded event (ST4 does though...)
         global sbot_projects
         id = view.window().id()
@@ -223,7 +240,8 @@ class WindowEvent(sublime_plugin.EventListener):
             sbot_projects[id] = SbotProject(fn)
 
     def on_deactivated(self, view):
-        # Save to file. Also crude, but on_close is not reliable. (Fixed in ST4)
+        ''' When focus/tab lost. '''
+        # Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (Fixed in ST4)
         v = view
         dump_view('EventListener.on_deactivated', v)
         sbot_project = get_project(v)
@@ -231,7 +249,6 @@ class WindowEvent(sublime_plugin.EventListener):
         if sbot_project is not None:
 
             sig_lines = []
-            highlights = [] # TODOC
 
             for row in get_signet_rows(v):
                 sig_lines.append(row + 1) # Adjust to 1-based
@@ -289,10 +306,10 @@ class ToggleSignetCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class NextSignetCommand(sublime_plugin.TextCommand):
-    ''' Navigate to signet in whole collection. TODOC Probably combine next and previous since they are similar. '''
+    ''' Navigate to signet in whole collection. TODOC2 Probably combine next and previous since they are similar. '''
 
     def run(self, edit):
-        # TODOC Probably should enable only if there are any signets in views or project.
+        # TODOC2 Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
@@ -353,7 +370,7 @@ class PreviousSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        # TODOC Probably should enable only if there are any signets in views or project.
+        # TODOC2 Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
@@ -427,27 +444,27 @@ class ClearSignetsCommand(sublime_plugin.TextCommand):
 class RenderHtmlCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        ##### Get prefs.
+        ''' Get prefs.'''
         html_font_size = settings.get('html_font_size', 12)
         html_font_face = settings.get('html_font_face', 'Consolas')
         html_plain_text = settings.get('html_plain_text', '#000000')
         html_background = settings.get('html_background', 'transparent')
         html_line_numbers = settings.get('html_line_numbers', True)
 
-        ##### Collect scope/style info.
+        ## Collect scope/style info.
         all_scopes = set() # All unique values
         scope_tokens = [] # One [(Region, scope)] per line
 
-        ##### Html style info.
+        ## Html style info.
         css1 = dict() # {selector:properties}
         css2 = dict() # {properties:selector}
         style_map = dict() # {scope:selector}
 
-        ##### Tokenize by scope.
+        ## Tokenize by scope.
         has_selection = len(v.sel()[0]) > 0
         selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-        for line_region in v.split_by_newlines(selreg): # TODOC Optimize using python splitlines()?
+        for line_region in v.split_by_newlines(selreg): # TODOC2 Optimize using python splitlines()?
             # line_num += 1
             line_tokens = [] # (Region, scope)
 
@@ -475,7 +492,7 @@ class RenderHtmlCommand(sublime_plugin.TextCommand):
 
             scope_tokens.append(line_tokens)
 
-        ##### Fix up styles and output css.
+        ## Fix up styles and output css.
         for scope in all_scopes:
             if scope == WHITESPACE:
                 pass # Ignore, treat as plain text.
@@ -503,16 +520,16 @@ class RenderHtmlCommand(sublime_plugin.TextCommand):
                         css2[props] = sel
                         style_map[scope] = sel
 
-        # Create css.
+        ## Create css.
         style_text = ""
         for k in css1.keys():
             style_text += '.{} {}\n'.format(k, css1[k])
 
-        ##### Content text.
+        ## Content text.
         content = []
         line_num = 1
 
-        # Iterate collected lines.
+        ## Iterate collected lines.
         gutter_size = math.ceil(math.log(len(scope_tokens), 10))
         padding = 1.4 + gutter_size * 0.5
 
@@ -537,7 +554,7 @@ class RenderHtmlCommand(sublime_plugin.TextCommand):
             content.append('</p>\n')
             line_num += 1
 
-        ##### Output html. Lang tag? <html lang="en">
+        ## Output html. Lang tag? <html lang="en">
         html1 = textwrap.dedent('''
             <!DOCTYPE html>
             <html>
@@ -572,7 +589,7 @@ class RenderHtmlCommand(sublime_plugin.TextCommand):
             </html>
             ''')
 
-        ##### Output. 
+        ## Output everything. 
         output_type = settings.get('html_output', 'new_file')
 
         if(output_type == 'clipboard'):
@@ -671,17 +688,12 @@ class ShowScopesCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class HighlightTextCommand(sublime_plugin.TextCommand): #TODOC persist these.
+class HighlightTextCommand(sublime_plugin.TextCommand): #TODOC1 persist these.
     ''' Parts borrowed from StyleToken.
-
     Apparently, regions added by v.add_regions() can not set the foreground color.
     By default they only color the background and with options they can also color the outline
     only or underline the region. Setting the foreground color is not supported.
     Also note that they are not added to scopes accessible by extract_scope(point).
-
-    add_regions(key, [regions], <scope>, <icon>, <flags>)
-    Add a set of regions to the view. If a set of regions already exists with the given key, they will be overwritten. 
-    The scope is used to source a color to draw the regions in, it should be the name of a scope, such as "comment" or "string".
     '''
 
     def run(self, edit):
