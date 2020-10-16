@@ -13,7 +13,8 @@ import sublime
 import sublime_plugin
 import Default.goto_line
 import time
-from collections import defaultdict
+# from collections import defaultdict
+import traceback
 
 
 ### Defs.
@@ -25,10 +26,8 @@ SIGNET_ICON = 'bookmark'
 # SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
 
-### Vars.
+### Vars - global accross all windows.
 settings = {}
-views_inited = set()
-highlight_slots = set()
 sbot_projects = {} # {window_id:SbotProject}
 
 
@@ -54,49 +53,63 @@ class SbotProject(object):
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
 
+        # Window state.
+        self.views_inited = set()
+        self.highlight_slots = set()
+
         # Unpack into our convenience collections.
-        self.signets = {} # {filename:[signet_rows]} # persisted row is 1-based, internally is 0-based (like ST)
-        self.highlights = {} # {filename:[{"token":"abc", "wholeword":true, "scope":"xyz"}]}
-
-    # "highlights": [
-    #     {
-    #         "filename": "C:\\Users\\cepth\\AppData\\Roaming\\Sublime Text 3\\Packages\\SublimeBagOfTricks\\test\\tt.cs",
-    #         "tokens": [
-    #             { "token":"int", "wholeword":true, "scope":"xyz" },
-    #             { "token":"void", "wholeword":true, "scope":"xyz" },
-    #         ]
-    #     }
-    # ]
-
-
+        # {filename:[rows]} # persisted row is 1-based, internally is 0-based (like ST)
+        self.signets = {}
+        # {filename:[tokens]}  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
+        self.highlights = {} #TODOC1 debug persistence
 
         try:
             with open(self.fn, 'r') as fp:
                 values = json.load(fp)
-                for sig in values['signets']:
-                    self.signets[sig['filename']] = sig['rows']
+
+                if 'signets' in values:
+                    for sig in values['signets']:
+                        self.signets[sig['filename']] = sig['rows']
+
+                if 'highlights' in values:
+                    for hl in values['highlights']:
+                        self.highlights[hl['filename']] = hl['tokens']
+
         except FileNotFoundError as e:
             # Assumes new file.
             sublime.status_message('Creating new sbot project file')
+
         except:
-            e, v, t = sys.exc_info() # (type, value, traceback)
-            sublime.error_message('bad thing! {} {} {}'.format(e, v, t))
+            s = 'bad thing!' + traceback.format_exc()
+            # print(s)
+            sublime.error_message(s)
 
     def save(self):
         try:
             sigs = []
+            highlights = []
+
             for filename, rows in self.signets.items():
                 if len(rows) > 0:
                     if os.path.exists(filename): # last check
                         sigs.append({'filename': filename, 'rows': rows})
+
+            for filename, tokens in self.highlights.items():
+                if len(tokens) > 0:
+                    if os.path.exists(filename): # last check
+                        highlights.append({'filename': filename, 'tokens': tokens})
+
             values = {}
             values['signets'] = sigs
+            values['highlights'] = highlights
 
             with open(self.fn+'xxx', 'w') as fp:
                 json.dump(values, fp, indent=4)
+
         except:
-            e, v, t = sys.exc_info() # (type, value, traceback)
-            sublime.error_message('bad thing! {} {} {}'.format(e, v, t))
+            s = 'bad thing!' + traceback.format_exc()
+            # print(s)
+            sublime.error_message(s)
 
     def dump(self):
         for filename, rows in self.signets.items():
@@ -194,18 +207,45 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         v = self.view
         dump_view('ViewEventListener.on_activated', v)
 
-        # If this is the first time through and project has signets for this file, set them all.
-        if not v.id() in views_inited:
-            sproj = get_project(v)
-            if sproj is not None and v.file_name() in sproj.signets:
+        # If this is the first time through and project has signets and/or highlights for this file, set them all.
+        sproj = get_project(v)
+        if sproj is not None and not v.id() in sproj.views_inited:
+            if v.file_name() in sproj.signets:
                 scope = settings.get('signet_scope', 'comment')
                 regions = []
-                for r in sproj.signets.get(v.file_name(), []):
+                for row in sproj.signets.get(v.file_name(), []):
                     # A new signet.
-                    pt = v.text_point(r - 1, 0) # Adjust to 0-based
+                    pt = v.text_point(row - 1, 0) # Adjust to 0-based
                     regions.append(sublime.Region(pt, pt))
                 v.add_regions(SIGNET_REGION_NAME, regions, scope, SIGNET_ICON)
-            views_inited.add(v.id()) # Tag as initialized.
+
+            if v.file_name() in sproj.highlights:
+                mark_scopes = settings.get('mark_scopes')
+                which = 0
+                for tok in sproj.highlights.get(v.file_name(), []):
+                    print(tok)
+                    whole_word = tok['whole_word']
+                    scope = tok['scope']
+                    token = tok['token']
+                    escaped = re.escape(token)
+                    mark_regions = []
+
+                    if whole_word and escaped[0].isalnum():
+                        escaped = r'\b%s\b' % escaped
+
+                    if not whole_word:
+                        mark_regions.extend(v.find_all(token, sublime.LITERAL))
+                    else:
+                        mark_regions.extend(v.find_all(escaped))
+
+                    scope = mark_scopes[which]
+                    v.erase_regions(HIGHLIGHT_REGION_NAME % which) # does this work?
+                    v.add_regions(HIGHLIGHT_REGION_NAME % which, mark_regions, scope)
+
+                    which += 1
+                    if which >= len(mark_scopes):
+                        break;
+
 
     # def on_deactivated(self):
     #     dump_view('ViewEventListener.on_deactivated', v)
@@ -688,73 +728,84 @@ class ShowScopesCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class HighlightTextCommand(sublime_plugin.TextCommand): #TODOC1 persist these.
-    ''' Parts borrowed from StyleToken.
-    Apparently, regions added by v.add_regions() can not set the foreground color.
-    By default they only color the background and with options they can also color the outline
-    only or underline the region. Setting the foreground color is not supported.
-    Also note that they are not added to scopes accessible by extract_scope(point).
+class HighlightTextCommand(sublime_plugin.TextCommand):
+    ''' Highlight specific words using scopes. Parts borrowed from StyleToken.
+    Persistence supported via sbot-project contaier.
+
+    Note: Regions added by v.add_regions() can not set the foreground color. The scope color is used
+    for the region background color. Also they are not available via extract_scope().
     '''
 
     def run(self, edit):
         v = self.view
-        # Find open slot.
-        which = -1
+        sproj = get_project(v)
 
+        # Find open slot in scope list.
+        which = -1
         for i in range(NUM_HIGHLIGHTS):
-            if i not in highlight_slots:
+            if i not in sproj.highlight_slots:
                 which = i
-                highlight_slots.add(i)
+                sproj.highlight_slots.add(i)
                 break;
 
         if which >= 0:
-            # Get the region.
+            # Get the regions.
             mark_regions = v.get_regions(HIGHLIGHT_REGION_NAME % which)
             tokens = set()
 
-            for region in v.sel():
-                whole_word = region.empty()
-                if whole_word:
-                    region = v.word(region)
-                    if region.empty():
-                        continue
-                        
-                literal = v.substr(region)
-                escaped = re.escape(literal)
+            # Get whole word or specific span.
+            region = v.sel()[0]
+            whole_word = region.empty()
+            if whole_word:
+                region = v.word(region)
+                # if region.empty():
+                #     continue
+                    
+            token = v.substr(region)
+            escaped = re.escape(token)
 
-                if whole_word and escaped[0].isalnum():
-                    escaped = r'\b%s\b' % escaped
+            if whole_word and escaped[0].isalnum():
+                escaped = r'\b%s\b' % escaped
 
-                tokens.add(escaped)
+            tokens.add(escaped)
 
             if len(tokens) == 1 and not whole_word:
-                mark_regions.extend(v.find_all(literal, sublime.LITERAL))
+                mark_regions.extend(v.find_all(token, sublime.LITERAL))
             elif len(tokens) > 0:
                 mark_regions.extend(v.find_all('|'.join(tokens)))
 
+            # Get the scope.
             mark_scopes = settings.get('mark_scopes')
             scope = mark_scopes[which]
             v.erase_regions(HIGHLIGHT_REGION_NAME % which) # does this work?
             v.add_regions(HIGHLIGHT_REGION_NAME % which, mark_regions, scope)
 
+            # Add to persistence.
+            if v.file_name() not in sproj.highlights:
+                sproj.highlights[v.file_name()] = {}
+            sproj.highlights[v.file_name()] = { "token": token, "whole_word": whole_word, "scope": scope }
+
 
 #-----------------------------------------------------------------------------------
 class ClearHighlightCommand(sublime_plugin.TextCommand):
-    ''' Clear all marks where the cursor is.'''
+    ''' Clear all marks where the cursor is. '''
 
     def run(self, edit):
-        # Locate specific region.
+        # Locate specific region, crudely.
         v = self.view
+        sproj = get_project(v)
+
         point = v.sel()[0].a
-        toremove = set()
-        for i in highlight_slots:
+        slots_to_remove = set()
+        for i in sproj.highlight_slots:
             for region in v.get_regions(HIGHLIGHT_REGION_NAME % i):
                 if region.contains(point):
                     v.erase_regions(HIGHLIGHT_REGION_NAME % i)
-                    toremove.add(i)
+                    slots_to_remove.add(i)
                     break;
-        for i in toremove:
-            highlight_slots.remove(i)
+        for i in slots_to_remove:
+            sproj.highlight_slots.remove(i)
+            # Remove from persistence.
 
 
 #-----------------------------------------------------------------------------------
@@ -763,9 +814,15 @@ class ClearAllHighlightCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
+        sproj = get_project(v)
+
         for i in range(NUM_HIGHLIGHTS):
             v.erase_regions(HIGHLIGHT_REGION_NAME % i)
-        highlight_slots.clear()
+        sproj.highlight_slots.clear()
+
+        # Remove from persistence.
+        if v.file_name() in sproj.highlights:
+            del sproj.highlights[v.file_name()]
 
 
 #-----------------------------------------------------------------------------------
