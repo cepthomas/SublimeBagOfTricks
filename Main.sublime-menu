@@ -9,10 +9,10 @@
                 "caption": "Signets",
                 "children":
                 [
-                    { "command": "toggle_signet" },
-                    { "command": "next_signet" },
-                    { "command": "previous_signet" },
-                    { "command": "clear_signets" },
+                    { "command": "sbot_toggle_signet" },
+                    { "command": "sbot_next_signet" },
+                    { "command": "sbot_previous_signet" },
+                    { "command": "sbot_clear_signets" },
                 ]
             },
         ]

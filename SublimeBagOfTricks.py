@@ -15,6 +15,8 @@ import Default.goto_line
 import time
 # from collections import defaultdict
 import traceback
+import subprocess
+
 
 
 ### Defs.
@@ -26,14 +28,101 @@ SIGNET_ICON = 'bookmark'
 # SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
 
-### Vars - global accross all windows.
+### Vars - global across all Windows.
 settings = {}
 sbot_projects = {} # {window_id:SbotProject}
 
 
 
+# ======================SideBarStuff=====================================
+# ======================SideBarStuff=====================================
+# ======================SideBarStuff=====================================
+
+
+
+
+# def get_dir(path):
+#     pass
+
+# names = (os.path.split(path)[1] for path in paths)
+
+# if os.path.isfile(path) or os.path.islink(path):
+#     self.num_files = self.num_files + 1
+#     if self.match_function(path):
+#         self.files.append(path)
+# elif os.path.isdir(path):
+#     for content in os.listdir(path):
+#         file = os.path.join(path, content)
+#         if os.path.isfile(file) or os.path.islink(file):
+    
+# subprocess.call(args, *, stdin=None, stdout=None, stderr=None, shell=False, cwd=None, timeout=None, **other_popen_kwargs)
+# subprocess.run(["ls", "-l"])
+# subprocess.run("exit 1")
+
+# wt [options] [command ; ]
+# wt -d starting-directory
+
+
+
 #-----------------------------------------------------------------------------------
-class TestTestTestCommand(sublime_plugin.TextCommand):
+class SbotSbCopyNameCommand(sublime_plugin.WindowCommand):
+
+    def run(self, paths):
+        names = (os.path.split(path)[1] for path in paths)
+        sublime.set_clipboard('\n'.join(names))
+
+
+#-----------------------------------------------------------------------------------
+class SbotSbCopyPathCommand(sublime_plugin.WindowCommand):
+
+    def run(self, paths):
+        sublime.set_clipboard('\n'.join(paths))
+
+
+#-----------------------------------------------------------------------------------
+class SbotSbTerminalCommand(sublime_plugin.WindowCommand):
+
+    def run(self, paths):
+        if len(paths) > 0:
+            dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+            # print('dir:', dir)
+            subprocess.call(['wt', '-d', dir])
+
+
+#-----------------------------------------------------------------------------------
+class SbotSbTreeCommand(sublime_plugin.WindowCommand):
+
+    def run(self, paths):
+        if len(paths) > 0:
+            dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+            subprocess.call(['tree', dir, '/a', '/f', '|', 'clip'], shell=True)
+
+
+#-----------------------------------------------------------------------------------
+class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
+
+    def run(self, paths):
+        subprocess.call(['chrome', paths[0]])#, shell=True)TODOC1  "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+
+    def is_visible(self, paths):
+        vis = False
+
+        if len(paths) > 0:
+            if os.path.isfile(paths[0]):
+                fn = os.path.split(paths[0])[1]
+                if '.html' in fn or 'htm.' in fn:
+                    vis = True
+        return vis
+
+# ========================================================================
+
+
+
+
+
+
+#-----------------------------------------------------------------------------------
+class SbotTestTestTestCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, all=False):
         # save_sbot_projects()
@@ -315,7 +404,7 @@ class WindowEvent(sublime_plugin.EventListener):
 
 
  #-----------------------------------------------------------------------------------
-class ToggleSignetCommand(sublime_plugin.TextCommand):
+class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
@@ -345,7 +434,7 @@ class ToggleSignetCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class NextSignetCommand(sublime_plugin.TextCommand):
+class SbotNextSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. TODOC2 Probably combine next and previous since they are similar. '''
 
     def run(self, edit):
@@ -406,7 +495,7 @@ class NextSignetCommand(sublime_plugin.TextCommand):
        
 
 #-----------------------------------------------------------------------------------
-class PreviousSignetCommand(sublime_plugin.TextCommand):
+class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
@@ -468,7 +557,7 @@ class PreviousSignetCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class ClearSignetsCommand(sublime_plugin.TextCommand):
+class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         sproj = get_project(self.view)
@@ -481,10 +570,11 @@ class ClearSignetsCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class RenderHtmlCommand(sublime_plugin.TextCommand):
+class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        ''' Get prefs.'''
+        v = self.view
+        # Get prefs.
         html_font_size = settings.get('html_font_size', 12)
         html_font_face = settings.get('html_font_face', 'Consolas')
         html_plain_text = settings.get('html_plain_text', '#000000')
@@ -647,7 +737,7 @@ class RenderHtmlCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class ShowScopesCommand(sublime_plugin.TextCommand):
+class SbotShowScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
 
     def run(self, edit):
@@ -728,7 +818,7 @@ class ShowScopesCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class HighlightTextCommand(sublime_plugin.TextCommand):
+class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     ''' Highlight specific words using scopes. Parts borrowed from StyleToken.
     Persistence supported via sbot-project contaier.
 
@@ -787,7 +877,7 @@ class HighlightTextCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class ClearHighlightCommand(sublime_plugin.TextCommand):
+class SbotClearHighlightCommand(sublime_plugin.TextCommand):
     ''' Clear all marks where the cursor is. '''
 
     def run(self, edit):
@@ -809,7 +899,7 @@ class ClearHighlightCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class ClearAllHighlightCommand(sublime_plugin.TextCommand):
+class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
     ''' Clear all marks where the cursor is.'''
 
     def run(self, edit):
@@ -826,7 +916,7 @@ class ClearAllHighlightCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class RenderMarkdownCommand(sublime_plugin.TextCommand):
+class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     ''' Turn md into html.'''
 
     def is_visible(self):
@@ -874,7 +964,7 @@ class RenderMarkdownCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SplitViewCommand(sublime_plugin.WindowCommand):
+class SbotSplitViewCommand(sublime_plugin.WindowCommand):
     ''' Toggles betweensplit file in new row.'''
 
     def run(self):
@@ -894,7 +984,7 @@ class SplitViewCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class OpenSiteCommand(sublime_plugin.ApplicationCommand):
+class SbotOpenSiteCommand(sublime_plugin.ApplicationCommand):
     ''' Open a web page. '''
 
     def run(self, url):

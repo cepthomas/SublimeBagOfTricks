@@ -14,7 +14,7 @@ associated with each scope.
 |:--------            |:-------     |
 | highlight_text      | blabla      |
 | clear_highlight     | blabla      |
-| clear_all_highlight | blabla      |
+| clear_all_highlights| blabla      |
 | show_scopes         | blabla      |
 
 
@@ -27,7 +27,7 @@ Simple render to html with styles for printing.
 | render_markdown     | blabla      |
 
 
-## Bookmarks
+## Signets (bookmarks)
 - Enhanced bookmarks: Persistence, next/prev across files.
 - New bookmarks. `Bookmark` and `mark` are already taken so I shall use `signet` which means in French:
     ```

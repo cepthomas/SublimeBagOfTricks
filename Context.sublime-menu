@@ -2,30 +2,26 @@
 [
     { "caption": "-" },
 
-    { "command": "test_test_test" },
+    { "command": "sbot_test_test_test" },
 
     { "caption": "-" },
 
-    { "command": "toggle_signet" },
-    { "command": "next_signet", },
-    { "command": "previous_signet", },
-    { "command": "clear_signets" },
+    { "command": "sbot_toggle_signet" },
+    { "command": "sbot_next_signet", },
+    { "command": "sbot_previous_signet", },
+    { "command": "sbot_clear_signets" },
 
     { "caption": "-" },
 
-    { "command": "show_scopes" },
-
-    { "command": "split_view" },
-
-    { "command": "render_html" },
-
-    { "command": "render_markdown" },
-
-    { "command": "show_scopes" },
+    { "command": "sbot_show_scopes" },
+    { "command": "sbot_split_view" },
+    { "command": "sbot_render_html" },
+    { "command": "sbot_render_markdown" },
+    { "command": "sbot_show_scopes" },
 
     { "caption": "-" },
 
-    { "command": "highlight_text" },
-    { "command": "clear_highlight" },
-    { "command": "clear_all_highlight" },
+    { "command": "sbot_highlight_text" },
+    { "command": "sbot_clear_highlight" },
+    { "command": "sbot_clear_all_highlights" },
 ]
