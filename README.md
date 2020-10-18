@@ -37,7 +37,7 @@ Simple render to html with styles, primarily for printing.
 | html_font_size           | For rendered html |
 | html_plain_text          | If you need to change the fg for plain (unstyled) text |
 | html_background          | If you need to change the bg color (not done automatically from color scheme) |
-| html_output              | One of: clipboard, new_file (view), default_file (original filenam + .html) |
+| html_output              | One of: clipboard, new_file (view), default_file (original filename + .html), default_file_open (default_file + show) |
 | html_line_numbers        | Optionally add line numbers |
 | md_font_face             | For rendered markdown |
 | md_font_size             | For rendered markdown |

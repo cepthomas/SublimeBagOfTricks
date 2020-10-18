@@ -142,3 +142,4 @@ dmypy.json
 *.sln
 .vs
 
+/old

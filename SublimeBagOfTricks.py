@@ -404,7 +404,7 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotNextSignetCommand(sublime_plugin.TextCommand):
-    ''' Navigate to signet in whole collection. TODOC2 Probably combine next and previous since they are similar. '''
+    ''' Navigate to signet in whole collection. TODOC2 Maybe combine next and previous since they are similar. '''
 
     def run(self, edit):
         # TODOC2 Probably should enable only if there are any signets in views or project.
@@ -468,7 +468,6 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        # TODOC2 Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
@@ -745,21 +744,23 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 def output_html(edit, view, content=[]):
     output_type = settings.get('html_output', 'new_file')
 
-    if(output_type == 'clipboard'):
+    if output_type == 'clipboard':
         sublime.set_clipboard("".join(content))
 
-    elif(output_type == 'new_file'):
+    elif output_type == 'new_file':
         new_view = sublime.active_window().new_file()
         new_view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
         new_view.insert(edit, 0, "".join(content))
 
-    elif(output_type == 'default_file'):
+    elif output_type == 'default_file' or output_type == 'default_file_open':
         if view.file_name() is None:
             sublime.error_message("Can't use html_output=default_file for unnamed files")
         else:
-            with open(view.file_name() + '.html', 'w') as file:
-                file.write("".join(content))
-        #TODOC2 open in browser?
+            hfile = view.file_name() + '.html'
+            with open(hfile, 'w') as f:
+                f.write("".join(content))
+                if output_type == 'default_file_open':
+                    webbrowser.open_new_tab(hfile)
 
 
 # =========================================================================
