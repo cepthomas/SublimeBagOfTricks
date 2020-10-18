@@ -35,14 +35,14 @@ sbot_projects = {} # {window_id:SbotProject}
 class SbotTestTestTestCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, all=False):
-        # save_sbot_projects()
+        # _save_sbot_projects()
         v = self.view
         w = self.view.window()
         # for sheet in w.sheets():
         #     print('sheet:', sheet)
         for view in w.views(): # These are in order L -> R.
             print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
-        get_project(v).dump() # These are not ordered like file.
+        _get_project(v).dump() # These are not ordered like file.
 
 
 #-----------------------------------------------------------------------------------
@@ -59,6 +59,94 @@ def plugin_loaded():
     # logging.info("=============================== log start =========================================================");
     # logging.info("ddir:" + ddir);
 
+
+# =========================================================================
+# ====================== SbotProject ======================================
+# =========================================================================
+
+#-----------------------------------------------------------------------------------
+class SbotProject(object):
+    ''' Container for persistence. '''
+
+    def __init__(self, project_fn):
+        self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
+
+        # Window state.
+        self.views_inited = set()
+        self.highlight_slots = set()
+
+        # Unpack into our convenience collections.
+        # {filename:[rows]} # persisted row is 1-based, internally is 0-based (like ST)
+        self.signets = {}
+        # {filename:[tokens]}  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
+        self.highlights = {}
+
+        try:
+            with open(self.fn, 'r') as fp:
+                values = json.load(fp)
+
+                if 'signets' in values:
+                    for sig in values['signets']:
+                        self.signets[sig['filename']] = sig['rows']
+
+                if 'highlights' in values:
+                    for hl in values['highlights']:
+                        self.highlights[hl['filename']] = hl['tokens']
+
+        except FileNotFoundError as e:
+            # Assumes new file.
+            sublime.status_message('Creating new sbot project file')
+
+        except:
+            s = 'bad thing!' + traceback.format_exc()
+            # print(s)
+            sublime.error_message(s)
+
+    def save(self):
+        try:
+            sigs = []
+            highlights = []
+            values = {}
+
+            for filename, rows in self.signets.items():
+                if len(rows) > 0:
+                    if os.path.exists(filename): # last check
+                        sigs.append({'filename': filename, 'rows': rows})
+            values['signets'] = sigs
+
+            for filename, tokens in self.highlights.items():
+                if len(tokens) > 0:
+                    if os.path.exists(filename): # last check
+                        highlights.append({'filename': filename, 'tokens': tokens})
+            values['highlights'] = highlights
+
+            with open(self.fn+'xxx', 'w') as fp: #TODOC fix xxx
+                json.dump(values, fp, indent=4)
+
+        except:
+            s = 'bad thing!' + traceback.format_exc()
+            sublime.error_message(s)
+
+    def dump(self):
+        for filename, rows in self.signets.items():
+            print('signet file:', filename, len(rows))
+
+
+#-----------------------------------------------------------------------------------
+def _save_sbot_projects():
+    ''' For rent. '''
+    for id in list(sbot_projects):
+        sbot_projects[id].save()
+
+
+#-----------------------------------------------------------------------------------
+def _get_project(view):
+    ''' Get the sbot project for the view. None if invalid. '''
+    sproj = None
+    id = view.window().id()
+    if id in sbot_projects:
+        sproj = sbot_projects[id]
+    return sproj
 
 # =========================================================================
 # ====================== SideBarStuff =====================================
@@ -116,99 +204,11 @@ class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
 
 
 # =========================================================================
-# ====================== SbotProject ======================================
-# =========================================================================
-
-#-----------------------------------------------------------------------------------
-class SbotProject(object):
-    ''' Container for persistence. '''
-
-    def __init__(self, project_fn):
-        self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
-
-        # Window state.
-        self.views_inited = set()
-        self.highlight_slots = set()
-
-        # Unpack into our convenience collections.
-        # {filename:[rows]} # persisted row is 1-based, internally is 0-based (like ST)
-        self.signets = {}
-        # {filename:[tokens]}  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
-        self.highlights = {} #TODOC debug persistence
-
-        try:
-            with open(self.fn, 'r') as fp:
-                values = json.load(fp)
-
-                if 'signets' in values:
-                    for sig in values['signets']:
-                        self.signets[sig['filename']] = sig['rows']
-
-                if 'highlights' in values:
-                    for hl in values['highlights']:
-                        self.highlights[hl['filename']] = hl['tokens']
-
-        except FileNotFoundError as e:
-            # Assumes new file.
-            sublime.status_message('Creating new sbot project file')
-
-        except:
-            s = 'bad thing!' + traceback.format_exc()
-            # print(s)
-            sublime.error_message(s)
-
-    def save(self):
-        try:
-            sigs = []
-            highlights = []
-            values = {}
-
-            for filename, rows in self.signets.items():
-                if len(rows) > 0:
-                    if os.path.exists(filename): # last check
-                        sigs.append({'filename': filename, 'rows': rows})
-            values['signets'] = sigs
-
-            for filename, tokens in self.highlights.items():
-                if len(tokens) > 0:
-                    if os.path.exists(filename): # last check
-                        highlights.append({'filename': filename, 'tokens': tokens})
-            values['highlights'] = highlights
-
-            with open(self.fn+'xxx', 'w') as fp: #TODOC fix xxx
-                json.dump(values, fp, indent=4)
-
-        except:
-            s = 'bad thing!' + traceback.format_exc()
-            sublime.error_message(s)
-
-    def dump(self):
-        for filename, rows in self.signets.items():
-            print('signet file:', filename, len(rows))
-
-
-#-----------------------------------------------------------------------------------
-def save_sbot_projects():
-    ''' For rent. '''
-    for id in list(sbot_projects):
-        sbot_projects[id].save()
-
-
-#-----------------------------------------------------------------------------------
-def get_project(view):
-    ''' Get the sbot project for the view. None if invalid. '''
-    sproj = None
-    id = view.window().id()
-    if id in sbot_projects:
-        sproj = sbot_projects[id]
-    return sproj
-
-# =========================================================================
 # ====================== Utilities ========================================
 # =========================================================================
 
 #-----------------------------------------------------------------------------------
-def dump_view(preamble, view):
+def _dump_view(preamble, view):
     ''' Helper util. '''
     s = []
     s.append('***')
@@ -236,10 +236,10 @@ def dump_view(preamble, view):
             
 
 #-----------------------------------------------------------------------------------
-def wait_load_file(view, line):
+def _wait_load_file(view, line):
     ''' Helper. '''
     if view.is_loading():
-        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # TODOC not forever...
+        sublime.set_timeout(lambda: _wait_load_file(view, line), 100) # TODOC not forever...
     else: # good to go
         view.run_command("goto_line", {"line": line})
 
@@ -255,10 +255,10 @@ class ViewEvent(sublime_plugin.ViewEventListener):
     def on_activated(self):
         ''' When focus/tab received. '''
         v = self.view
-        dump_view('ViewEventListener.on_activated', v)
+        _dump_view('ViewEventListener.on_activated', v)
 
         # If this is the first time through and project has signets and/or highlights for this file, set them all.
-        sproj = get_project(v)
+        sproj = _get_project(v)
         if sproj is not None and not v.id() in sproj.views_inited:
 
             # Process signets.
@@ -295,6 +295,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
                     v.erase_regions(HIGHLIGHT_REGION_NAME % which) # does this work?
                     v.add_regions(HIGHLIGHT_REGION_NAME % which, mark_regions, scope)
 
+                    sproj.highlight_slots.add(which)
                     which += 1
                     if which >= len(mark_scopes):
                         break;
@@ -313,7 +314,7 @@ class WindowEvent(sublime_plugin.EventListener):
 
     def on_activated(self, view):
         ''' When focus/tab received. '''
-        # dump_view('EventListener.on_activated', view) # Sometimes gets valid view with None file_name
+        # _dump_view('EventListener.on_activated', view) # Sometimes gets valid view with None file_name
 
         # This is kind of crude but there is no project_loaded event (ST4 does though...)
         global sbot_projects
@@ -328,13 +329,13 @@ class WindowEvent(sublime_plugin.EventListener):
         ''' When focus/tab lost. '''
         # Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (Fixed in ST4)
         v = view
-        # dump_view('EventListener.on_deactivated', v)
-        sbot_project = get_project(v)
+        # _dump_view('EventListener.on_deactivated', v)
+        sbot_project = _get_project(v)
 
         if sbot_project is not None:
             sig_lines = []
 
-            for row in get_signet_rows(v):
+            for row in _get_signet_rows(v):
                 sig_lines.append(row + 1) # Adjust to 1-based
 
             if len(sig_lines) > 0:
@@ -355,7 +356,7 @@ class WindowEvent(sublime_plugin.EventListener):
 # ====================== Signets ==========================================
 # =========================================================================
 
- #-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
 class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
@@ -367,7 +368,7 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
         signet_rows = []
 
         existing = False
-        for row in get_signet_rows(v):
+        for row in _get_signet_rows(v):
             if sel_row == row:
                 existing = True
             else:
@@ -398,7 +399,7 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
 
         # 1) If there's another bookmark below >>> goto it
         if not done:
-            sig_rows = get_signet_rows(v)
+            sig_rows = _get_signet_rows(v)
             for sr in sig_rows:
                 if sr > sel_row:
                     w.active_view().run_command("goto_line", {"line": sr + 1})
@@ -411,7 +412,7 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
 
             while not done and view_index < len(w.views()):
                 vv = w.views()[view_index]
-                sig_rows = get_signet_rows(vv)
+                sig_rows = _get_signet_rows(vv)
                 if(len(sig_rows) > 0):
                     w.focus_view(vv)
                     vv.run_command("goto_line", {"line": sig_rows[0] + 1})
@@ -422,12 +423,12 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
         # 3) Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet
         if not done:
             sig_files = []
-            sproj = get_project(self.view)
+            sproj = _get_project(self.view)
             if sproj is not None:
                 for sig_fn, sig_rows in sproj.signets.items():
                     if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
                         vv = w.open_file(sig_fn)
-                        sublime.set_timeout(lambda: wait_load_file(vv, sig_rows[0]), 10) # already 1-based in file
+                        sublime.set_timeout(lambda: _wait_load_file(vv, sig_rows[0]), 10) # already 1-based in file
                         w.focus_view(vv)
                         done = True
                         break
@@ -437,7 +438,7 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
             view_index = 0
             while not done and view_index < len(w.views()):
                 vv = w.views()[view_index]
-                sig_rows = get_signet_rows(vv)
+                sig_rows = _get_signet_rows(vv)
                 if(len(sig_rows) > 0):
                     w.focus_view(vv)
                     vv.run_command("goto_line", {"line": sig_rows[0] + 1})
@@ -458,7 +459,7 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
 
         # 1) If there's another bookmark above >>> goto it
         if not done:
-            sig_rows = get_signet_rows(v)
+            sig_rows = _get_signet_rows(v)
             sig_rows.reverse()
             for sr in sig_rows:
                 if sr < sel_row:
@@ -472,7 +473,7 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
 
             while not done and view_index >= 0:
                 vv = w.views()[view_index]
-                sig_rows = get_signet_rows(vv)
+                sig_rows = _get_signet_rows(vv)
                 if(len(sig_rows) > 0):
                     w.focus_view(vv)
                     vv.run_command("goto_line", {"line": sig_rows[-1] + 1})
@@ -483,12 +484,12 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
         # 3) Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet
         if not done:
             sig_files = []
-            sproj = get_project(self.view)
+            sproj = _get_project(self.view)
             if sproj is not None:
                 for sig_fn, sig_rows in sproj.signets.items():
                     if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
                         vv = w.open_file(sig_fn)
-                        sublime.set_timeout(lambda: wait_load_file(vv, sig_rows[-1]), 10) # already 1-based in file
+                        sublime.set_timeout(lambda: _wait_load_file(vv, sig_rows[-1]), 10) # already 1-based in file
                         w.focus_view(vv)
                         done = True
                         break
@@ -498,7 +499,7 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
             view_index = len(w.views()) - 1
             while not done and view_index >= 0:
                 vv = w.views()[view_index]
-                sig_rows = get_signet_rows(vv)
+                sig_rows = _get_signet_rows(vv)
                 if(len(sig_rows) > 0):
                     w.focus_view(vv)
                     vv.run_command("goto_line", {"line": sig_rows[-1] + 1})
@@ -511,7 +512,7 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
 class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        sproj = get_project(self.view)
+        sproj = _get_project(self.view)
         # clear persistence
         if sproj is not None:
             sproj.signets.clear()
@@ -521,7 +522,7 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def get_signet_rows(view):
+def _get_signet_rows(view):
     ''' Get all the signet row numbers in the view. Returns a sorted list. '''
     # Current signets in this view.
     sig_rows = []
@@ -686,7 +687,7 @@ class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
             </html>
             ''')
 
-        output_html(edit, v, [html1, style_text, html2, "".join(content), html3])
+        _output_html(edit, v, [html1, style_text, html2, "".join(content), html3])
 
 
 #-----------------------------------------------------------------------------------
@@ -720,11 +721,11 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
         content = '\n'.join(html)
 
-        output_html(edit, v, content)
+        _output_html(edit, v, content)
 
 
 #-----------------------------------------------------------------------------------
-def output_html(edit, view, content=[]):
+def _output_html(edit, view, content=[]):
     output_type = settings.get('html_output', 'new_file')
 
     if output_type == 'clipboard':
@@ -761,7 +762,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
-        sproj = get_project(v)
+        sproj = _get_project(v)
         mark_scopes = settings.get('mark_scopes')
 
         # Find open slot in scope list.
@@ -816,7 +817,7 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Locate specific region, crudely.
         v = self.view
-        sproj = get_project(v)
+        sproj = _get_project(v)
 
         point = v.sel()[0].a
         slots_to_remove = set()
@@ -837,7 +838,7 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
-        sproj = get_project(v)
+        sproj = _get_project(v)
         mark_scopes = settings.get('mark_scopes')
 
         for i in range(len(mark_scopes)):
@@ -940,18 +941,21 @@ class SbotSplitViewCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         lo = self.window.layout()
+        w = self.window
 
         if(len(lo['rows']) > 2):
             # Remove split.
-            self.window.run_command("focus_group", { "group": 1 } )
-            self.window.run_command("close_file")
-            self.window.run_command("set_layout", { "cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]] } )
+            w.run_command("focus_group", { "group": 1 } )
+            w.run_command("close_file")
+            w.run_command("set_layout", { "cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]] } )
         else:
             # Add split.
-            self.window.run_command("set_layout", { "cols": [0.0, 1.0], "rows": [0.0, 0.5, 1.0], "cells": [[0, 0, 1, 1], [0, 1, 1, 2]] } )
-            self.window.run_command("focus_group", { "group": 0 } )
-            self.window.run_command("clone_file")
-            self.window.run_command("move_to_group", { "group": 1 } )
+            sel_row, _ = w.active_view().rowcol(w.active_view().sel()[0].a) # current sel
+            w.run_command("set_layout", { "cols": [0.0, 1.0], "rows": [0.0, 0.5, 1.0], "cells": [[0, 0, 1, 1], [0, 1, 1, 2]] } )
+            w.run_command("focus_group", { "group": 0 } )
+            w.run_command("clone_file")
+            w.run_command("move_to_group", { "group": 1 } )
+            w.active_view().run_command("goto_line", {"line": sel_row})
 
 
 #-----------------------------------------------------------------------------------
