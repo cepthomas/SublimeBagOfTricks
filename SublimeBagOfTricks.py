@@ -18,7 +18,6 @@ import sublime_plugin
 # ====== Defs ========
 HIGHLIGHT_REGION_NAME = 'highlight_%d'
 SIGNET_REGION_NAME = 'signet'
-NUM_HIGHLIGHTS = 10
 WHITESPACE = '_ws'
 SIGNET_ICON = 'bookmark'  # 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
@@ -763,10 +762,11 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = self.view
         sproj = get_project(v)
+        mark_scopes = settings.get('mark_scopes')
 
         # Find open slot in scope list.
         which = -1
-        for i in range(NUM_HIGHLIGHTS):
+        for i in range(len(mark_scopes)):
             if i not in sproj.highlight_slots:
                 which = i
                 sproj.highlight_slots.add(i)
@@ -799,7 +799,6 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
                 mark_regions.extend(v.find_all('|'.join(tokens)))
 
             # Get the scope.
-            mark_scopes = settings.get('mark_scopes')
             scope = mark_scopes[which]
             v.erase_regions(HIGHLIGHT_REGION_NAME % which) # does this work?
             v.add_regions(HIGHLIGHT_REGION_NAME % which, mark_regions, scope)
@@ -839,8 +838,9 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = self.view
         sproj = get_project(v)
+        mark_scopes = settings.get('mark_scopes')
 
-        for i in range(NUM_HIGHLIGHTS):
+        for i in range(len(mark_scopes)):
             v.erase_regions(HIGHLIGHT_REGION_NAME % i)
         sproj.highlight_slots.clear()
 
