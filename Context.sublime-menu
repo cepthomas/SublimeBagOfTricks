@@ -3,25 +3,26 @@
     { "caption": "-" },
 
     { "command": "sbot_test_test_test" },
+    { "caption": "Split View", "command": "sbot_split_view" },
 
     { "caption": "-" },
 
-    { "command": "sbot_toggle_signet" },
-    { "command": "sbot_next_signet", },
-    { "command": "sbot_previous_signet", },
-    { "command": "sbot_clear_signets" },
+    { "caption": "Toggle Signet", "command": "sbot_toggle_signet" },
+    { "caption": "Next Signet", "command": "sbot_next_signet" },
+    { "caption": "Previous Signet", "command": "sbot_previous_signet" },
+    { "caption": "Clear All Signets", "command": "sbot_clear_signets" },
 
     { "caption": "-" },
 
-    { "command": "sbot_show_scopes" },
-    { "command": "sbot_split_view" },
-    { "command": "sbot_render_html" },
-    { "command": "sbot_render_markdown" },
-    { "command": "sbot_show_scopes" },
+    { "caption": "Higlight Text", "command": "sbot_highlight_text" },
+    { "caption": "Clear Highlight", "command": "sbot_clear_highlight" },
+    { "caption": "Clear All Highlights", "command": "sbot_clear_all_highlights" },
+    { "caption": "Show Scopes", "command": "sbot_show_scopes" },
 
     { "caption": "-" },
 
-    { "command": "sbot_highlight_text" },
-    { "command": "sbot_clear_highlight" },
-    { "command": "sbot_clear_all_highlights" },
+    { "caption": "Render Html", "command": "sbot_render_html" },
+    { "caption": "Render Markdown", "command": "sbot_render_markdown" },
+
+    { "caption": "-" },
 ]

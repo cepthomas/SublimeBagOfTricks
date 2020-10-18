@@ -14,8 +14,17 @@
     // One of: new_file, clipboard, default_file
     "html_output": "default_file",
 
-    // Optional.
+    // Optionally add line numbers.
     "html_line_numbers": true,
+
+    // If you need to change the bg color. Not done automatically from color scheme.
+    "md_background": "OldLace",
+
+    // For rendered html.
+    "md_font_face": "Calibri",
+
+    // For rendered html. Not sure what the units are.
+    "md_font_size": 14,
 
     // Scopes for marking text.
     "mark_scopes": [ "string", "constant.language", "comment", "markup.list.numbered", "variable.parameter", "invalid" ],

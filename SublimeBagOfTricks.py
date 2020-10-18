@@ -1,68 +1,70 @@
 import os
 import re
-import pdb
 import textwrap
 import math
-import uuid
 import json
 import webbrowser
-import sys
 import logging
 from html import escape
-import sublime
-import sublime_plugin
-import Default.goto_line
+# import Default.goto_line
 import time
-# from collections import defaultdict
 import traceback
 import subprocess
+import sublime
+import sublime_plugin
 
 
 
-### Defs.
+# ====== Defs ========
 HIGHLIGHT_REGION_NAME = 'highlight_%d'
 SIGNET_REGION_NAME = 'signet'
 NUM_HIGHLIGHTS = 10
 WHITESPACE = '_ws'
-SIGNET_ICON = 'bookmark'
-# SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
+SIGNET_ICON = 'bookmark'  # 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
 
-### Vars - global across all Windows.
-settings = {}
+# ====== Vars - global across all Windows ====
+settings = None  # Settings()
 sbot_projects = {} # {window_id:SbotProject}
 
 
+# =========================================================================
+# ====================== System stuff =====================================
+# =========================================================================
 
-# ======================SideBarStuff=====================================
-# ======================SideBarStuff=====================================
-# ======================SideBarStuff=====================================
+#-----------------------------------------------------------------------------------
+class SbotTestTestTestCommand(sublime_plugin.TextCommand):
 
-
-
-
-# def get_dir(path):
-#     pass
-
-# names = (os.path.split(path)[1] for path in paths)
-
-# if os.path.isfile(path) or os.path.islink(path):
-#     self.num_files = self.num_files + 1
-#     if self.match_function(path):
-#         self.files.append(path)
-# elif os.path.isdir(path):
-#     for content in os.listdir(path):
-#         file = os.path.join(path, content)
-#         if os.path.isfile(file) or os.path.islink(file):
-    
-# subprocess.call(args, *, stdin=None, stdout=None, stderr=None, shell=False, cwd=None, timeout=None, **other_popen_kwargs)
-# subprocess.run(["ls", "-l"])
-# subprocess.run("exit 1")
-
-# wt [options] [command ; ]
-# wt -d starting-directory
+    def run(self, edit, all=False):
+        # save_sbot_projects()
+        v = self.view
+        w = self.view.window()
+        # for sheet in w.sheets():
+        #     print('sheet:', sheet)
+        for view in w.views(): # These are in order L -> R.
+            print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
+        get_project(v).dump() # These are not ordered like file.
 
 
+#-----------------------------------------------------------------------------------
+def plugin_loaded():
+    ''' Initialize module stuff. '''
+    global settings
+    # Init logging.
+    ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
+    logf = ddir + r'\sbot_log.txt'
+    logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
+    logging.basicConfig(filename=logf, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
+    # logging.info("cwd:" + os.getcwd());
+    logging.info("=============================== log start =========================================================");
+    logging.info("ddir:" + ddir);
+
+    settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
+
+
+# =========================================================================
+# ====================== SideBarStuff =====================================
+# =========================================================================
 
 #-----------------------------------------------------------------------------------
 class SbotSbCopyNameCommand(sublime_plugin.WindowCommand):
@@ -102,7 +104,7 @@ class SbotSbTreeCommand(sublime_plugin.WindowCommand):
 class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
-        subprocess.call(['chrome', paths[0]])#, shell=True)TODOC1  "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+        webbrowser.open_new_tab(paths[0])
 
     def is_visible(self, paths):
         vis = False
@@ -110,30 +112,14 @@ class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
         if len(paths) > 0:
             if os.path.isfile(paths[0]):
                 fn = os.path.split(paths[0])[1]
-                if '.html' in fn or 'htm.' in fn:
+                if '.htm' in fn:
                     vis = True
         return vis
 
-# ========================================================================
 
-
-
-
-
-
-#-----------------------------------------------------------------------------------
-class SbotTestTestTestCommand(sublime_plugin.TextCommand):
-
-    def run(self, edit, all=False):
-        # save_sbot_projects()
-        v = self.view
-        w = self.view.window()
-        # for sheet in w.sheets():
-        #     print('sheet:', sheet)
-        for view in w.views(): # These are in order L -> R.
-            print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
-        get_project(v).dump() # These are not ordered like file.
-
+# =========================================================================
+# ====================== SbotProject ======================================
+# =========================================================================
 
 #-----------------------------------------------------------------------------------
 class SbotProject(object):
@@ -206,20 +192,24 @@ class SbotProject(object):
 
 
 #-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module stuff. '''
-    global settings
-    # Init logging.
-    ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
-    logf = ddir + r'\sbot_log.txt'
-    logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
-    logging.basicConfig(filename=logf, filemode='a', format=logformat, level=logging.INFO) ### mode a/w
-    # logging.info("cwd:" + os.getcwd());
-    logging.info("=============================== log start =========================================================");
-    logging.info("ddir:" + ddir);
+def save_sbot_projects():
+    ''' For rent. '''
+    for id in list(sbot_projects):
+        sbot_projects[id].save()
 
-    settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
+#-----------------------------------------------------------------------------------
+def get_project(view):
+    ''' Get the sbot project for the view. None if invalid. '''
+    sproj = None
+    id = view.window().id()
+    if id in sbot_projects:
+        sproj = sbot_projects[id]
+    return sproj
+
+# =========================================================================
+# ====================== Utilities ========================================
+# =========================================================================
 
 #-----------------------------------------------------------------------------------
 def dump_view(preamble, view):
@@ -250,35 +240,6 @@ def dump_view(preamble, view):
             
 
 #-----------------------------------------------------------------------------------
-def save_sbot_projects():
-    ''' For rent. '''
-    for id in list(sbot_projects):
-        sbot_projects[id].save()
-
-
-#-----------------------------------------------------------------------------------
-def get_project(view):
-    ''' Get the sbot project for the view. None if invalid. '''
-    sproj = None
-    id = view.window().id()
-    if id in sbot_projects:
-        sproj = sbot_projects[id]
-    return sproj
-
-
-#-----------------------------------------------------------------------------------
-def get_signet_rows(view):
-    ''' Get all the signet row numbers in the view. Returns a sorted list. '''
-    # Current signets in this view.
-    sig_rows = []
-    for reg in view.get_regions('signet'):
-        row, _ = view.rowcol(reg.a)
-        sig_rows.append(row)
-    sig_rows.sort()
-    return sig_rows
-
-
-#-----------------------------------------------------------------------------------
 def wait_load_file(view, line):
     ''' Helper. '''
     if view.is_loading():
@@ -286,6 +247,10 @@ def wait_load_file(view, line):
     else: # good to go
         view.run_command("goto_line", {"line": line})
 
+
+# =========================================================================
+# ====================== EventListeners ===================================
+# =========================================================================
 
 #-----------------------------------------------------------------------------------
 class ViewEvent(sublime_plugin.ViewEventListener):
@@ -402,6 +367,10 @@ class WindowEvent(sublime_plugin.EventListener):
     # def on_pre_close(self, view):
     #     dump_view('EventListener.on_pre_close', view)
 
+
+# =========================================================================
+# ====================== Signets ==========================================
+# =========================================================================
 
  #-----------------------------------------------------------------------------------
 class SbotToggleSignetCommand(sublime_plugin.TextCommand):
@@ -570,6 +539,22 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
+def get_signet_rows(view):
+    ''' Get all the signet row numbers in the view. Returns a sorted list. '''
+    # Current signets in this view.
+    sig_rows = []
+    for reg in view.get_regions('signet'):
+        row, _ = view.rowcol(reg.a)
+        sig_rows.append(row)
+    sig_rows.sort()
+    return sig_rows
+
+
+# =========================================================================
+# ====================== Rendering ========================================
+# =========================================================================
+
+#-----------------------------------------------------------------------------------
 class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
@@ -719,103 +704,67 @@ class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
             </html>
             ''')
 
-        ## Output everything. 
-        output_type = settings.get('html_output', 'new_file')
-
-        if(output_type == 'clipboard'):
-            sublime.set_clipboard(html1 + style_text + html2 + "".join(content) + html3)
-        elif(output_type == 'new_file'):
-            new_view = sublime.active_window().new_file()
-            new_view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
-            new_view.insert(edit, 0, html1 + style_text + html2 + "".join(content) + html3)
-        elif(output_type == 'default_file'):
-            if v.file_name() is None:
-                sublime.error_message("Can't use html_output=default_file for unnamed files")
-            else:
-                with open(v.file_name() + '.html', 'w') as file:
-                    file.write(html1 + style_text + html2 + "".join(content) + html3)
+        output_html(edit, v, [html1, style_text, html2, "".join(content), html3])
 
 
 #-----------------------------------------------------------------------------------
-class SbotShowScopesCommand(sublime_plugin.TextCommand):
-    ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
+class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
+    ''' Turn md into html.'''
+
+    def is_visible(self):
+        v = self.view
+        vis = False
+        fn = v.file_name()
+        if fn is not None:
+            vis = v.file_name().endswith('.md')
+        return vis
 
     def run(self, edit):
         v = self.view
-        style_text = []
-        content = []
-        scopes = ['entity.name', 'entity.other.inherited-class', 'entity.name.section', 'entity.name.tag', 'entity.other.attribute-name',
-            'variable', 'variable.language', 'variable.parameter', 'variable.function', 'constant', 'constant.numeric', 'constant.language',
-            'constant.character.escape', 'storage.type', 'storage.modifier', 'support', 'keyword', 'keyword.control', 'keyword.operator',
-            'keyword.declaration', 'string', 'comment', 'invalid', 'invalid.deprecated']
+        ##### Get prefs.
+        html_background = settings.get('md_background', 'transparent')
+        html_font_size = settings.get('md_font_size', 12)
+        html_font_face = settings.get('md_font_face', 'Arial')
+
+        html = []
+        html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
+        html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(html_background, html_font_face, html_font_size))
+        html.append("</style></head><body>")
+
+        html.append(v.substr(sublime.Region(0, v.size())))
+
+        html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
+        html.append("</body></html>")
+
+        content = '\n'.join(html)
+
+        output_html(edit, v, content)
 
 
-        ''' All primary scopes
-        scopes = ['comment.block', 'comment.block.documentation', 'comment.line', 'constant.character.escape', 'constant.language', 'constant.numeric',
-            'constant.numeric.complex', 'constant.numeric.complex.imaginary', 'constant.numeric.complex.real', 'constant.numeric.float',
-            'constant.numeric.float.binary', 'constant.numeric.float.decimal', 'constant.numeric.float.hexadecimal', 'constant.numeric.float.octal',
-            'constant.numeric.float.other', 'constant.numeric.integer', 'constant.numeric.integer.binary', 'constant.numeric.integer.decimal',
-            'constant.numeric.integer.hexadecimal', 'constant.numeric.integer.octal', 'constant.numeric.integer.other', 'constant.other',
-            'constant.other.placeholder', 'entity.name.class', 'entity.name.class.forward-decl', 'entity.name.constant', 'entity.name.enum',
-            'entity.name.function', 'entity.name.function.constructor', 'entity.name.function.destructor', 'entity.name.impl', 'entity.name.interface',
-            'entity.name.label', 'entity.name.namespace', 'entity.name.section', 'entity.name.struct', 'entity.name.tag', 'entity.name.trait',
-            'entity.name.type', 'entity.name.union', 'entity.other.attribute-name', 'entity.other.inherited-class', 'invalid.deprecated', 'invalid.illegal',
-            'keyword.control', 'keyword.control.conditional', 'keyword.control.import', 'keyword.declaration.class', 'keyword.declaration.enum', 
-            'keyword.declaration.function', 'keyword.declaration.impl', 'keyword.declaration.interface', 'keyword.declaration.struct', 
-            'keyword.declaration.trait', 'keyword.declaration.type', 'keyword.declaration.union', 'keyword.operator', 'keyword.operator.arithmetic', 
-            'keyword.operator.assignment', 'keyword.operator.bitwise', 'keyword.operator.logical', 'keyword.operator.word', 'keyword.other', 'markup.bold', 
-            'markup.deleted', 'markup.heading', 'markup.inserted', 'markup.italic', 'markup.list.numbered', 'markup.list.unnumbered', 'markup.other', 
-            'markup.quote', 'markup.raw.block', 'markup.raw.inline', 'markup.underline', 'markup.underline.link', 'punctuation.accessor', 
-            'punctuation.definition.annotation', 'punctuation.definition.comment', 'punctuation.definition.keyword', 'punctuation.definition.string.begin', 
-            'punctuation.definition.string.end', 'punctuation.definition.variable', 'punctuation.section.interpolation.begin', 
-            'punctuation.section.interpolation.end', 'punctuation.separator', 'punctuation.separator.continuation', 'punctuation.terminator', 'source', 
-            'source.language-suffix.embedded', 'storage.modifier', 'storage.type', 'storage.type', 'storage.type.class', 'storage.type.enum', 
-            'storage.type.function', 'storage.type.impl', 'storage.type.interface', 'storage.type.struct', 'storage.type.trait', 'storage.type.union', 
-            'string.quoted.double', 'string.quoted.other', 'string.quoted.single', 'string.quoted.triple', 'string.regexp', 'string.unquoted', 'support.class', 
-            'support.constant', 'support.function', 'support.module', 'support.type', 'text.html', 'text.xml', 'variable.annotation', 'variable.function', 
-            'variable.language', 'variable.other', 'variable.other.constant', 'variable.other.member', 'variable.other.readwrite', 'variable.parameter']
-        '''
+#-----------------------------------------------------------------------------------
+def output_html(edit, view, content=[]):
+    output_type = settings.get('html_output', 'new_file')
 
-        for scope in scopes:
-            style = v.style_for_scope(scope)
-            # print(scope, style)
-            props = '{{ color:{}; '.format(style['foreground'])
-            props2 = 'fg:{} '.format(style['foreground'])
-            if 'background' in style:
-                props += 'background-color:{}; '.format(style['background'])
-                props2 += 'bg:{} '.format(style['background'])
-            if style['bold']:
-                props += 'font-weight:bold; '
-                props2 += 'bold '
-            if style['italic']:
-                props += 'font-style:italic; '
-                props2 += 'italic '
-            props += '}'
+    if(output_type == 'clipboard'):
+        sublime.set_clipboard("".join(content))
 
-            i = len(style_text)
-            style_text.append('.st{} {}'.format(i, props))
-            content.append('<p><span class=st{}>{}  {}</span></p>'.format(i, scope, props2))
+    elif(output_type == 'new_file'):
+        new_view = sublime.active_window().new_file()
+        new_view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
+        new_view.insert(edit, 0, "".join(content))
 
-        # Output html.
-        html1 = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<style  type="text/css">\np {\nmargin: 0em;\nfont-family: Consolas;\nfont-size: 1.0em;\nbackground-color: transparent;\n}\n'
-        html2 = '</style>\n</head>\n<body>\n'
-        html3 = '</body>\n</html>\n'
-        # Could also: sublime.set_clipboard(html1 + '\n'.join(style_text) + html2 + '\n'.join(content) + html3)
+    elif(output_type == 'default_file'):
+        if view.file_name() is None:
+            sublime.error_message("Can't use html_output=default_file for unnamed files")
+        else:
+            with open(view.file_name() + '.html', 'w') as file:
+                file.write("".join(content))
+        #TODOC2 open in browser?
 
-        # Do popup
-        html = '''
-            <body>
-                <style>
-                    p {{ margin: 0em; }}
-                    {}
-                </style>
-                {}
-                {}
-            </body>
-        '''.format('\n'.join(style_text), '\n'.join(content), html3)
 
-        v.show_popup(html, max_width=512)
-
+# =========================================================================
+# ====================== Highlighting =====================================
+# =========================================================================
 
 #-----------------------------------------------------------------------------------
 class SbotHighlightTextCommand(sublime_plugin.TextCommand):
@@ -916,52 +865,89 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
-    ''' Turn md into html.'''
-
-    def is_visible(self):
-        v = self.view
-        vis = False
-        fn = v.file_name()
-        if fn is not None:
-            vis = v.file_name().endswith('.md')
-        return vis
+class SbotShowScopesCommand(sublime_plugin.TextCommand):
+    ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
 
     def run(self, edit):
         v = self.view
-        ##### Get prefs.
-        html_background = settings.get('html_background', 'transparent')
+        style_text = []
+        content = []
+        scopes = ['entity.name', 'entity.other.inherited-class', 'entity.name.section', 'entity.name.tag', 'entity.other.attribute-name',
+            'variable', 'variable.language', 'variable.parameter', 'variable.function', 'constant', 'constant.numeric', 'constant.language',
+            'constant.character.escape', 'storage.type', 'storage.modifier', 'support', 'keyword', 'keyword.control', 'keyword.operator',
+            'keyword.declaration', 'string', 'comment', 'invalid', 'invalid.deprecated']
 
-        html = []
-        html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
-        html.append("<style>body {{ background-color:{}; }}".format(html_background))
-        html.append("</style></head><body>")
 
-        html.append(v.substr(sublime.Region(0, v.size())))
+        ''' All primary scopes
+        scopes = ['comment.block', 'comment.block.documentation', 'comment.line', 'constant.character.escape', 'constant.language', 'constant.numeric',
+            'constant.numeric.complex', 'constant.numeric.complex.imaginary', 'constant.numeric.complex.real', 'constant.numeric.float',
+            'constant.numeric.float.binary', 'constant.numeric.float.decimal', 'constant.numeric.float.hexadecimal', 'constant.numeric.float.octal',
+            'constant.numeric.float.other', 'constant.numeric.integer', 'constant.numeric.integer.binary', 'constant.numeric.integer.decimal',
+            'constant.numeric.integer.hexadecimal', 'constant.numeric.integer.octal', 'constant.numeric.integer.other', 'constant.other',
+            'constant.other.placeholder', 'entity.name.class', 'entity.name.class.forward-decl', 'entity.name.constant', 'entity.name.enum',
+            'entity.name.function', 'entity.name.function.constructor', 'entity.name.function.destructor', 'entity.name.impl', 'entity.name.interface',
+            'entity.name.label', 'entity.name.namespace', 'entity.name.section', 'entity.name.struct', 'entity.name.tag', 'entity.name.trait',
+            'entity.name.type', 'entity.name.union', 'entity.other.attribute-name', 'entity.other.inherited-class', 'invalid.deprecated', 'invalid.illegal',
+            'keyword.control', 'keyword.control.conditional', 'keyword.control.import', 'keyword.declaration.class', 'keyword.declaration.enum', 
+            'keyword.declaration.function', 'keyword.declaration.impl', 'keyword.declaration.interface', 'keyword.declaration.struct', 
+            'keyword.declaration.trait', 'keyword.declaration.type', 'keyword.declaration.union', 'keyword.operator', 'keyword.operator.arithmetic', 
+            'keyword.operator.assignment', 'keyword.operator.bitwise', 'keyword.operator.logical', 'keyword.operator.word', 'keyword.other', 'markup.bold', 
+            'markup.deleted', 'markup.heading', 'markup.inserted', 'markup.italic', 'markup.list.numbered', 'markup.list.unnumbered', 'markup.other', 
+            'markup.quote', 'markup.raw.block', 'markup.raw.inline', 'markup.underline', 'markup.underline.link', 'punctuation.accessor', 
+            'punctuation.definition.annotation', 'punctuation.definition.comment', 'punctuation.definition.keyword', 'punctuation.definition.string.begin', 
+            'punctuation.definition.string.end', 'punctuation.definition.variable', 'punctuation.section.interpolation.begin', 
+            'punctuation.section.interpolation.end', 'punctuation.separator', 'punctuation.separator.continuation', 'punctuation.terminator', 'source', 
+            'source.language-suffix.embedded', 'storage.modifier', 'storage.type', 'storage.type', 'storage.type.class', 'storage.type.enum', 
+            'storage.type.function', 'storage.type.impl', 'storage.type.interface', 'storage.type.struct', 'storage.type.trait', 'storage.type.union', 
+            'string.quoted.double', 'string.quoted.other', 'string.quoted.single', 'string.quoted.triple', 'string.regexp', 'string.unquoted', 'support.class', 
+            'support.constant', 'support.function', 'support.module', 'support.type', 'text.html', 'text.xml', 'variable.annotation', 'variable.function', 
+            'variable.language', 'variable.other', 'variable.other.constant', 'variable.other.member', 'variable.other.readwrite', 'variable.parameter']
+        '''
 
-        html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
-        html.append("</body></html>")
+        for scope in scopes:
+            style = v.style_for_scope(scope)
+            # print(scope, style)
+            props = '{{ color:{}; '.format(style['foreground'])
+            props2 = 'fg:{} '.format(style['foreground'])
+            if 'background' in style:
+                props += 'background-color:{}; '.format(style['background'])
+                props2 += 'bg:{} '.format(style['background'])
+            if style['bold']:
+                props += 'font-weight:bold; '
+                props2 += 'bold '
+            if style['italic']:
+                props += 'font-style:italic; '
+                props2 += 'italic '
+            props += '}'
 
-        content = '\n'.join(html)
+            i = len(style_text)
+            style_text.append('.st{} {}'.format(i, props))
+            content.append('<p><span class=st{}>{}  {}</span></p>'.format(i, scope, props2))
 
-        ##### Output. 
-        output_type = settings.get('html_output', 'new_file')
+        # Output html.
+        html1 = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<style  type="text/css">\np {\nmargin: 0em;\nfont-family: Consolas;\nfont-size: 1.0em;\nbackground-color: transparent;\n}\n'
+        html2 = '</style>\n</head>\n<body>\n'
+        html3 = '</body>\n</html>\n'
+        # Could also: sublime.set_clipboard(html1 + '\n'.join(style_text) + html2 + '\n'.join(content) + html3)
 
-        if(output_type == 'clipboard'):
-            sublime.set_clipboard(content)
-        elif(output_type == 'new_file'):
-            new_view = sublime.active_window().new_file()
-            new_view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
-            new_view.insert(edit, 0, content)
-        elif(output_type == 'default_file'):
-            if v.file_name() is None:
-                sublime.error_message("Can't use html_output=default_file for unnamed files")
-            else:
-                with open(v.file_name() + '.html', 'w') as file:
-                    file.write(content)
+        # Do popup
+        html = '''
+            <body>
+                <style>
+                    p {{ margin: 0em; }}
+                    {}
+                </style>
+                {}
+                {}
+            </body>
+        '''.format('\n'.join(style_text), '\n'.join(content), html3)
 
-        # Process.Start(fn);
+        v.show_popup(html, max_width=512)
 
+
+# =========================================================================
+# ====================== Misc commands ====================================
+# =========================================================================
 
 #-----------------------------------------------------------------------------------
 class SbotSplitViewCommand(sublime_plugin.WindowCommand):
@@ -991,8 +977,10 @@ class SbotOpenSiteCommand(sublime_plugin.ApplicationCommand):
         webbrowser.open_new_tab(url)
 
 
-#-----------------------------------------------------------------------------------
-# Holding tank for a bunch of examples and extras.
+# =========================================================================
+# ====================== Holding tank examples ============================
+# =========================================================================
+
 #-----------------------------------------------------------------------------------
 class SbotExUserInputCommand(sublime_plugin.TextCommand):
     ''' Command: Get input from user. sbot_ex_user_input
