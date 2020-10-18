@@ -50,16 +50,15 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
 def plugin_loaded():
     ''' Initialize module stuff. '''
     global settings
-    # Init logging.
-    ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
-    logf = ddir + r'\sbot_log.txt'
-    logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
-    logging.basicConfig(filename=logf, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
-    # logging.info("cwd:" + os.getcwd());
-    logging.info("=============================== log start =========================================================");
-    logging.info("ddir:" + ddir);
-
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
+
+    # # Init logging.
+    # ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
+    # logf = ddir + r'\sbot_log.txt'
+    # logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
+    # logging.basicConfig(filename=logf, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
+    # logging.info("=============================== log start =========================================================");
+    # logging.info("ddir:" + ddir);
 
 
 # =========================================================================
@@ -136,7 +135,7 @@ class SbotProject(object):
         # {filename:[rows]} # persisted row is 1-based, internally is 0-based (like ST)
         self.signets = {}
         # {filename:[tokens]}  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
-        self.highlights = {} #TODOC1 debug persistence
+        self.highlights = {} #TODOC debug persistence
 
         try:
             with open(self.fn, 'r') as fp:
@@ -163,27 +162,25 @@ class SbotProject(object):
         try:
             sigs = []
             highlights = []
+            values = {}
 
             for filename, rows in self.signets.items():
                 if len(rows) > 0:
                     if os.path.exists(filename): # last check
                         sigs.append({'filename': filename, 'rows': rows})
+            values['signets'] = sigs
 
             for filename, tokens in self.highlights.items():
                 if len(tokens) > 0:
                     if os.path.exists(filename): # last check
                         highlights.append({'filename': filename, 'tokens': tokens})
-
-            values = {}
-            values['signets'] = sigs
             values['highlights'] = highlights
 
-            with open(self.fn+'xxx', 'w') as fp:
+            with open(self.fn+'xxx', 'w') as fp: #TODOC fix xxx
                 json.dump(values, fp, indent=4)
 
         except:
             s = 'bad thing!' + traceback.format_exc()
-            # print(s)
             sublime.error_message(s)
 
     def dump(self):
@@ -243,7 +240,7 @@ def dump_view(preamble, view):
 def wait_load_file(view, line):
     ''' Helper. '''
     if view.is_loading():
-        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # TODOC2 not forever...
+        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # TODOC not forever...
     else: # good to go
         view.run_command("goto_line", {"line": line})
 
@@ -264,6 +261,8 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         # If this is the first time through and project has signets and/or highlights for this file, set them all.
         sproj = get_project(v)
         if sproj is not None and not v.id() in sproj.views_inited:
+
+            # Process signets.
             if v.file_name() in sproj.signets:
                 scope = settings.get('signet_scope', 'comment')
                 regions = []
@@ -273,6 +272,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
                     regions.append(sublime.Region(pt, pt))
                 v.add_regions(SIGNET_REGION_NAME, regions, scope, SIGNET_ICON)
 
+            # Process highlights.
             if v.file_name() in sproj.highlights:
                 mark_scopes = settings.get('mark_scopes')
                 which = 0
@@ -302,19 +302,10 @@ class ViewEvent(sublime_plugin.ViewEventListener):
 
 
     # def on_deactivated(self):
-    #     dump_view('ViewEventListener.on_deactivated', v)
-
     # def on_new(self): # When creating new window -> ctrl-shift-n
-    #     dump_view('ViewEventListener.on_new', self.view)
-
     # def on_load(self): # When user opens file (not from persistence at start up!)
-    #     dump_view('ViewEventListener.on_load', self.view)
-
     # def on_close(self): # 
-    #     dump_view('ViewEventListener.on_close', self.view)
-
     # def on_pre_close(self):
-    #     dump_view('ViewEventListener.on_pre_close', v)
 
 
 #-----------------------------------------------------------------------------------
@@ -323,7 +314,8 @@ class WindowEvent(sublime_plugin.EventListener):
 
     def on_activated(self, view):
         ''' When focus/tab received. '''
-        dump_view('EventListener.on_activated', view) # Sometimes gets valid view with None file_name
+        # dump_view('EventListener.on_activated', view) # Sometimes gets valid view with None file_name
+
         # This is kind of crude but there is no project_loaded event (ST4 does though...)
         global sbot_projects
         id = view.window().id()
@@ -337,11 +329,10 @@ class WindowEvent(sublime_plugin.EventListener):
         ''' When focus/tab lost. '''
         # Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (Fixed in ST4)
         v = view
-        dump_view('EventListener.on_deactivated', v)
+        # dump_view('EventListener.on_deactivated', v)
         sbot_project = get_project(v)
 
         if sbot_project is not None:
-
             sig_lines = []
 
             for row in get_signet_rows(v):
@@ -356,16 +347,9 @@ class WindowEvent(sublime_plugin.EventListener):
             sbot_project.save()
 
     # def on_new(self, view): # When creating new window -> ctrl-shift-n
-    #     dump_view('EventListener.on_new', view)
-
     # def on_load(self, view): # When user opens file (not from persistence at start up!)
-    #     dump_view('EventListener.on_load', view)
-
     # def on_close(self, view):
-    #     dump_view('EventListener.on_close', view)
-
     # def on_pre_close(self, view):
-    #     dump_view('EventListener.on_pre_close', view)
 
 
 # =========================================================================
@@ -404,10 +388,10 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotNextSignetCommand(sublime_plugin.TextCommand):
-    ''' Navigate to signet in whole collection. TODOC2 Maybe combine next and previous since they are similar. '''
+    ''' Navigate to signet in whole collection. TODOC Maybe combine next and previous since they are similar. '''
 
     def run(self, edit):
-        # TODOC2 Probably should enable only if there are any signets in views or project.
+        # TODOC Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
@@ -578,7 +562,7 @@ class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
         has_selection = len(v.sel()[0]) > 0
         selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-        for line_region in v.split_by_newlines(selreg): # TODOC2 Optimize using python splitlines()?
+        for line_region in v.split_by_newlines(selreg): # TODOC Optimize using python splitlines()?
             # line_num += 1
             line_tokens = [] # (Region, scope)
 
