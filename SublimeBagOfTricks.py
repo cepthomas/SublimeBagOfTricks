@@ -261,11 +261,25 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         v = self.view
         _dump_view('ViewEventListener.on_activated', v)
 
-        # If this is the first time through and project has signets and/or highlights for this file, set them all.
-        sproj = _get_project(v)
-        if sproj is not None and not v.id() in sproj.views_inited:
+        # This is kind of crude but there is no project_loaded event (ST4 does though...)
+        sproj = None
+        global sbot_projects
+        id = v.window().id()
+        # Check for already loaded.
+        if not id in sbot_projects:
+            fn = v.window().project_file_name()
+            # Load the project file.
+            sproj = SbotProject(fn)
+            sbot_projects[id] = sproj
+        else:
+            sproj = sbot_projects[id]
 
-            # Process signets. ###############TODOX########################################################################
+
+
+        # If this is the first time through and project has signets and/or highlights for this file, set them all.
+        if v.id() not in sproj.views_inited:
+
+            # Process signets. ############### TODOX ########################################################################
             if v.file_name() in sproj.signets:
                 scope = settings.get('signet_scope', 'comment')
                 regions = []
@@ -275,11 +289,11 @@ class ViewEvent(sublime_plugin.ViewEventListener):
                     regions.append(sublime.Region(pt, pt))
                 v.add_regions(SIGNET_REGION_NAME, regions, scope, SIGNET_ICON)
 
-            # Process highlights. ################TODOX#######################################################################
+            # Process highlights. ################ TODOX #######################################################################
             if v.file_name() in sproj.highlights:
                 mark_scopes = settings.get('mark_scopes')
                 which = 0
-                for tok in sproj.highlights.get(v.file_name(), []):
+                for tok in sproj.highlights.get(v.file_name(), {}):
                     # print(tok)
                     whole_word = tok['whole_word']
                     scope = tok['scope']
@@ -304,35 +318,10 @@ class ViewEvent(sublime_plugin.ViewEventListener):
                     if which >= len(mark_scopes):
                         break;
 
-
-    # def on_deactivated(self):
-    # def on_new(self): # When creating new window -> ctrl-shift-n
-    # def on_load(self): # When user opens file (not from persistence at start up!)
-    # def on_close(self): # 
-    # def on_pre_close(self):
-
-
-#-----------------------------------------------------------------------------------
-class WindowEvent(sublime_plugin.EventListener): #####################TODOX##################################################################
-    ''' Listener. '''
-
-    def on_activated(self, view):
-        ''' When focus/tab received. '''
-        # _dump_view('EventListener.on_activated', view) # Sometimes gets valid view with None file_name
-
-        # This is kind of crude but there is no project_loaded event (ST4 does though...)
-        global sbot_projects
-        id = view.window().id()
-        # Check for already loaded.
-        if not id in sbot_projects:
-            fn = view.window().project_file_name()
-            # Load the project file.
-            sbot_projects[id] = SbotProject(fn)
-
-    def on_deactivated(self, view):
+    def on_deactivated(self):
         ''' When focus/tab lost. '''
         # Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (Fixed in ST4)
-        v = view
+        v = self.view
         # _dump_view('EventListener.on_deactivated', v)
         sbot_project = _get_project(v)
 
@@ -350,10 +339,11 @@ class WindowEvent(sublime_plugin.EventListener): #####################TODOX#####
             # Save the project file.
             sbot_project.save()
 
-    # def on_new(self, view): # When creating new window -> ctrl-shift-n
-    # def on_load(self, view): # When user opens file (not from persistence at start up!)
-    # def on_close(self, view):
-    # def on_pre_close(self, view):
+
+    # def on_new(self): # When creating new window -> ctrl-shift-n
+    # def on_load(self): # When user opens file (not from persistence at start up!)
+    # def on_close(self): # 
+    # def on_pre_close(self):
 
 
 # =========================================================================
