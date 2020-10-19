@@ -14,7 +14,19 @@
 
     { "caption": "-" },
 
-    { "caption": "Higlight Text", "command": "sbot_highlight_text" },
+    {
+        "caption": "Highlight",
+        "children":
+        [
+            { "caption": "HL 1", "command": "sbot_highlight_text", "args" : {"hl_index" : 0} },
+            { "caption": "HL 2", "command": "sbot_highlight_text", "args" : {"hl_index" : 1} },
+            { "caption": "HL 3", "command": "sbot_highlight_text", "args" : {"hl_index" : 2} },
+            { "caption": "HL 4", "command": "sbot_highlight_text", "args" : {"hl_index" : 3} },
+            { "caption": "HL 5", "command": "sbot_highlight_text", "args" : {"hl_index" : 4} }
+        ]
+    },
+
+    // { "caption": "Higlight Text", "command": "sbot_highlight_text" },
     { "caption": "Clear Highlight", "command": "sbot_clear_highlight" },
     { "caption": "Clear All Highlights", "command": "sbot_clear_all_highlights" },
     { "caption": "Show Scopes", "command": "sbot_show_scopes" },
@@ -25,4 +37,13 @@
     { "caption": "Render Markdown", "command": "sbot_render_markdown" },
 
     { "caption": "-" },
+
+    {
+        "caption": "Extras",
+        "children":
+        [
+            { "command": "sbot_ex_list_select" },
+            { "command": "sbot_ex_menu" }
+        ]
+    }
 ]

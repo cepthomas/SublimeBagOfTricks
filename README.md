@@ -13,14 +13,14 @@ associated with each scope.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_highlight_text      | Highlight text using next in mark_scopes |
+| sbot_highlight_text      | Highlight text using next in highlight_scopes |
 | sbot_clear_highlight     | Remove highlight in selection |
 | sbot_clear_all_highlights| Remove all highlights |
 | sbot_show_scopes         | Popup that shows style for scopes |
 
 | Setting                  | Description |
 |:--------                 |:-------     |
-| mark_scopes              | List of scopes for marking text |
+| highlight_scopes         | List of scopes for marking text |
 
 
 ## Render To Html
