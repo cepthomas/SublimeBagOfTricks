@@ -23,8 +23,8 @@ SIGNET_ICON = 'bookmark'  # 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
 
 # ====== Vars - global across all Windows ====
-settings = None  # Settings()
-sbot_projects = {} # {window_id:SbotProject}
+settings = None
+sbot_projects = {} # k:window_id v:SbotProject
 
 
 # =========================================================================
@@ -42,7 +42,7 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         #     print('sheet:', sheet)
         for view in w.views(): # These are in order L -> R.
             print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
-        _get_project(v).dump() # These are not ordered like file.
+        # _get_project(v).dump() # These are not ordered like file.
 
 
 #-----------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ def plugin_loaded():
     global settings
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
-    # # Init logging.
+    # Init logging.
     # ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
     # logf = ddir + r'\sbot_log.txt'
     # logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
@@ -65,20 +65,23 @@ def plugin_loaded():
 # =========================================================================
 
 #-----------------------------------------------------------------------------------
-class SbotProject(object):
+class SbotProject(object): #Make abstract? TODOX
     ''' Container for persistence. '''
 
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
 
-        # Window state.
+        # Need this because ST window/view lifecycle is unreliable.
         self.views_inited = set()
+
+        # Keep track of assigned highlight styles.
         self.highlight_slots = set()
 
         # Unpack into our convenience collections.
-        # {filename:[rows]} # persisted row is 1-based, internally is 0-based (like ST)
+        # k:filename v:[rows]  persisted row is 1-based, internally is 0-based (like ST)
         self.signets = {}
-        # {filename:[tokens]}  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
+
+        # k:filename v:[tokens]  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
         self.highlights = {}
 
         try:
@@ -114,7 +117,7 @@ class SbotProject(object):
                         sigs.append({'filename': filename, 'rows': rows})
             values['signets'] = sigs
 
-            for filename, tokens in self.highlights.items(): #TODOC save broken
+            for filename, tokens in self.highlights.items():
                 if len(tokens) > 0:
                     if os.path.exists(filename): # last check
                         highlights.append({'filename': filename, 'tokens': tokens})
@@ -127,14 +130,14 @@ class SbotProject(object):
             s = 'bad thing!' + traceback.format_exc()
             sublime.error_message(s)
 
-    def dump(self):
-        for filename, rows in self.signets.items():
-            print('signet file:', filename, len(rows))
+    # def dump(self):
+    #     for filename, rows in self.signets.items():
+    #         print('signet file:', filename, len(rows))
 
 
 #-----------------------------------------------------------------------------------
 def _save_sbot_projects():
-    ''' For rent. '''
+    ''' Save all projects to file. '''
     for id in list(sbot_projects):
         sbot_projects[id].save()
 
@@ -262,7 +265,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         sproj = _get_project(v)
         if sproj is not None and not v.id() in sproj.views_inited:
 
-            # Process signets.
+            # Process signets. ###############TODOX########################################################################
             if v.file_name() in sproj.signets:
                 scope = settings.get('signet_scope', 'comment')
                 regions = []
@@ -272,12 +275,12 @@ class ViewEvent(sublime_plugin.ViewEventListener):
                     regions.append(sublime.Region(pt, pt))
                 v.add_regions(SIGNET_REGION_NAME, regions, scope, SIGNET_ICON)
 
-            # Process highlights.
+            # Process highlights. ################TODOX#######################################################################
             if v.file_name() in sproj.highlights:
                 mark_scopes = settings.get('mark_scopes')
                 which = 0
                 for tok in sproj.highlights.get(v.file_name(), []):
-                    print(tok)
+                    # print(tok)
                     whole_word = tok['whole_word']
                     scope = tok['scope']
                     token = tok['token']
@@ -310,7 +313,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
 
 
 #-----------------------------------------------------------------------------------
-class WindowEvent(sublime_plugin.EventListener):
+class WindowEvent(sublime_plugin.EventListener): #####################TODOX##################################################################
     ''' Listener. '''
 
     def on_activated(self, view):
@@ -862,34 +865,33 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         scopes = ['entity.name', 'entity.other.inherited-class', 'entity.name.section', 'entity.name.tag', 'entity.other.attribute-name',
             'variable', 'variable.language', 'variable.parameter', 'variable.function', 'constant', 'constant.numeric', 'constant.language',
             'constant.character.escape', 'storage.type', 'storage.modifier', 'support', 'keyword', 'keyword.control', 'keyword.operator',
-            'keyword.declaration', 'string', 'comment', 'invalid', 'invalid.deprecated']
+            'keyword.declaration', 'string', 'comment', 'invalid', 'invalid.deprecated', 'markup.list']
 
 
-        ''' All primary scopes
-        scopes = ['comment.block', 'comment.block.documentation', 'comment.line', 'constant.character.escape', 'constant.language', 'constant.numeric',
-            'constant.numeric.complex', 'constant.numeric.complex.imaginary', 'constant.numeric.complex.real', 'constant.numeric.float',
-            'constant.numeric.float.binary', 'constant.numeric.float.decimal', 'constant.numeric.float.hexadecimal', 'constant.numeric.float.octal',
-            'constant.numeric.float.other', 'constant.numeric.integer', 'constant.numeric.integer.binary', 'constant.numeric.integer.decimal',
-            'constant.numeric.integer.hexadecimal', 'constant.numeric.integer.octal', 'constant.numeric.integer.other', 'constant.other',
-            'constant.other.placeholder', 'entity.name.class', 'entity.name.class.forward-decl', 'entity.name.constant', 'entity.name.enum',
-            'entity.name.function', 'entity.name.function.constructor', 'entity.name.function.destructor', 'entity.name.impl', 'entity.name.interface',
-            'entity.name.label', 'entity.name.namespace', 'entity.name.section', 'entity.name.struct', 'entity.name.tag', 'entity.name.trait',
-            'entity.name.type', 'entity.name.union', 'entity.other.attribute-name', 'entity.other.inherited-class', 'invalid.deprecated', 'invalid.illegal',
-            'keyword.control', 'keyword.control.conditional', 'keyword.control.import', 'keyword.declaration.class', 'keyword.declaration.enum', 
-            'keyword.declaration.function', 'keyword.declaration.impl', 'keyword.declaration.interface', 'keyword.declaration.struct', 
-            'keyword.declaration.trait', 'keyword.declaration.type', 'keyword.declaration.union', 'keyword.operator', 'keyword.operator.arithmetic', 
-            'keyword.operator.assignment', 'keyword.operator.bitwise', 'keyword.operator.logical', 'keyword.operator.word', 'keyword.other', 'markup.bold', 
-            'markup.deleted', 'markup.heading', 'markup.inserted', 'markup.italic', 'markup.list.numbered', 'markup.list.unnumbered', 'markup.other', 
-            'markup.quote', 'markup.raw.block', 'markup.raw.inline', 'markup.underline', 'markup.underline.link', 'punctuation.accessor', 
-            'punctuation.definition.annotation', 'punctuation.definition.comment', 'punctuation.definition.keyword', 'punctuation.definition.string.begin', 
-            'punctuation.definition.string.end', 'punctuation.definition.variable', 'punctuation.section.interpolation.begin', 
-            'punctuation.section.interpolation.end', 'punctuation.separator', 'punctuation.separator.continuation', 'punctuation.terminator', 'source', 
-            'source.language-suffix.embedded', 'storage.modifier', 'storage.type', 'storage.type', 'storage.type.class', 'storage.type.enum', 
-            'storage.type.function', 'storage.type.impl', 'storage.type.interface', 'storage.type.struct', 'storage.type.trait', 'storage.type.union', 
-            'string.quoted.double', 'string.quoted.other', 'string.quoted.single', 'string.quoted.triple', 'string.regexp', 'string.unquoted', 'support.class', 
-            'support.constant', 'support.function', 'support.module', 'support.type', 'text.html', 'text.xml', 'variable.annotation', 'variable.function', 
-            'variable.language', 'variable.other', 'variable.other.constant', 'variable.other.member', 'variable.other.readwrite', 'variable.parameter']
-        '''
+        # All primary scopes
+        # scopes = ['comment.block', 'comment.block.documentation', 'comment.line', 'constant.character.escape', 'constant.language', 'constant.numeric',
+        #     'constant.numeric.complex', 'constant.numeric.complex.imaginary', 'constant.numeric.complex.real', 'constant.numeric.float',
+        #     'constant.numeric.float.binary', 'constant.numeric.float.decimal', 'constant.numeric.float.hexadecimal', 'constant.numeric.float.octal',
+        #     'constant.numeric.float.other', 'constant.numeric.integer', 'constant.numeric.integer.binary', 'constant.numeric.integer.decimal',
+        #     'constant.numeric.integer.hexadecimal', 'constant.numeric.integer.octal', 'constant.numeric.integer.other', 'constant.other',
+        #     'constant.other.placeholder', 'entity.name.class', 'entity.name.class.forward-decl', 'entity.name.constant', 'entity.name.enum',
+        #     'entity.name.function', 'entity.name.function.constructor', 'entity.name.function.destructor', 'entity.name.impl', 'entity.name.interface',
+        #     'entity.name.label', 'entity.name.namespace', 'entity.name.section', 'entity.name.struct', 'entity.name.tag', 'entity.name.trait',
+        #     'entity.name.type', 'entity.name.union', 'entity.other.attribute-name', 'entity.other.inherited-class', 'invalid.deprecated', 'invalid.illegal',
+        #     'keyword.control', 'keyword.control.conditional', 'keyword.control.import', 'keyword.declaration.class', 'keyword.declaration.enum', 
+        #     'keyword.declaration.function', 'keyword.declaration.impl', 'keyword.declaration.interface', 'keyword.declaration.struct', 
+        #     'keyword.declaration.trait', 'keyword.declaration.type', 'keyword.declaration.union', 'keyword.operator', 'keyword.operator.arithmetic', 
+        #     'keyword.operator.assignment', 'keyword.operator.bitwise', 'keyword.operator.logical', 'keyword.operator.word', 'keyword.other', 'markup.bold', 
+        #     'markup.deleted', 'markup.heading', 'markup.inserted', 'markup.italic', 'markup.list.numbered', 'markup.list.unnumbered', 'markup.other', 
+        #     'markup.quote', 'markup.raw.block', 'markup.raw.inline', 'markup.underline', 'markup.underline.link', 'punctuation.accessor', 
+        #     'punctuation.definition.annotation', 'punctuation.definition.comment', 'punctuation.definition.keyword', 'punctuation.definition.string.begin', 
+        #     'punctuation.definition.string.end', 'punctuation.definition.variable', 'punctuation.section.interpolation.begin', 
+        #     'punctuation.section.interpolation.end', 'punctuation.separator', 'punctuation.separator.continuation', 'punctuation.terminator', 'source', 
+        #     'source.language-suffix.embedded', 'storage.modifier', 'storage.type', 'storage.type', 'storage.type.class', 'storage.type.enum', 
+        #     'storage.type.function', 'storage.type.impl', 'storage.type.interface', 'storage.type.struct', 'storage.type.trait', 'storage.type.union', 
+        #     'string.quoted.double', 'string.quoted.other', 'string.quoted.single', 'string.quoted.triple', 'string.regexp', 'string.unquoted', 'support.class', 
+        #     'support.constant', 'support.function', 'support.module', 'support.type', 'text.html', 'text.xml', 'variable.annotation', 'variable.function', 
+        #     'variable.language', 'variable.other', 'variable.other.constant', 'variable.other.member', 'variable.other.readwrite', 'variable.parameter']
 
         for scope in scopes:
             style = v.style_for_scope(scope)
