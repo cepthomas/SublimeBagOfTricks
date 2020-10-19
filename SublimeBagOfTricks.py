@@ -114,7 +114,7 @@ class SbotProject(object):
                         sigs.append({'filename': filename, 'rows': rows})
             values['signets'] = sigs
 
-            for filename, tokens in self.highlights.items():
+            for filename, tokens in self.highlights.items(): #TODOC save broken
                 if len(tokens) > 0:
                     if os.path.exists(filename): # last check
                         highlights.append({'filename': filename, 'tokens': tokens})
@@ -147,6 +147,7 @@ def _get_project(view):
     if id in sbot_projects:
         sproj = sbot_projects[id]
     return sproj
+
 
 # =========================================================================
 # ====================== SideBarStuff =====================================
