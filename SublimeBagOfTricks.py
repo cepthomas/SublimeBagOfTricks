@@ -6,7 +6,6 @@ import json
 import webbrowser
 import logging
 from html import escape
-# import Default.goto_line
 import time
 import traceback
 import subprocess
@@ -40,9 +39,37 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         w = self.view.window()
         # for sheet in w.sheets():
         #     print('sheet:', sheet)
-        for view in w.views(): # These are in order L -> R.
-            print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
+        # for view in w.views(): # These are in order L -> R.
+        #     print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
         # _get_project(v).dump() # These are not ordered like file.
+
+
+        # vals = []
+        # for i in range(100):
+        #     start = time.perf_counter()
+        #     selreg = sublime.Region(0, v.size())
+        #     for line_region in v.split_by_newlines(selreg):
+        #         pass
+        #     vals.append(time.perf_counter() - start)
+        #     # print(time.perf_counter() - start)
+        #     # use time.perf_counter or time.process_time instead
+        # print('split_by_newlines', sum(vals) / len(vals))
+
+        # vals = []
+        # for i in range(100):
+        #     start = time.perf_counter()
+        #     selreg = sublime.Region(0, v.size())
+        #     for s in v.substr(selreg):
+        #         pass
+        #     vals.append(time.perf_counter() - start)
+        # print('substr', sum(vals) / len(vals))
+
+        # split_by_newlines 0.002095901999994112
+        # substr 0.0007107040000050802
+        # split_by_newlines 0.002201611999987563
+        # substr 0.0006807069999990744
+        # split_by_newlines 0.002213284000006297
+        # substr 0.000633377999986351
 
 
 #-----------------------------------------------------------------------------------
@@ -84,11 +111,13 @@ class SbotProject(object):
 
                 if 'signets' in values:
                     for sig in values['signets']:
-                        self.signets[sig['filename']] = sig['rows']
+                        if os.path.exists(sig['filename']): # sanity check
+                            self.signets[sig['filename']] = sig['rows']
 
                 if 'highlights' in values:
                     for hl in values['highlights']:
-                        self.highlights[hl['filename']] = hl['tokens']
+                        if os.path.exists(sig['filename']): # sanity check
+                            self.highlights[hl['filename']] = hl['tokens']
 
         except FileNotFoundError as e:
             # Assumes new file.
@@ -106,14 +135,12 @@ class SbotProject(object):
 
             for filename, rows in self.signets.items():
                 if len(rows) > 0:
-                    if os.path.exists(filename): # last check
-                        sigs.append({'filename': filename, 'rows': rows})
+                    sigs.append({'filename': filename, 'rows': rows})
             values['signets'] = sigs
 
             for filename, tokens in self.highlights.items():
                 if len(tokens) > 0:
-                    if os.path.exists(filename): # last check
-                        highlights.append({'filename': filename, 'tokens': tokens})
+                    highlights.append({'filename': filename, 'tokens': tokens})
             values['highlights'] = highlights
 
             with open(self.fn, 'w') as fp:
@@ -226,7 +253,7 @@ def _dump_view(preamble, view):
 def _wait_load_file(view, line):
     ''' Helper. '''
     if view.is_loading():
-        sublime.set_timeout(lambda: _wait_load_file(view, line), 100) # TODOC not forever...
+        sublime.set_timeout(lambda: _wait_load_file(view, line), 100) # maybe not forever?
     else: # good to go
         view.run_command("goto_line", {"line": line})
 
@@ -305,7 +332,6 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
         v = self.view
         # Get current row.
         sel_row, _ = v.rowcol(v.sel()[0].a)
-        print('||||', sel_row)
         _toggle_signet(v, _get_signet_rows(v), sel_row)
 
 
@@ -314,7 +340,6 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. TODOC Maybe combine next and previous since they are similar. '''
 
     def run(self, edit):
-        # TODOC Probably should enable only if there are any signets in views or project.
         v = self.view
         w = self.view.window()
         done = False
@@ -369,6 +394,9 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
                 else:
                     view_index += 1
        
+
+    def is_enabled(self):
+        return len(_get_signet_rows(self.view)) > 0
 
 #-----------------------------------------------------------------------------------
 class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
@@ -430,6 +458,8 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
                 else:
                     view_index -= 1
 
+    def is_enabled(self):
+        return len(_get_signet_rows(self.view)) > 0
 
 #-----------------------------------------------------------------------------------
 class SbotClearSignetsCommand(sublime_plugin.TextCommand):
@@ -479,6 +509,7 @@ def _toggle_signet(view, rows, sel_row=-1):
     for r in signet_rows:
         pt = view.text_point(r, 0) # 0-based
         regions.append(sublime.Region(pt, pt))
+
     view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope', 'comment'), SIGNET_ICON)
 
 
@@ -513,7 +544,7 @@ class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
         has_selection = len(v.sel()[0]) > 0
         selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-        for line_region in v.split_by_newlines(selreg): # TODOC Optimize using python splitlines()?
+        for line_region in v.split_by_newlines(selreg): # TODOC s.splitlines() seems to be about 3x faster but would double memory use.
             # line_num += 1
             line_tokens = [] # (Region, scope)
 
