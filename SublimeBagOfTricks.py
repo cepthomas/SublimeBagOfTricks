@@ -16,8 +16,7 @@ import sublime_plugin
 
 
 # ====== Defs ========
-HIGHLIGHT_REGION_NAME = 'highlight_%d'
-# HIGHLIGHT_SLOT_NAME = 'highlight_slots'
+HIGHLIGHT_REGION_NAME = 'highlight_%s'
 SIGNET_REGION_NAME = 'signet'
 WHITESPACE = '_ws'
 SIGNET_ICON = 'bookmark'  # 'Packages/Theme - Default/common/label.png'
@@ -53,12 +52,12 @@ def plugin_loaded():
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
     # Init logging.
-    # ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
-    # logf = ddir + r'\sbot_log.txt'
-    # logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
-    # logging.basicConfig(filename=logf, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
-    # logging.info("=============================== log start =========================================================");
-    # logging.info("ddir:" + ddir);
+    ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
+    logf = ddir + r'\sbot_log.txt'
+    logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
+    logging.basicConfig(filename=logf, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
+    logging.info("=============================== log start =========================================================");
+    logging.info("ddir:" + ddir);
 
 
 # =========================================================================
@@ -66,7 +65,7 @@ def plugin_loaded():
 # =========================================================================
 
 #-----------------------------------------------------------------------------------
-class SbotProject(object): # Make abstract TODOX
+class SbotProject(object):
     ''' Container for persistence. '''
 
     def __init__(self, project_fn):
@@ -75,15 +74,9 @@ class SbotProject(object): # Make abstract TODOX
         # Need this because ST window/view lifecycle is unreliable.
         self.views_inited = set()
 
-        # # Keep track of assigned highlight styles. TODOC per view!!!
-        # self.highlight_slots = set()
-
         # Unpack into our convenience collections.
-        # k:filename v:[rows]  0-based (like ST)
-        self.signets = {}
-
-        # k:filename v:[tokens]  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
-        self.highlights = {}
+        self.signets = {}  # k:filename v:[rows]  0-based (like ST)
+        self.highlights = {}  # k:filename v:[tokens]  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
 
         try:
             with open(self.fn, 'r') as fp:
@@ -103,7 +96,6 @@ class SbotProject(object): # Make abstract TODOX
 
         except:
             s = 'bad thing!' + traceback.format_exc()
-            # print(s)
             sublime.error_message(s)
 
     def save(self):
@@ -124,16 +116,12 @@ class SbotProject(object): # Make abstract TODOX
                         highlights.append({'filename': filename, 'tokens': tokens})
             values['highlights'] = highlights
 
-            with open(self.fn+'xxx', 'w') as fp: #TODOC fix xxx
+            with open(self.fn, 'w') as fp:
                 json.dump(values, fp, indent=4)
 
         except:
             s = 'bad thing!' + traceback.format_exc()
             sublime.error_message(s)
-
-    # def dump(self):
-    #     for filename, rows in self.signets.items():
-    #         print('signet file:', filename, len(rows))
 
 
 #-----------------------------------------------------------------------------------
@@ -178,7 +166,6 @@ class SbotSbTerminalCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            # print('dir:', dir)
             subprocess.call(['wt', '-d', dir])
 
 
@@ -216,28 +203,23 @@ class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
 def _dump_view(preamble, view):
     ''' Helper util. '''
     s = []
-    s.append('***')
+    s.append('view')
     s.append(preamble)
-    if view is None:
-        s.append('view:None')
-    else:
-        s.append('view:' + str(view.id()))
 
-        fn = view.file_name()
-        if fn is None:
-            s.append('file_name:None')
-        else:
-            s.append('file_name:' + os.path.split(fn)[1])
+    s.append('view_id:')
+    s.append('None' if view is None else str(view.id()))
 
+    if view is not None:
         w = view.window()
-        if w is not None:
-            fn = w.project_file_name()
-            if fn is None:
-                s.append('project_file_name:None')
-            else:
-                s.append('project_file_name:' + os.path.split(fn)[1])
+        fn = view.file_name()
 
-    logging.info(" | ".join(s));
+        s.append('file_name:')
+        s.append('None' if fn is None else os.path.split(fn)[1])
+
+        s.append('project_file_name:')
+        s.append('None' if w is None or w.project_file_name() is None else os.path.split(w.project_file_name())[1])
+
+    logging.info(" ".join(s));
             
 
 #-----------------------------------------------------------------------------------
@@ -283,35 +265,10 @@ class ViewEvent(sublime_plugin.ViewEventListener):
             if v.file_name() in sproj.signets:
                 _toggle_signet(v, sproj.signets.get(v.file_name(), []))
 
-                # scope = settings.get('signet_scope', 'comment')
-                # regions = []
-                # for row in sproj.signets.get(v.file_name(), []):
-                #     # A new signet.
-                #     pt = v.text_point(row - 1, 0) # Adjust to 0-based
-                #     regions.append(sublime.Region(pt, pt))
-                # v.add_regions(SIGNET_REGION_NAME, regions, scope, SIGNET_ICON)
-
-            # Process highlights. ################ TODOX #######################################################################
+            # Process highlights.
             if v.file_name() in sproj.highlights:
-                highlight_scopes = settings.get('highlight_scopes')
-                hl_index = 0
-# make like SbotHighlightTextCommand
                 for tok in sproj.highlights.get(v.file_name(), {}):
-                    # print('tok:', tok)
-                    whole_word = tok['whole_word']
-                    scope = tok['scope']
-                    token = tok['token']
-                    escaped = re.escape(token)
-                    mark_regions = []
-
-                    if whole_word and escaped[0].isalnum():
-                        escaped = r'\b%s\b' % escaped
-
-                    mark_regions = v.find_all(token, sublime.LITERAL if whole_word else None)
-
-                    scope = highlight_scopes[hl_index]
-                    # v.erase_regions(HIGHLIGHT_REGION_NAME % hl_index) # does this work?
-                    v.add_regions(HIGHLIGHT_REGION_NAME % hl_index, mark_regions, scope)
+                    _highlight_one(v, tok['token'], tok['whole_word'], tok['scope'])
 
     def on_deactivated(self):
         ''' When focus/tab lost. '''
@@ -337,12 +294,6 @@ class ViewEvent(sublime_plugin.ViewEventListener):
             sbot_project.save()
 
 
-    # def on_new(self): # When creating new window -> ctrl-shift-n
-    # def on_load(self): # When user opens file (not from persistence at start up!)
-    # def on_close(self): # 
-    # def on_pre_close(self):
-
-
 # =========================================================================
 # ====================== Signets ==========================================
 # =========================================================================
@@ -352,37 +303,10 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
-
         # Get current row.
         sel_row, _ = v.rowcol(v.sel()[0].a)
-
+        print('||||', sel_row)
         _toggle_signet(v, _get_signet_rows(v), sel_row)
-
-        # # scope = settings.get('signet_scope', 'comment')
-
-        # # Current location.
-        # sel_row, _ = v.rowcol(v.sel()[0].a)
-
-        # signet_rows = []
-
-        # # Is there one there?
-        # existing = False
-        # for row in _get_signet_rows(v):
-        #     if sel_row == row:
-        #         existing = True
-        #     else:
-        #         signet_rows.append(row)
-
-        # if not existing:
-        #     signet_rows.append(sel_row)
-
-        # # Update visual signets, brutally.
-        # # v.erase_regions(SIGNET_REGION_NAME)
-        # regions = []
-        # for r in signet_rows:
-        #     pt = v.text_point(r, 0) # 0-based
-        #     regions.append(sublime.Region(pt, pt))
-        # v.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope', 'comment'), SIGNET_ICON)
 
 
 #-----------------------------------------------------------------------------------
@@ -551,7 +475,6 @@ def _toggle_signet(view, rows, sel_row=-1):
         signet_rows = rows
 
     # Update visual signets, brutally.
-    # view.erase_regions(SIGNET_REGION_NAME)
     regions = []
     for r in signet_rows:
         pt = view.text_point(r, 0) # 0-based
@@ -567,6 +490,8 @@ def _toggle_signet(view, rows, sel_row=-1):
 class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
+        # TODOC Render mark regions too. Ideally overlay the scope rendering but could be separate.
+
         v = self.view
         # Get prefs.
         html_font_size = settings.get('html_font_size', 12)
@@ -780,7 +705,7 @@ def _output_html(edit, view, content=[]):
 #-----------------------------------------------------------------------------------
 class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     ''' Highlight specific words using scopes. Parts borrowed from StyleToken.
-    Persistence supported via sbot-project contaier.
+    Persistence supported via sbot-project container.
 
     Note: Regions added by v.add_regions() can not set the foreground color. The scope color is used
     for the region background color. Also they are not available via extract_scope().
@@ -788,33 +713,18 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, hl_index):
         v = self.view
-        highlight_scopes = settings.get('highlight_scopes')
-        hl_index %= 5
 
         # Get whole word or specific span.
         region = v.sel()[0]
         whole_word = region.empty()
         if whole_word:
             region = v.word(region)
-       
         token = v.substr(region)
 
-        print('token1', token)
+        highlight_scopes = settings.get('highlight_scopes')
+        scope = highlight_scopes[hl_index % len(highlight_scopes)]
 
-
-        escaped = re.escape(token)
-
-        if whole_word and escaped[0].isalnum():
-            escaped = r'\b%s\b' % escaped
-
-        print('token2', token)
-        print('region', region)
-
-        mark_regions = v.find_all(token, sublime.LITERAL if whole_word else None)
-
-        # Get the scope.
-        scope = highlight_scopes[hl_index]
-        v.add_regions(HIGHLIGHT_REGION_NAME % hl_index, mark_regions, scope)
+        _highlight_one(v, token, whole_word, scope)
 
         # Add to persistence.
         sproj = _get_project(v)
@@ -836,9 +746,10 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
         point = v.sel()[0].a
 
         for i in range(len(highlight_scopes)):
-            for region in v.get_regions(HIGHLIGHT_REGION_NAME % i):
+            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+            for region in v.get_regions(reg_name):
                 if region.contains(point):
-                    v.erase_regions(HIGHLIGHT_REGION_NAME % i)
+                    v.erase_regions(reg_name)
                     break;
 
 
@@ -852,7 +763,8 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
         highlight_scopes = settings.get('highlight_scopes')
 
         for i in range(len(highlight_scopes)):
-            v.erase_regions(HIGHLIGHT_REGION_NAME % i)
+            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+            v.erase_regions(reg_name)
 
         # Remove from persistence.
         if v.file_name() in sproj.highlights:
@@ -867,36 +779,11 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         v = self.view
         style_text = []
         content = []
-        scopes = ['entity.name', 'entity.other.inherited-class', 'entity.name.section', 'entity.name.tag', 'entity.other.attribute-name',
-            'variable', 'variable.language', 'variable.parameter', 'variable.function', 'constant', 'constant.numeric', 'constant.language',
-            'constant.character.escape', 'storage.type', 'storage.modifier', 'support', 'keyword', 'keyword.control', 'keyword.operator',
-            'keyword.declaration', 'string', 'comment', 'invalid', 'invalid.deprecated', 'markup.list']
-
-
-        # All primary scopes
-        # scopes = ['comment.block', 'comment.block.documentation', 'comment.line', 'constant.character.escape', 'constant.language', 'constant.numeric',
-        #     'constant.numeric.complex', 'constant.numeric.complex.imaginary', 'constant.numeric.complex.real', 'constant.numeric.float',
-        #     'constant.numeric.float.binary', 'constant.numeric.float.decimal', 'constant.numeric.float.hexadecimal', 'constant.numeric.float.octal',
-        #     'constant.numeric.float.other', 'constant.numeric.integer', 'constant.numeric.integer.binary', 'constant.numeric.integer.decimal',
-        #     'constant.numeric.integer.hexadecimal', 'constant.numeric.integer.octal', 'constant.numeric.integer.other', 'constant.other',
-        #     'constant.other.placeholder', 'entity.name.class', 'entity.name.class.forward-decl', 'entity.name.constant', 'entity.name.enum',
-        #     'entity.name.function', 'entity.name.function.constructor', 'entity.name.function.destructor', 'entity.name.impl', 'entity.name.interface',
-        #     'entity.name.label', 'entity.name.namespace', 'entity.name.section', 'entity.name.struct', 'entity.name.tag', 'entity.name.trait',
-        #     'entity.name.type', 'entity.name.union', 'entity.other.attribute-name', 'entity.other.inherited-class', 'invalid.deprecated', 'invalid.illegal',
-        #     'keyword.control', 'keyword.control.conditional', 'keyword.control.import', 'keyword.declaration.class', 'keyword.declaration.enum', 
-        #     'keyword.declaration.function', 'keyword.declaration.impl', 'keyword.declaration.interface', 'keyword.declaration.struct', 
-        #     'keyword.declaration.trait', 'keyword.declaration.type', 'keyword.declaration.union', 'keyword.operator', 'keyword.operator.arithmetic', 
-        #     'keyword.operator.assignment', 'keyword.operator.bitwise', 'keyword.operator.logical', 'keyword.operator.word', 'keyword.other', 'markup.bold', 
-        #     'markup.deleted', 'markup.heading', 'markup.inserted', 'markup.italic', 'markup.list.numbered', 'markup.list.unnumbered', 'markup.other', 
-        #     'markup.quote', 'markup.raw.block', 'markup.raw.inline', 'markup.underline', 'markup.underline.link', 'punctuation.accessor', 
-        #     'punctuation.definition.annotation', 'punctuation.definition.comment', 'punctuation.definition.keyword', 'punctuation.definition.string.begin', 
-        #     'punctuation.definition.string.end', 'punctuation.definition.variable', 'punctuation.section.interpolation.begin', 
-        #     'punctuation.section.interpolation.end', 'punctuation.separator', 'punctuation.separator.continuation', 'punctuation.terminator', 'source', 
-        #     'source.language-suffix.embedded', 'storage.modifier', 'storage.type', 'storage.type', 'storage.type.class', 'storage.type.enum', 
-        #     'storage.type.function', 'storage.type.impl', 'storage.type.interface', 'storage.type.struct', 'storage.type.trait', 'storage.type.union', 
-        #     'string.quoted.double', 'string.quoted.other', 'string.quoted.single', 'string.quoted.triple', 'string.regexp', 'string.unquoted', 'support.class', 
-        #     'support.constant', 'support.function', 'support.module', 'support.type', 'text.html', 'text.xml', 'variable.annotation', 'variable.function', 
-        #     'variable.language', 'variable.other', 'variable.other.constant', 'variable.other.member', 'variable.other.readwrite', 'variable.parameter']
+        scopes = [
+            'comment', 'constant', 'constant.character.escape', 'constant.language', 'constant.numeric', 'entity.name', 'entity.name.section',
+            'entity.name.tag', 'entity.other', 'invalid', 'invalid.deprecated', 'invalid.illegal', 'keyword', 'keyword.control',
+            'keyword.declaration', 'keyword.operator', 'markup', 'punctuation', 'source', 'storage.modifier', 'storage.type', 'string',
+            'support', 'text', 'variable', 'variable.function', 'variable.language', 'variable.parameter']
 
         for scope in scopes:
             style = v.style_for_scope(scope)
@@ -937,6 +824,18 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         '''.format('\n'.join(style_text), '\n'.join(content), html3)
 
         v.show_popup(html, max_width=512)
+
+
+#-----------------------------------------------------------------------------------
+def _highlight_one(view, token, whole_word, scope):
+
+    escaped = re.escape(token)
+    if whole_word and escaped[0].isalnum():
+        escaped = r'\b%s\b' % escaped
+
+    mark_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
+    highlight_scopes = settings.get('highlight_scopes')
+    view.add_regions(HIGHLIGHT_REGION_NAME % scope, mark_regions, scope)
 
 
 # =========================================================================
@@ -1069,7 +968,6 @@ class SbotExInputHandler(sublime_plugin.TextInputHandler):
     ''' Generic user input handler. '''
 
     def __init__(self, view):
-        # print("SbotExInputHandler.__init__")
         self.view = view
 
     def placeholder(self):
@@ -1079,8 +977,6 @@ class SbotExInputHandler(sublime_plugin.TextInputHandler):
         return "description for SbotExInputHandler"
 
     def initial_text(self):
-        # for r in self.view.sel():
-        #     print(r)
         # Check if something selected.
         if len(self.view.sel()) > 0:
             if(self.view.sel()[0].size() == 0):

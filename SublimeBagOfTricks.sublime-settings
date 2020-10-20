@@ -27,7 +27,7 @@
     "md_font_size": 14,
 
     // Scopes for marking text.
-    "hignlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
+    "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
 
     // Scope for gutter signet icon.
     "signet_scope": "keyword"

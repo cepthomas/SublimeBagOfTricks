@@ -15,7 +15,8 @@ Accumulated notes that will eventually go away.
     - mark.py Uses add_regions() to add an icon to the gutter
     - show_scope_name.py Uses a popup to show the scope names at the caret
 - Themes basically decorate the core UI elements like side-pane, tabs, menus etc: "theme": "Soda Light 3.sublime-theme"
-- Color-schemes are responsible for the syntax-highlighting: "color_scheme": "Packages\Visual Studio Bold Color Scheme\Visual Studio Bold.tmTheme",
+- Color-schemes are responsible for the syntax-highlighting: "color_scheme": "Packages\Visual Studio Bold Color Scheme\Visual Studio Bold.tmTheme"
+- If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
 
 
 ## Directories and Files
