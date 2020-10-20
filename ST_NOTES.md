@@ -3,25 +3,32 @@
 Accumulated notes that will eventually go away.
 
 ## Misc Notes
-- package-metadata.json is used for package management - remove while developing/debugging because PackageControl will delete it.
-- Commands can't end with `_numeral`: `my_cmd_1` should be `stpt_cmd1`.
-- There is a bunch of magic naming for Commands and InputHandlers to support mapping to the menu and key maps.
-  e.g. `class MyExampleInputHandler` maps to command `my_example`.
-- Other good examples in Packages\Default:
-    - arithmetic.py Accepts an input from the user when run via the Command Palette
-    - exec.py Uses phantoms to display errors inline
-    - font.py Shows how to work with settings
-    - goto_line.py Prompts the user for input, then updates the selection
-    - mark.py Uses add_regions() to add an icon to the gutter
-    - show_scope_name.py Uses a popup to show the scope names at the caret
-- Themes basically decorate the core UI elements like side-pane, tabs, menus etc: "theme": "Soda Light 3.sublime-theme"
-- Color-schemes are responsible for the syntax-highlighting: "color_scheme": "Packages\Visual Studio Bold Color Scheme\Visual Studio Bold.tmTheme"
-- If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
+package-metadata.json is used for package management - remove while developing/debugging because PackageControl will delete it.
+
+Commands can't end with `_numeral`: `my_cmd_1` should be `stpt_cmd1`.
+
+There is a bunch of magic naming for Commands and InputHandlers to support mapping to the menu and key maps.
+
+e.g. `class MyExampleInputHandler` maps to command `my_example`.
+
+Other good examples in Packages\Default:
+  - arithmetic.py Accepts an input from the user when run via the Command Palette
+  - exec.py Uses phantoms to display errors inline
+  - font.py Shows how to work with settings
+  - goto_line.py Prompts the user for input, then updates the selection
+  - mark.py Uses add_regions() to add an icon to the gutter
+  - show_scope_name.py Uses a popup to show the scope names at the caret
+
+Themes basically decorate the core UI elements like side-pane, tabs, menus etc: "theme": "Soda Light 3.sublime-theme"
+
+Color-schemes are responsible for the syntax-highlighting: "color_scheme": "Packages\Visual Studio Bold Color Scheme\Visual Studio Bold.tmTheme"
+
+If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
 
 
 ## Directories and Files
-- `%executable_dir%`: C:\Program Files\Sublime Text
-- `%data_dir%`: %APPDATA%\Sublime Text 3 (C:\Users\%user%\AppData\Roaming\Sublime Text 3)
+`%executable_dir%`: C:\Program Files\Sublime Text
+`%data_dir%`: %APPDATA%\Sublime Text 3 (C:\Users\%user%\AppData\Roaming\Sublime Text 3)
 
 Nearly all of the interesting files for users live under `%data_dir%`.
 
@@ -39,6 +46,9 @@ There are two special packages: Default and User. Default is always ordered firs
 To create a new package, simply create a new directory under `%data_dir%\Installed Packages`. You can access this directory from the Preferences > Browse Packages menu.
 
 To override a file in an existing package, just create a file with the same name under the `Packages\%name%` directory.
+
+To remove items from default menus: In <user>\AppData\Roaming\Sublime Text 3\Packages, create a new folder that’s named exactly like the package you want to overwrite. For Sublime Core, this is “Default”. In this folder, create a new .sublime-menu file. Either add only your own stuff, or copy the default content and edit it.
+
 
 For example to override the file function.sublime-snippet in the Python.sublime-package package that ships with Sublime Text, create a directory called Python under the `%data_dir%\Packages` directory, and place your function.sublime-snippet file there.
 

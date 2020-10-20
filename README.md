@@ -7,9 +7,8 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 # Features
 
 ## Colorizing
-Word colorizing similar to StyleToken but simpler. Also a handy scope popup that shows you the style
-associated with each scope.
-
+- Word colorizing similar to [StyleToken](https://github.com/vcharnahrebel/style-token).
+- Also a handy scope popup that shows you the style associated with each scope.
 
 | Command                  | Description |
 |:--------                 |:-------     |
@@ -24,7 +23,8 @@ associated with each scope.
 
 
 ## Render To Html
-Simple render to html with styles, primarily for printing.
+- Simple render to html with styles, primarily for printing.
+- Version to render markdown file to html using [Markdeep](https://casual-effects.com/markdeep/).
 
 | Command                  | Description |
 |:--------                 |:-------     |
@@ -63,7 +63,6 @@ Enhanced bookmarks:
 | signet_scope             | ST scope name for gutter icon color |
 
 ## Miscellany
-
 | Command                  | Description |
 |:--------                 |:-------     |
 | sbot_split_view          | Toggles simple horizontal split screen, like MS products |
