@@ -20,6 +20,8 @@ SIGNET_REGION_NAME = 'signet'
 WHITESPACE = '_ws'
 SIGNET_ICON = 'bookmark'  # 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
+NEXT_SIG = 1
+PREV_SIG = 2
 
 # ====== Vars - global across all Windows ====
 settings = None
@@ -251,7 +253,7 @@ def _dump_view(preamble, view):
 
 #-----------------------------------------------------------------------------------
 def _wait_load_file(view, line):
-    ''' Helper. '''
+    ''' Open file asynchronously then position at line. '''
     if view.is_loading():
         sublime.set_timeout(lambda: _wait_load_file(view, line), 100) # maybe not forever?
     else: # good to go
@@ -306,14 +308,14 @@ class ViewEvent(sublime_plugin.ViewEventListener):
 
         if sbot_project is not None:
             # Gather signets.
-            sig_lines = []
+            sig_rows = []
 
             for row in _get_signet_rows(v):
-                sig_lines.append(row)
-                # sig_lines.append(row + 1) # Adjust to 1-based
+                sig_rows.append(row)
+                # sig_rows.append(row + 1) # Adjust to 1-based
 
-            if len(sig_lines) > 0:
-                sbot_project.signets[v.file_name()] = sig_lines
+            if len(sig_rows) > 0:
+                sbot_project.signets[v.file_name()] = sig_rows
             elif v.file_name() in sbot_project.signets:
                 del sbot_project.signets[v.file_name()]
 
@@ -336,130 +338,87 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotNextSignetCommand(sublime_plugin.TextCommand):
-    ''' Navigate to signet in whole collection. TODOC Maybe combine next and previous since they are similar. '''
+def move_to_signet(view, dir):
+    ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
+    v = view
+    w = view.window()
+    done = False
+    sel_row, _ = v.rowcol(v.sel()[0].a) # current sel
+    incr = +1 if dir == NEXT_SIG else -1
+    array_end = 0 if dir == NEXT_SIG else -1
 
-    def run(self, edit):
-        v = self.view
-        w = self.view.window()
-        done = False
-        sel_row, _ = v.rowcol(v.sel()[0].a) # current sel
+    # 1) NEXT_SIG: If there's another bookmark below >>> goto it
+    # 1) PREV_SIG: If there's another bookmark above >>> goto it
+    if not done:
+        sig_rows = get_signet_rows(v)
+        if dir == PREV_SIG:
+            sig_rows.reverse()
 
-        # 1) If there's another bookmark below >>> goto it
-        if not done:
-            sig_rows = _get_signet_rows(v)
-            for sr in sig_rows:
-                if sr > sel_row:
-                    w.active_view().run_command("goto_line", {"line": sr + 1})
+        for sr in sig_rows:
+            if (dir == NEXT_SIG and sr > sel_row) or (dir == PREV_SIG and sr < sel_row):
+                w.active_view().run_command("goto_line", {"line": sr + 1})
+                done = True
+                break
+
+    # 2) NEXT_SIG: Else if there's an open signet file to the right of this tab >>> focus tab, goto first signet
+    # 2) PREV_SIG: Else if there's an open signet file to the left of this tab >>> focus tab, goto last signet
+    if not done:
+        view_index = w.get_view_index(v)[1] + incr
+
+        while not done and ((dir == NEXT_SIG and view_index < len(w.views()) or (dir == PREV_SIG and view_index >= 0))):
+            vv = w.views()[view_index]
+            sig_rows = _get_signet_rows(vv)
+            if(len(sig_rows) > 0):
+                w.focus_view(vv)
+                vv.run_command("goto_line", {"line": sig_rows[array_end] + 1})
+                done = True
+            else:
+                view_index += incr
+
+    # 3) Both: Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet TODOC or last if prev?
+    if not done:
+        sig_files = []
+        sproj = _get_project(v)
+        if sproj is not None:
+            for sig_fn, sig_rows in sproj.signets.items():
+                if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
+                    vv = w.open_file(sig_fn)
+                    sublime.set_timeout(lambda: _wait_load_file(vv, sig_rows[array_end]), 10) # already 1-based in file
+                    w.focus_view(vv)
                     done = True
                     break
 
-        # 2) Else if there's an open signet file to the right of this tab >>> focus tab, goto first signet
-        if not done:
-            view_index = w.get_view_index(v)[1] + 1
+    # 4) NEXT_SIG: Else >>> find first tab/file with signets, focus tab, goto first signet
+    # 4) PREV_SIG: Else >>> find last tab/file with signets, focus tab, goto last signet
+    if not done:
+        view_index = 0 if dir == NEXT_SIG else len(w.views()) - 1
 
-            while not done and view_index < len(w.views()):
-                vv = w.views()[view_index]
-                sig_rows = _get_signet_rows(vv)
-                if(len(sig_rows) > 0):
-                    w.focus_view(vv)
-                    vv.run_command("goto_line", {"line": sig_rows[0] + 1})
-                    done = True
-                else:
-                    view_index += 1
+        while not done and ((dir == NEXT_SIG and view_index < len(w.views()) or (dir == PREV_SIG and view_index >= 0))):
+            vv = w.views()[view_index]
+            sig_rows = _get_signet_rows(vv)
+            if(len(sig_rows) > 0):
+                w.focus_view(vv)
+                vv.run_command("goto_line", {"line": sig_rows[array_end] + 1})
+                done = True
+            else:
+                view_index += incr
 
-        # 3) Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet
-        if not done:
-            sig_files = []
-            sproj = _get_project(self.view)
-            if sproj is not None:
-                for sig_fn, sig_rows in sproj.signets.items():
-                    if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
-                        vv = w.open_file(sig_fn)
-                        sublime.set_timeout(lambda: _wait_load_file(vv, sig_rows[0]), 10) # already 1-based in file
-                        w.focus_view(vv)
-                        done = True
-                        break
 
-        # 4) Else >>> find first tab/file with signets, focus tab, goto first signet
-        if not done:
-            view_index = 0
-            while not done and view_index < len(w.views()):
-                vv = w.views()[view_index]
-                sig_rows = _get_signet_rows(vv)
-                if(len(sig_rows) > 0):
-                    w.focus_view(vv)
-                    vv.run_command("goto_line", {"line": sig_rows[0] + 1})
-                    done = True
-                else:
-                    view_index += 1
-       
+#-----------------------------------------------------------------------------------
+class SbotNextSignetCommand(sublime_plugin.TextCommand):
+    ''' Navigate to signet in whole collection. '''
 
-    def is_enabled(self):
-        return len(_get_signet_rows(self.view)) > 0
+    def run(self, edit):
+        move_to_signet(self.view, NEXT_SIG)
+
 
 #-----------------------------------------------------------------------------------
 class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        v = self.view
-        w = self.view.window()
-        done = False
-        sel_row, _ = v.rowcol(v.sel()[0].a) # current sel
+        move_to_signet(self.view, PREV_SIG)
 
-        # 1) If there's another bookmark above >>> goto it
-        if not done:
-            sig_rows = _get_signet_rows(v)
-            sig_rows.reverse()
-            for sr in sig_rows:
-                if sr < sel_row:
-                    w.active_view().run_command("goto_line", {"line": sr + 1})
-                    done = True
-                    break
-
-        # 2) Else if there's an open signet file to the left of this tab >>> focus tab, goto last signet
-        if not done:
-            view_index = w.get_view_index(v)[1] - 1
-
-            while not done and view_index >= 0:
-                vv = w.views()[view_index]
-                sig_rows = _get_signet_rows(vv)
-                if(len(sig_rows) > 0):
-                    w.focus_view(vv)
-                    vv.run_command("goto_line", {"line": sig_rows[-1] + 1})
-                    done = True
-                else:
-                    view_index -= 1
-
-        # 3) Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet
-        if not done:
-            sig_files = []
-            sproj = _get_project(self.view)
-            if sproj is not None:
-                for sig_fn, sig_rows in sproj.signets.items():
-                    if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
-                        vv = w.open_file(sig_fn)
-                        sublime.set_timeout(lambda: _wait_load_file(vv, sig_rows[-1]), 10) # already 1-based in file
-                        w.focus_view(vv)
-                        done = True
-                        break
-
-        # 4) Else >>> find last tab/file with signets, focus tab, goto last signet
-        if not done:
-            view_index = len(w.views()) - 1
-            while not done and view_index >= 0:
-                vv = w.views()[view_index]
-                sig_rows = _get_signet_rows(vv)
-                if(len(sig_rows) > 0):
-                    w.focus_view(vv)
-                    vv.run_command("goto_line", {"line": sig_rows[-1] + 1})
-                    done = True
-                else:
-                    view_index -= 1
-
-    def is_enabled(self):
-        return len(_get_signet_rows(self.view)) > 0
 
 #-----------------------------------------------------------------------------------
 class SbotClearSignetsCommand(sublime_plugin.TextCommand):
@@ -544,7 +503,7 @@ class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
         has_selection = len(v.sel()[0]) > 0
         selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-        for line_region in v.split_by_newlines(selreg): # TODOC s.splitlines() seems to be about 3x faster but would double memory use.
+        for line_region in v.split_by_newlines(selreg): # s.splitlines() seems to be about 3x faster but would double memory use.
             # line_num += 1
             line_tokens = [] # (Region, scope)
 
