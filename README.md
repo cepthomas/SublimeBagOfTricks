@@ -28,8 +28,9 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_render_html         | Render current file to html |
+| sbot_render_text         | Render current file including scope colors and highlights to html |
 | sbot_render_markdown     | Render current markdown file to html |
+
 
 | Setting                  | Description |
 |:--------                 |:-------     |
@@ -68,7 +69,7 @@ Enhanced bookmarks:
 | sbot_split_view          | Toggles simple horizontal split screen, like MS products |
 
 ## SideBar
-Commands added to the sidebar.
+Commands added to the sidebar. Just the stuff I need.
 
 | Command                  | Description |
 |:--------                 |:-------     |

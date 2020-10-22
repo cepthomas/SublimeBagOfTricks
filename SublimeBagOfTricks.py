@@ -16,6 +16,7 @@ import sublime_plugin
 
 # ====== Defs ========
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
+MAX_HIGHLIGHTS = 6
 SIGNET_REGION_NAME = 'signet'
 WHITESPACE = '_ws'
 SIGNET_ICON = 'bookmark'  # 'Packages/Theme - Default/common/label.png'
@@ -45,33 +46,16 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         #     print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
         # _get_project(v).dump() # These are not ordered like file.
 
-
-        # vals = []
-        # for i in range(100):
-        #     start = time.perf_counter()
-        #     selreg = sublime.Region(0, v.size())
-        #     for line_region in v.split_by_newlines(selreg):
-        #         pass
-        #     vals.append(time.perf_counter() - start)
-        #     # print(time.perf_counter() - start)
-        #     # use time.perf_counter or time.process_time instead
-        # print('split_by_newlines', sum(vals) / len(vals))
-
-        # vals = []
-        # for i in range(100):
-        #     start = time.perf_counter()
-        #     selreg = sublime.Region(0, v.size())
-        #     for s in v.substr(selreg):
-        #         pass
-        #     vals.append(time.perf_counter() - start)
-        # print('substr', sum(vals) / len(vals))
-
-        # split_by_newlines 0.002095901999994112
-        # substr 0.0007107040000050802
-        # split_by_newlines 0.002201611999987563
-        # substr 0.0006807069999990744
-        # split_by_newlines 0.002213284000006297
-        # substr 0.000633377999986351
+        vals = []
+        for i in range(100):
+            start = time.perf_counter()
+            selreg = sublime.Region(0, v.size())
+            for line_region in v.split_by_newlines(selreg):
+                pass
+            # for s in v.substr(selreg):
+            #     pass
+            vals.append(time.perf_counter() - start)
+        print('split_by_newlines', sum(vals) / len(vals))
 
 
 #-----------------------------------------------------------------------------------
@@ -350,7 +334,7 @@ def move_to_signet(view, dir):
     # 1) NEXT_SIG: If there's another bookmark below >>> goto it
     # 1) PREV_SIG: If there's another bookmark above >>> goto it
     if not done:
-        sig_rows = get_signet_rows(v)
+        sig_rows = _get_signet_rows(v)
         if dir == PREV_SIG:
             sig_rows.reverse()
 
@@ -364,7 +348,6 @@ def move_to_signet(view, dir):
     # 2) PREV_SIG: Else if there's an open signet file to the left of this tab >>> focus tab, goto last signet
     if not done:
         view_index = w.get_view_index(v)[1] + incr
-
         while not done and ((dir == NEXT_SIG and view_index < len(w.views()) or (dir == PREV_SIG and view_index >= 0))):
             vv = w.views()[view_index]
             sig_rows = _get_signet_rows(vv)
@@ -375,7 +358,8 @@ def move_to_signet(view, dir):
             else:
                 view_index += incr
 
-    # 3) Both: Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet TODOC or last if prev?
+    # 3) NEXT_SIG: Else if there is a signet file in the project that is not open >>> open it, focus tab, goto first signet
+    # 3) PREV_SIG: Else if there is a signet file in the project that is not open >>> open it, focus tab, goto last signet
     if not done:
         sig_files = []
         sproj = _get_project(v)
@@ -392,7 +376,6 @@ def move_to_signet(view, dir):
     # 4) PREV_SIG: Else >>> find last tab/file with signets, focus tab, goto last signet
     if not done:
         view_index = 0 if dir == NEXT_SIG else len(w.views()) - 1
-
         while not done and ((dir == NEXT_SIG and view_index < len(w.views()) or (dir == PREV_SIG and view_index >= 0))):
             vv = w.views()[view_index]
             sig_rows = _get_signet_rows(vv)
@@ -476,16 +459,18 @@ def _toggle_signet(view, rows, sel_row=-1):
 # ====================== Rendering ========================================
 # =========================================================================
 
+
+
 #-----------------------------------------------------------------------------------
-class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
+class SbotRenderTextCommand(sublime_plugin.TextCommand): #TODOC consolidate adjacent styles when separated only by ws.
 
     def run(self, edit):
-        # TODOC Render mark regions too. Ideally overlay the scope rendering but could be separate.
-
         v = self.view
-        # Get prefs.
+        sproj = _get_project(v)
+
+        ## Get prefs.
         html_font_size = settings.get('html_font_size', 12)
-        html_font_face = settings.get('html_font_face', 'Consolas')
+        html_font_face = settings.get('html_font_face', 'Arial')
         html_plain_text = settings.get('html_plain_text', '#000000')
         html_background = settings.get('html_background', 'transparent')
         html_line_numbers = settings.get('html_line_numbers', True)
@@ -493,16 +478,30 @@ class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
         ## Collect scope/style info.
         all_scopes = set() # All unique values
         scope_tokens = [] # One [(Region, scope)] per line
+        highlight_regions = [] # (Region, scope)
 
         ## Html style info.
         css1 = dict() # {selector:properties}
         css2 = dict() # {properties:selector}
         style_map = dict() # {scope:selector}
 
-        ## Tokenize by scope.
+        ## If there are highlights, collect them.
+        if v.file_name() in sproj.highlights:
+            highlight_scopes = settings.get('highlight_scopes')
+            num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
+            for i in range(num_highlights):
+                reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+                for region in v.get_regions(reg_name):
+                    highlight_regions.append((region, highlight_scopes[i] + '.highlight')) # discriminate for post-processing
+
+            highlight_regions.sort(key=lambda v: v[0].a)
+            # print('highlight_regions', highlight_regions)
+            # [((11381, 11384), 'constant.language'), ((11728, 11731), 'constant.language'), ((11750, 11753), 'constant.language'), ((17840, 17849), 'markup.list'), 
+
+        ## Tokenize whole file by syntax scope.
         has_selection = len(v.sel()[0]) > 0
         selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
-
+        
         for line_region in v.split_by_newlines(selreg): # s.splitlines() seems to be about 3x faster but would double memory use.
             # line_num += 1
             line_tokens = [] # (Region, scope)
@@ -513,6 +512,22 @@ class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
             current_scope_start = line_region.a # current chunk
 
             for point in range(line_region.a, line_region.b + 1):
+
+                # # Check highlights first
+                # if len(highlight_regions) > 0:
+                #     if point >= highlight_regions[0].a:
+                #         # In a highlight.
+                #         if point > current_scope_start:
+                #             # Save old.
+                #             line_tokens.append((sublime.Region(current_scope_start, point), current_scope))
+                #         current_scope = new_scope
+                #         current_scope_start = point
+                #         all_scopes.add(new_scope)
+                #     else:
+                #         pass
+
+
+
                 # Get new scope. Check if it's ws.
                 new_scope = WHITESPACE if v.substr(point).isspace() else v.scope_name(point)
 
@@ -558,6 +573,33 @@ class SbotRenderHtmlCommand(sublime_plugin.TextCommand):
                         css1[sel] = props
                         css2[props] = sel
                         style_map[scope] = sel
+
+        ## Highlight styles. They are handled differently.
+        highlight_scopes = settings.get('highlight_scopes')
+        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
+
+        for i in range(num_highlights):
+            # style_for_scope(scope_name) dict    Accepts a string scope name and returns a dict of style information,
+            # include the keys foreground, bold, italic, source_line, source_column and source_file. 
+            # If the scope has a background color set, the key background will be present. 
+            # The foreground and background colors are normalized to the six character hex form with a leading hash, e.g. #ff0000.
+            scope = highlight_scopes[i]
+            ss = v.style_for_scope(scope)
+
+            # Swapsies.
+            background = ss['background'] if 'background' in ss else ss['foreground']
+            props = '{{ color:{}; background-color:{}; }}'.format(html_background, background)
+
+            # Fix name.
+            scope += '.highlight'
+
+            if props in css2:
+                style_map[scope] = css2[props]
+            else:
+                sel = 'st{}'.format(len(css1))
+                css1[sel] = props
+                css2[props] = sel
+                style_map[scope] = sel
 
         ## Create css.
         style_text = ""
@@ -712,7 +754,10 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
         token = v.substr(region)
 
         highlight_scopes = settings.get('highlight_scopes')
-        scope = highlight_scopes[hl_index % len(highlight_scopes)]
+        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
+        hl_index = min(hl_index, num_highlights)
+
+        scope = highlight_scopes[hl_index]
 
         _highlight_one(v, token, whole_word, scope)
 
@@ -732,10 +777,11 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
         v = self.view
         sproj = _get_project(v)
         highlight_scopes = settings.get('highlight_scopes')
+        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
         point = v.sel()[0].a
 
-        for i in range(len(highlight_scopes)):
+        for i in range(num_highlights):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             for region in v.get_regions(reg_name):
                 if region.contains(point):
@@ -751,8 +797,9 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
         v = self.view
         sproj = _get_project(v)
         highlight_scopes = settings.get('highlight_scopes')
+        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
-        for i in range(len(highlight_scopes)):
+        for i in range(num_highlights):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             v.erase_regions(reg_name)
 
@@ -823,9 +870,9 @@ def _highlight_one(view, token, whole_word, scope):
     if whole_word and escaped[0].isalnum():
         escaped = r'\b%s\b' % escaped
 
-    mark_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
-    highlight_scopes = settings.get('highlight_scopes')
-    view.add_regions(HIGHLIGHT_REGION_NAME % scope, mark_regions, scope)
+    highlight_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
+    if len(highlight_regions) > 0:
+        view.add_regions(HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)
 
 
 # =========================================================================
