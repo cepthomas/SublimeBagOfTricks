@@ -9,7 +9,7 @@
     "html_plain_text": "#000000",
 
     // If you need to change the bg color. Not done automatically from color scheme.
-    "html_background": "transparent",
+    "html_background": "white",
 
     // One of: new_file, clipboard, default_file, default_file_open
     "html_output": "default_file_open",

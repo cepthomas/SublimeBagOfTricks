@@ -18,7 +18,6 @@ import sublime_plugin
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 MAX_HIGHLIGHTS = 6
 SIGNET_REGION_NAME = 'signet'
-WHITESPACE = '_ws'
 SIGNET_ICON = 'bookmark'  # 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
 NEXT_SIG = 1
@@ -26,7 +25,7 @@ PREV_SIG = 2
 
 # ====== Vars - global across all Windows ====
 settings = None
-sbot_projects = {} # k:window_id v:SbotProject
+sbot_projects = {} # {k:window_id v:SbotProject}
 
 
 # =========================================================================
@@ -46,16 +45,16 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         #     print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
         # _get_project(v).dump() # These are not ordered like file.
 
-        vals = []
-        for i in range(100):
-            start = time.perf_counter()
-            selreg = sublime.Region(0, v.size())
-            for line_region in v.split_by_newlines(selreg):
-                pass
-            # for s in v.substr(selreg):
-            #     pass
-            vals.append(time.perf_counter() - start)
-        print('split_by_newlines', sum(vals) / len(vals))
+        # vals = []
+        # for i in range(100):
+        #     start = time.perf_counter()
+        #     sel_reg = sublime.Region(0, v.size())
+        #     for line_region in v.split_by_newlines(sel_reg):
+        #         pass
+        #     # for s in v.substr(sel_reg):
+        #     #     pass
+        #     vals.append(time.perf_counter() - start)
+        # print('split_by_newlines', sum(vals) / len(vals))
 
 
 #-----------------------------------------------------------------------------------
@@ -79,7 +78,7 @@ def plugin_loaded():
 
 #-----------------------------------------------------------------------------------
 class SbotProject(object):
-    ''' Container for persistence. '''
+    ''' Container for persistence. TODOR '''
 
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
@@ -121,13 +120,15 @@ class SbotProject(object):
 
             for filename, rows in self.signets.items():
                 if len(rows) > 0:
-                    sigs.append({'filename': filename, 'rows': rows})
-            values['signets'] = sigs
+                    if os.path.exists(filename): # sanity check
+                        sigs.append({'filename': filename, 'rows': rows})
+                values['signets'] = sigs
 
             for filename, tokens in self.highlights.items():
                 if len(tokens) > 0:
-                    highlights.append({'filename': filename, 'tokens': tokens})
-            values['highlights'] = highlights
+                    if os.path.exists(filename): # sanity check
+                        highlights.append({'filename': filename, 'tokens': tokens})
+                values['highlights'] = highlights
 
             with open(self.fn, 'w') as fp:
                 json.dump(values, fp, indent=4)
@@ -244,6 +245,31 @@ def _wait_load_file(view, line):
         view.run_command("goto_line", {"line": line})
 
 
+#-----------------------------------------------------------------------------------
+class SbotPerfCounter(object):
+    ''' Container for perf counter. '''
+
+    def __init__(self, id):
+        self.id = id
+        self.vals = []
+        self.start = 0
+
+    def start(self):
+        self.start = time.perf_counter()
+
+    def stop(self):
+        if self.start != 0:
+            self.vals.append(time.perf_counter() - self.start)
+            self.start = 0
+
+    def dump(self):
+        s =  '{}: {}'.format(self.id, sum(vals) / len(vals)) if len(self.vals) > 0 else '{}: No data'.format(self.id)
+        return s
+
+    def clear(self):
+        self.vals = []
+
+
 # =========================================================================
 # ====================== EventListeners ===================================
 # =========================================================================
@@ -284,7 +310,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
                     _highlight_one(v, tok['token'], tok['whole_word'], tok['scope'])
 
     def on_deactivated(self):
-        ''' When focus/tab lost. '''
+        ''' When focus/tab lost. TODOC gets goofed up on file->save'''
         # Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (Fixed in ST4)
         v = self.view
         # _dump_view('EventListener.on_deactivated', v)
@@ -306,6 +332,10 @@ class ViewEvent(sublime_plugin.ViewEventListener):
             # Save the project file.
             sbot_project.save()
 
+    def on_selection_modified(self):
+        pos = self.view.sel()[0].begin()
+        self.view.set_status("position", 'Pos {}'.format(pos))
+
 
 # =========================================================================
 # ====================== Signets ==========================================
@@ -323,7 +353,7 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 def move_to_signet(view, dir):
-    ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
+    ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. TODOC Add option goto signet(s) in this file. '''
     v = view
     w = view.window()
     done = False
@@ -460,10 +490,9 @@ def _toggle_signet(view, rows, sel_row=-1):
 # =========================================================================
 
 
-
 #-----------------------------------------------------------------------------------
-class SbotRenderTextCommand(sublime_plugin.TextCommand): #TODOC consolidate adjacent styles when separated only by ws.
-
+class SbotRenderTextCommand(sublime_plugin.TextCommand):
+    ''' TODOR Slow on large files. '''
     def run(self, edit):
         v = self.view
         sproj = _get_project(v)
@@ -472,162 +501,153 @@ class SbotRenderTextCommand(sublime_plugin.TextCommand): #TODOC consolidate adja
         html_font_size = settings.get('html_font_size', 12)
         html_font_face = settings.get('html_font_face', 'Arial')
         html_plain_text = settings.get('html_plain_text', '#000000')
-        html_background = settings.get('html_background', 'transparent')
+        html_background = settings.get('html_background', 'white')
         html_line_numbers = settings.get('html_line_numbers', True)
 
         ## Collect scope/style info.
-        all_scopes = set() # All unique values
-        scope_tokens = [] # One [(Region, scope)] per line
-        highlight_regions = [] # (Region, scope)
-
-        ## Html style info.
-        css1 = dict() # {selector:properties}
-        css2 = dict() # {properties:selector}
-        style_map = dict() # {scope:selector}
+        all_styles = [] # style
+        region_styles = [] # One [(Region, style(ref?))] per line
+        highlight_regions = [] # (Region, style(ref?))
 
         ## If there are highlights, collect them.
         if v.file_name() in sproj.highlights:
             highlight_scopes = settings.get('highlight_scopes')
             num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
             for i in range(num_highlights):
+
+                # Get the style and invert for highlights.
+                scope = highlight_scopes[i]
+                ss = v.style_for_scope(scope)
+                background = ss['background'] if 'background' in ss else ss['foreground']
+                foreground = html_background
+                ss['background'] = background
+                ss['foreground'] = foreground
+
+                # Collect the highlight regions.
                 reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
                 for region in v.get_regions(reg_name):
-                    highlight_regions.append((region, highlight_scopes[i] + '.highlight')) # discriminate for post-processing
+                    highlight_regions.append((region, ss))
 
+            # Put all in order.
             highlight_regions.sort(key=lambda v: v[0].a)
-            # print('highlight_regions', highlight_regions)
-            # [((11381, 11384), 'constant.language'), ((11728, 11731), 'constant.language'), ((11750, 11753), 'constant.language'), ((17840, 17849), 'markup.list'), 
 
-        ## Tokenize whole file by syntax scope.
+        ## Tokenize selection by syntax scope.
         has_selection = len(v.sel()[0]) > 0
-        selreg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
+        sel_reg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
         
-        for line_region in v.split_by_newlines(selreg): # s.splitlines() seems to be about 3x faster but would double memory use.
-            # line_num += 1
-            line_tokens = [] # (Region, scope)
+        # Local helpers. TODOR inefficient!
+        def _add_style(style):
+            # Add style to our list. 
+            if all_styles.count(style) == 0:
+                all_styles.append(style)
 
-            # Process the line chars.
-            current_scope = ""
-            new_scope = ""
-            current_scope_start = line_region.a # current chunk
-
-            for point in range(line_region.a, line_region.b + 1):
-
-                # # Check highlights first
-                # if len(highlight_regions) > 0:
-                #     if point >= highlight_regions[0].a:
-                #         # In a highlight.
-                #         if point > current_scope_start:
-                #             # Save old.
-                #             line_tokens.append((sublime.Region(current_scope_start, point), current_scope))
-                #         current_scope = new_scope
-                #         current_scope_start = point
-                #         all_scopes.add(new_scope)
-                #     else:
-                #         pass
+        def _get_style(style):
+                # Locate the style and return the index.
+                st_index = -1
+                for i in range(len(all_styles)):
+                    if style == all_styles[i]:
+                        st_index = i
+                        break
+                return st_index
 
 
+        for line_region in v.split_by_newlines(sel_reg): # string.splitlines() seems to be about 3x faster but would double memory use.
+            line_styles = [] # (Region, style(ref?))
 
-                # Get new scope. Check if it's ws.
-                new_scope = WHITESPACE if v.substr(point).isspace() else v.scope_name(point)
+            # Start a new line.
+            current_style = None
+            # new_style = None
+            current_style_start = line_region.a # current chunk
 
-                # Check for scope change.
-                if new_scope != current_scope:
-                    if point > current_scope_start:
-                        # Save old.
-                        line_tokens.append((sublime.Region(current_scope_start, point), current_scope))
-                    current_scope = new_scope
-                    current_scope_start = point
-                    all_scopes.add(new_scope)
+            # Process the individual line chars.
+            point = line_region.a
 
-            # Save last.
-            if point > current_scope_start:
-                line_tokens.append((sublime.Region(current_scope_start, line_region.b), current_scope))
+            while point < line_region.b:
 
-            scope_tokens.append(line_tokens)
+                # Check if it's a highlight first as they take precedence.
+                if len(highlight_regions) > 0 and point >= highlight_regions[0][0].a:
 
-        ## Fix up styles and output css.
-        for scope in all_scopes:
-            if scope == WHITESPACE:
-                pass # Ignore, treat as plain text.
-            else:
-                style = v.style_for_scope(scope)
-                # Check for plain text, ignore style.
-                if style['foreground'] == html_plain_text and style['bold'] == False and style['italic'] == False:
-                    pass 
+                    # Start a highlight.
+                    new_style =  highlight_regions[0][1]
+
+                    # Save last maybe.
+                    if point > current_style_start:
+                        line_styles.append((sublime.Region(current_style_start, point), current_style))
+
+                    # Save highlight info.
+                    line_styles.append((highlight_regions[0][0], new_style))
+
+                    _add_style(new_style)
+
+                    # Bump ahead.
+                    point = highlight_regions[0][0].b
+                    current_style = new_style
+                    current_style_start = point
+
+                    del highlight_regions[0]
+
                 else:
-                    # Legit style.
-                    props = '{{ color:{}; '.format(style['foreground'])
-                    if 'background' in style:
-                        props += 'background-color:{}; '.format(style['background'])
-                    if style['bold']:
-                        props += 'font-weight:bold; '
-                    if style['italic']:
-                        props += 'font-style:italic; '
-                    props += '}'
+                    # Plain ordinary style. Did it change?
+                    new_style = v.style_for_scope(v.scope_name(point))
+                    if new_style != current_style:
 
-                    if props in css2:
-                        style_map[scope] = css2[props]
-                    else:
-                        sel = 'st{}'.format(len(css1))
-                        css1[sel] = props
-                        css2[props] = sel
-                        style_map[scope] = sel
+                        # Save last maybe.
+                        if point > current_style_start:
+                            line_styles.append((sublime.Region(current_style_start, point), current_style))
 
-        ## Highlight styles. They are handled differently.
-        highlight_scopes = settings.get('highlight_scopes')
-        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
+                        current_style = new_style
+                        current_style_start = point
 
-        for i in range(num_highlights):
-            # style_for_scope(scope_name) dict    Accepts a string scope name and returns a dict of style information,
-            # include the keys foreground, bold, italic, source_line, source_column and source_file. 
-            # If the scope has a background color set, the key background will be present. 
-            # The foreground and background colors are normalized to the six character hex form with a leading hash, e.g. #ff0000.
-            scope = highlight_scopes[i]
-            ss = v.style_for_scope(scope)
+                        _add_style(new_style)
 
-            # Swapsies.
-            background = ss['background'] if 'background' in ss else ss['foreground']
-            props = '{{ color:{}; background-color:{}; }}'.format(html_background, background)
+                    # Bump ahead.
+                    point += 1
 
-            # Fix name.
-            scope += '.highlight'
+            # Done. Save last maybe.
+            if point > current_style_start:
+                line_styles.append((sublime.Region(current_style_start, point), current_style))
 
-            if props in css2:
-                style_map[scope] = css2[props]
-            else:
-                sel = 'st{}'.format(len(css1))
-                css1[sel] = props
-                css2[props] = sel
-                style_map[scope] = sel
+            # Add to master list.
+            region_styles.append(line_styles)
 
         ## Create css.
         style_text = ""
-        for k in css1.keys():
-            style_text += '.{} {}\n'.format(k, css1[k])
+        st_index = 0
+        for style in all_styles:
+            props = '{{ color:{}; '.format(style['foreground'])
+            if 'background' in style:
+                props += 'background-color:{}; '.format(style['background'])
+            if style['bold']:
+                props += 'font-weight:bold; '
+            if style['italic']:
+                props += 'font-style:italic; '
+            props += '}'
+
+            style_text += '.st{} {}\n'.format(st_index, props)
+            st_index += 1
 
         ## Content text.
         content = []
         line_num = 1
 
         ## Iterate collected lines.
-        gutter_size = math.ceil(math.log(len(scope_tokens), 10))
+        gutter_size = math.ceil(math.log(len(region_styles), 10))
         padding = 1.4 + gutter_size * 0.5
 
-        for line_tokens in scope_tokens:
+        for line_styles in region_styles:
             if html_line_numbers:
                 content.append("<p>{:0{size}}  ".format(line_num, size=gutter_size))
             else:
                 content.append("<p>")
 
-            for region, scope in line_tokens:
-                #[(Region, scope)]
+            for region, style in line_styles:
+                #[(Region, style(ref))]
                 text = v.substr(region)
 
-                if scope == WHITESPACE:
-                    content.append(text) # plain text
-                elif scope in style_map:
-                    content.append('<span class={}>{}</span>'.format(style_map[scope], escape(text)))
+                # Locate the style.
+                st_index = _get_style(style)
+                if st_index >= 0:
+                    content.append('<span class=st{}>{}</span>'.format(st_index, escape(text)))
                 else:
                     content.append(text) # plain text
 
@@ -688,7 +708,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = self.view
         ##### Get prefs.
-        html_background = settings.get('md_background', 'transparent')
+        html_background = settings.get('md_background', 'white')
         html_font_size = settings.get('md_font_size', 12)
         html_font_face = settings.get('md_font_face', 'Arial')
 
@@ -746,14 +766,17 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     def run(self, edit, hl_index):
         v = self.view
 
+        # Prefs.
+        highlight_scopes = settings.get('highlight_scopes')
+
         # Get whole word or specific span.
         region = v.sel()[0]
+
         whole_word = region.empty()
         if whole_word:
             region = v.word(region)
         token = v.substr(region)
 
-        highlight_scopes = settings.get('highlight_scopes')
         num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
         hl_index = min(hl_index, num_highlights)
 
@@ -781,11 +804,21 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
 
         point = v.sel()[0].a
 
+        highlight_scope = ''
+
         for i in range(num_highlights):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             for region in v.get_regions(reg_name):
                 if region.contains(point):
+                    highlight_scope = highlight_scopes[i]
                     v.erase_regions(reg_name)
+
+                    # Remove from persistence.
+                    if v.file_name() in sproj.highlights:
+                        for i in range(len(sproj.highlights[v.file_name()])):
+                            if sproj.highlights[v.file_name()][i]['scope'] == highlight_scope:
+                                del sproj.highlights[v.file_name()][i]
+                                break;
                     break;
 
 
@@ -843,7 +876,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
             content.append('<p><span class=st{}>{}  {}</span></p>'.format(i, scope, props2))
 
         # Output html.
-        html1 = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<style  type="text/css">\np {\nmargin: 0em;\nfont-family: Consolas;\nfont-size: 1.0em;\nbackground-color: transparent;\n}\n'
+        html1 = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<style  type="text/css">\np {\nmargin: 0em;\nfont-family: Consolas;\nfont-size: 1.0em;\nbackground-color: white;\n}\n'
         html2 = '</style>\n</head>\n<body>\n'
         html3 = '</body>\n</html>\n'
         # Could also: sublime.set_clipboard(html1 + '\n'.join(style_text) + html2 + '\n'.join(content) + html3)
@@ -961,7 +994,7 @@ class SbotExMsgBoxCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, cmd=None):
         # print("MsgBox! {0} {1}".format(self.name(), edit))
-        sublime.ok_cancel_dialog("Hi there from StptMsgBoxCommand") # ok_cancel_dialog
+        sublime.ok_cancel_dialog("Hi there from StptMsgBoxCommand")
 
 
 #-----------------------------------------------------------------------------------

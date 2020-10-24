@@ -24,6 +24,7 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 
 ## Render To Html
 - Simple render to html with styles, primarily for printing.
+- Line wrap with optional line numbers.
 - Version to render markdown file to html using [Markdeep](https://casual-effects.com/markdeep/).
 
 | Command                  | Description |
