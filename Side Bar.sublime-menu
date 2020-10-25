@@ -13,5 +13,5 @@
 
     { "caption": "Render Source", "command": "sbot_render_source" },
     { "caption": "Render Markdown", "command": "sbot_render_markdown" },
-    { "caption": "Render Text", "command": "sbot_render_text" }
+    { "caption": "Render To Html", "command": "sbot_render_to_html" }
 ]

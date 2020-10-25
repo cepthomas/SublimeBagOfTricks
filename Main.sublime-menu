@@ -46,7 +46,7 @@
                             },
                             {
                                 "caption": "Documentation",
-                                "command": "open_site",
+                                "command": "sbot_open_site",
                                 "args": { "url": "https://github.com/cepthomas/SublimeBagOfTricks/blob/master/README.md"  }
                             },
                         ]

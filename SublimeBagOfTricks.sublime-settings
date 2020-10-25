@@ -1,34 +1,24 @@
 {
-    // For rendered html.
+    ///// Render settings /////
     "html_font_face": "Consolas",
-
-    // For rendered html. Not sure what the units are.
     "html_font_size": 14,
-
-    // If you need to change the fg.
-    "html_plain_text": "#000000",
-
     // If you need to change the bg color. Not done automatically from color scheme.
     "html_background": "white",
-
-    // One of: new_file, clipboard, default_file, default_file_open
-    "html_output": "default_file_open",
-
     // Optionally add line numbers.
     "html_line_numbers": true,
-
-    // If you need to change the bg color. Not done automatically from color scheme.
     "md_background": "OldLace",
-
-    // For rendered html.
     "md_font_face": "Calibri",
-
-    // For rendered html. Not sure what the units are.
     "md_font_size": 14,
+    // One of: new_file, clipboard, default_file, default_file_open.
+    "render_output": "default_file_open",
 
+    ///// Highlight settings /////
     // Scopes for marking text.
     "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
 
-    // Scope for gutter signet icon.
-    "signet_scope": "keyword"
+    ///// Signet settings /////
+    // Scope for coloring gutter icon.
+    "signet_scope": "keyword",
+    // If true next/prev traverses all marked files, otherwise just the open file.
+    "signet_nav_files": true
 }

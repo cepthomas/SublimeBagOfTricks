@@ -29,7 +29,7 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_render_text         | Render current file including scope colors and highlights to html |
+| sbot_render_to_html      | Render current file including scope colors and highlights to html |
 | sbot_render_markdown     | Render current markdown file to html |
 
 
@@ -37,19 +37,18 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 |:--------                 |:-------     |
 | html_font_face           | For rendered html |
 | html_font_size           | For rendered html |
-| html_plain_text          | If you need to change the fg for plain (unstyled) text |
 | html_background          | If you need to change the bg color (not done automatically from color scheme) |
-| html_output              | One of: clipboard, new_file (view), default_file (original filename + .html), default_file_open (default_file + show) |
 | html_line_numbers        | Optionally add line numbers |
 | md_font_face             | For rendered markdown |
 | md_font_size             | For rendered markdown |
 | md_background            | If you need to change the markdown bg color (not done automatically from color scheme) |
+| render_output            | One of: clipboard, new_file (view), default_file (original filename + .html), default_file_open (default_file + show) |
 
 
 ## Signets (bookmarks)
 Enhanced bookmarks:
 - Persisted per ST project.
-- Next/previous traverses files in project - like VS.
+- Next/previous (optionally) traverses files in project - like VS.
 - `Bookmark` and `mark` are already taken so I shall use `signet` which means in French:
 > "Petit ruban ou filet qu'on insère entre les feuillets d'un livre pour marquer l'endroit que l'on veut retrouver."
 
@@ -63,6 +62,7 @@ Enhanced bookmarks:
 | Setting                  | Description |
 |:--------                 |:-------     |
 | signet_scope             | ST scope name for gutter icon color |
+| signet_nav_files         | Next/prev traverses all files otherwise just open one |
 
 ## Miscellany
 | Command                  | Description |

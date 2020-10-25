@@ -9,6 +9,7 @@ from html import escape
 import time
 import traceback
 import subprocess
+import tempfile
 import sublime
 import sublime_plugin
 
@@ -18,12 +19,13 @@ import sublime_plugin
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 MAX_HIGHLIGHTS = 6
 SIGNET_REGION_NAME = 'signet'
-SIGNET_ICON = 'bookmark'  # 'Packages/Theme - Default/common/label.png'
+# SIGNET_ICON = 'bookmark'
+SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
 NEXT_SIG = 1
 PREV_SIG = 2
 
-# ====== Vars - global across all Windows ====
+# ====== Vars - global for all open Windows (not Views!) ====
 settings = None
 sbot_projects = {} # {k:window_id v:SbotProject}
 
@@ -45,21 +47,10 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         #     print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
         # _get_project(v).dump() # These are not ordered like file.
 
-        # vals = []
-        # for i in range(100):
-        #     start = time.perf_counter()
-        #     sel_reg = sublime.Region(0, v.size())
-        #     for line_region in v.split_by_newlines(sel_reg):
-        #         pass
-        #     # for s in v.substr(sel_reg):
-        #     #     pass
-        #     vals.append(time.perf_counter() - start)
-        # print('split_by_newlines', sum(vals) / len(vals))
-
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
-    ''' Initialize module stuff. '''
+    ''' Initialize module global stuff. '''
     global settings
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
@@ -72,13 +63,19 @@ def plugin_loaded():
     logging.info("ddir:" + ddir);
 
 
+#-----------------------------------------------------------------------------------
+def plugin_unloaded():
+    logging.info("plugin_unloaded()");
+    _save_sbot_projects()
+
+    
 # =========================================================================
 # ====================== SbotProject ======================================
 # =========================================================================
 
 #-----------------------------------------------------------------------------------
 class SbotProject(object):
-    ''' Container for persistence. TODOR '''
+    ''' Container for persistence. Translates file json format to/from internal collections. TODOR '''
 
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
@@ -86,7 +83,7 @@ class SbotProject(object):
         # Need this because ST window/view lifecycle is unreliable.
         self.views_inited = set()
 
-        # Unpack into our convenience collections.
+        # Unpack persisted data into our internal convenience collections.
         self.signets = {}  # k:filename v:[rows]  0-based (like ST)
         self.highlights = {}  # k:filename v:[tokens]  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
 
@@ -115,20 +112,22 @@ class SbotProject(object):
     def save(self):
         try:
             sigs = []
-            highlights = []
+            hls = []
             values = {}
+
+            # Persisted our internal convenience collections as json.
 
             for filename, rows in self.signets.items():
                 if len(rows) > 0:
-                    if os.path.exists(filename): # sanity check
+                    if filename is not None and os.path.exists(filename): # sanity check
                         sigs.append({'filename': filename, 'rows': rows})
                 values['signets'] = sigs
 
             for filename, tokens in self.highlights.items():
                 if len(tokens) > 0:
-                    if os.path.exists(filename): # sanity check
-                        highlights.append({'filename': filename, 'tokens': tokens})
-                values['highlights'] = highlights
+                    if filename is not None and os.path.exists(filename): # sanity check
+                        hls.append({'filename': filename, 'tokens': tokens})
+                values['highlights'] = hls
 
             with open(self.fn, 'w') as fp:
                 json.dump(values, fp, indent=4)
@@ -274,67 +273,108 @@ class SbotPerfCounter(object):
 # ====================== EventListeners ===================================
 # =========================================================================
 
+
+#-----------------------------------------------------------------------------------
+# class WindowEvent(sublime_plugin.EventListener):
+#     ''' Listener. '''
+    
+#     def xlog(self, text, view):
+#         s = '>>> {} view:{}'.format(text, 'None' if view is None else view.file_name())
+#         logging.info(s)
+
+#     def on_activated(self, view):
+#         self.xlog('on_activated()', view)
+
+#     def on_deactivated(self, view):
+#         self.xlog('on_deactivated()', view)
+
+#     def on_new(self, view):
+#         self.xlog('on_new()', view)
+
+#     def on_load(self, view):
+#         self.xlog('on_load()', view)
+
+#     def on_modified(self, view):
+#         self.xlog('on_modified()', view)
+
+#     def on_pre_close(self, view):
+#         self.xlog('on_pre_close()', view)
+
+#     def on_close(self, view):
+#         self.xlog('on_close()', view)
+                
+
 #-----------------------------------------------------------------------------------
 class ViewEvent(sublime_plugin.ViewEventListener):
     ''' Listener. '''
 
     def on_activated(self):
         ''' When focus/tab received. '''
-        v = self.view
-        _dump_view('ViewEventListener.on_activated', v)
-
-        # This is kind of crude but there is no project_loaded event (ST4 does though...)
-        sproj = None
-        global sbot_projects
-        id = v.window().id()
-
-        # Check for already loaded.
-        if not id in sbot_projects:
-            fn = v.window().project_file_name()
-            # Load the project file.
-            sproj = SbotProject(fn)
-            sbot_projects[id] = sproj
-        else:
-            sproj = sbot_projects[id]
-
-        # If this is the first time through and project has signets and/or highlights for this file, set them all.
-        if v.id() not in sproj.views_inited:
-
-            # Process signets.
-            if v.file_name() in sproj.signets:
-                _toggle_signet(v, sproj.signets.get(v.file_name(), []))
-
-            # Process highlights.
-            if v.file_name() in sproj.highlights:
-                for tok in sproj.highlights.get(v.file_name(), {}):
-                    _highlight_one(v, tok['token'], tok['whole_word'], tok['scope'])
+        # _dump_view('ViewEventListener.on_activated', self.view)
+        _load_project_maybe(self.view)
 
     def on_deactivated(self):
-        ''' When focus/tab lost. TODOC gets goofed up on file->save'''
-        # Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (Fixed in ST4)
-        v = self.view
-        # _dump_view('EventListener.on_deactivated', v)
-        sbot_project = _get_project(v)
-
-        if sbot_project is not None:
-            # Gather signets.
-            sig_rows = []
-
-            for row in _get_signet_rows(v):
-                sig_rows.append(row)
-                # sig_rows.append(row + 1) # Adjust to 1-based
-
-            if len(sig_rows) > 0:
-                sbot_project.signets[v.file_name()] = sig_rows
-            elif v.file_name() in sbot_project.signets:
-                del sbot_project.signets[v.file_name()]
-
-            # Save the project file.
-            sbot_project.save()
+        ''' When focus/tab lost. '''
+        # _dump_view('EventListener.on_deactivated', self.view)
+        _save_project_maybe(self.view)
 
     def on_selection_modified(self):
+        ''' Show the abs position in the status bar for debugging. '''
         pos = self.view.sel()[0].begin()
         self.view.set_status("position", 'Pos {}'.format(pos))
+
+
+#-----------------------------------------------------------------------------------
+def _load_project_maybe(v):
+    ''' This is kind of crude but there is no project_loaded event (ST4 does though...) '''
+    sproj = None
+    global sbot_projects
+    id = v.window().id()
+
+    # Check for already loaded.
+    if not id in sbot_projects:
+        fn = v.window().project_file_name()
+        # Load the project file.
+        sproj = SbotProject(fn)
+        sbot_projects[id] = sproj
+    else:
+        sproj = sbot_projects[id]
+
+    # If this is the first time through and project has signets and/or highlights for this file, get them all.
+    if v.id() not in sproj.views_inited:
+        sproj.views_inited.add(v.id())
+
+        # Process signets to visual.
+        if v.file_name() in sproj.signets:
+            _toggle_signet(v, sproj.signets.get(v.file_name(), []))
+
+        # Process highlights to visual.
+        if v.file_name() in sproj.highlights:
+            for tok in sproj.highlights.get(v.file_name(), {}):
+                _highlight_one(v, tok['token'], tok['whole_word'], tok['scope'])
+
+
+#-----------------------------------------------------------------------------------
+def _save_project_maybe(v):
+    '''  Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (Fixed in ST4) '''
+    sbot_project = _get_project(v)
+
+    if sbot_project is not None:
+        # Gather visual signets.
+        sig_rows = []
+
+        for row in _get_signet_rows(v):
+            sig_rows.append(row)
+            # sig_rows.append(row + 1) # Adjust to 1-based
+
+        if len(sig_rows) > 0:
+            sbot_project.signets[v.file_name()] = sig_rows
+        elif v.file_name() in sbot_project.signets:
+            del sbot_project.signets[v.file_name()]
+
+        # Save the project file.
+        sbot_project.save()
+
 
 
 # =========================================================================
@@ -353,9 +393,12 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 def move_to_signet(view, dir):
-    ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. TODOC Add option goto signet(s) in this file. '''
+    ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
     v = view
     w = view.window()
+    signet_nav_files = settings.get('signet_nav_files', True)
+
+    signet_nav_files
     done = False
     sel_row, _ = v.rowcol(v.sel()[0].a) # current sel
     incr = +1 if dir == NEXT_SIG else -1
@@ -373,6 +416,11 @@ def move_to_signet(view, dir):
                 w.active_view().run_command("goto_line", {"line": sr + 1})
                 done = True
                 break
+
+        # At begin or end. Check for single file operation.
+        if not done and not signet_nav_files and len(sig_rows) > 0:
+            w.active_view().run_command("goto_line", {"line": sig_rows[0] + 1})
+            done = True
 
     # 2) NEXT_SIG: Else if there's an open signet file to the right of this tab >>> focus tab, goto first signet
     # 2) PREV_SIG: Else if there's an open signet file to the left of this tab >>> focus tab, goto last signet
@@ -438,10 +486,12 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         sproj = _get_project(self.view)
+
         # clear persistence
         if sproj is not None:
             sproj.signets.clear()
-        # clear visual
+
+        # Clear visuals in open views.
         for vv in self.view.window().views():
             vv.erase_regions(SIGNET_REGION_NAME)
 
@@ -463,7 +513,7 @@ def _toggle_signet(view, rows, sel_row=-1):
     signet_rows = []
 
     if sel_row != -1:
-        # Is there one there?
+        # Is there one currently at the selected row?
         existing = False
         for row in rows:
             if sel_row == row:
@@ -476,7 +526,7 @@ def _toggle_signet(view, rows, sel_row=-1):
     else:
         signet_rows = rows
 
-    # Update visual signets, brutally.
+    # Update visual signets, brutally. This is the ST way.
     regions = []
     for r in signet_rows:
         pt = view.text_point(r, 0) # 0-based
@@ -491,7 +541,7 @@ def _toggle_signet(view, rows, sel_row=-1):
 
 
 #-----------------------------------------------------------------------------------
-class SbotRenderTextCommand(sublime_plugin.TextCommand):
+class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' TODOR Slow on large files. '''
     def run(self, edit):
         v = self.view
@@ -500,7 +550,6 @@ class SbotRenderTextCommand(sublime_plugin.TextCommand):
         ## Get prefs.
         html_font_size = settings.get('html_font_size', 12)
         html_font_face = settings.get('html_font_face', 'Arial')
-        html_plain_text = settings.get('html_plain_text', '#000000')
         html_background = settings.get('html_background', 'white')
         html_line_numbers = settings.get('html_line_numbers', True)
 
@@ -510,26 +559,25 @@ class SbotRenderTextCommand(sublime_plugin.TextCommand):
         highlight_regions = [] # (Region, style(ref?))
 
         ## If there are highlights, collect them.
-        if v.file_name() in sproj.highlights:
-            highlight_scopes = settings.get('highlight_scopes')
-            num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
-            for i in range(num_highlights):
+        highlight_scopes = settings.get('highlight_scopes')
+        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
+        for i in range(num_highlights):
 
-                # Get the style and invert for highlights.
-                scope = highlight_scopes[i]
-                ss = v.style_for_scope(scope)
-                background = ss['background'] if 'background' in ss else ss['foreground']
-                foreground = html_background
-                ss['background'] = background
-                ss['foreground'] = foreground
+            # Get the style and invert for highlights.
+            scope = highlight_scopes[i]
+            ss = v.style_for_scope(scope)
+            background = ss['background'] if 'background' in ss else ss['foreground']
+            foreground = html_background
+            ss['background'] = background
+            ss['foreground'] = foreground
 
-                # Collect the highlight regions.
-                reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
-                for region in v.get_regions(reg_name):
-                    highlight_regions.append((region, ss))
+            # Collect the highlight regions.
+            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+            for region in v.get_regions(reg_name):
+                highlight_regions.append((region, ss))
 
-            # Put all in order.
-            highlight_regions.sort(key=lambda v: v[0].a)
+        # Put all in order.
+        highlight_regions.sort(key=lambda v: v[0].a)
 
         ## Tokenize selection by syntax scope.
         has_selection = len(v.sel()[0]) > 0
@@ -708,13 +756,13 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = self.view
         ##### Get prefs.
-        html_background = settings.get('md_background', 'white')
-        html_font_size = settings.get('md_font_size', 12)
-        html_font_face = settings.get('md_font_face', 'Arial')
+        md_background = settings.get('md_background', 'white')
+        md_font_size = settings.get('md_font_size', 12)
+        md_font_face = settings.get('md_font_face', 'Arial')
 
         html = []
         html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
-        html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(html_background, html_font_face, html_font_size))
+        html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(md_background, md_font_face, md_font_size))
         html.append("</style></head><body>")
 
         html.append(v.substr(sublime.Region(0, v.size())))
@@ -729,7 +777,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 def _output_html(edit, view, content=[]):
-    output_type = settings.get('html_output', 'new_file')
+    output_type = settings.get('render_output', 'new_file')
 
     if output_type == 'clipboard':
         sublime.set_clipboard("".join(content))
@@ -741,7 +789,7 @@ def _output_html(edit, view, content=[]):
 
     elif output_type == 'default_file' or output_type == 'default_file_open':
         if view.file_name() is None:
-            sublime.error_message("Can't use html_output=default_file for unnamed files")
+            sublime.error_message("Can't use render_output=default_file for unnamed files")
         else:
             hfile = view.file_name() + '.html'
             with open(hfile, 'w') as f:
