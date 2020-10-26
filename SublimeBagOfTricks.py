@@ -75,7 +75,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class SbotProject(object):
-    ''' Container for persistence. Translates file json format to/from internal collections. TODOR '''
+    ''' Container for persistence. Translates file json format to/from internal collections. TODOC refactor all '''
 
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
@@ -115,8 +115,7 @@ class SbotProject(object):
             hls = []
             values = {}
 
-            # Persisted our internal convenience collections as json.
-
+            # Persist our internal convenience collections as json.
             for filename, rows in self.signets.items():
                 if len(rows) > 0:
                     if filename is not None and os.path.exists(filename): # sanity check
@@ -152,6 +151,58 @@ def _get_project(view):
     if id in sbot_projects:
         sproj = sbot_projects[id]
     return sproj
+
+
+#-----------------------------------------------------------------------------------
+def _load_project_maybe(v):
+    ''' This is kind of crude but there is no project_loaded event (ST4 has on_load_project() though...) '''
+    sproj = None
+    global sbot_projects
+    id = v.window().id()
+
+    # Check for already loaded.
+    if not id in sbot_projects:
+        fn = v.window().project_file_name()
+        # Load the project file.
+        sproj = SbotProject(fn)
+        sbot_projects[id] = sproj
+    else:
+        sproj = sbot_projects[id]
+
+    # If this is the first time through and project has signets and/or highlights for this file, get them all.
+    if v.id() not in sproj.views_inited:
+        sproj.views_inited.add(v.id())
+
+        # Process signets to visual.
+        if v.file_name() in sproj.signets:
+            _toggle_signet(v, sproj.signets.get(v.file_name(), []))
+
+        # Process highlights to visual.
+        if v.file_name() in sproj.highlights:
+            for tok in sproj.highlights.get(v.file_name(), {}):
+                _highlight_view(v, tok['token'], tok['whole_word'], tok['scope'])
+
+
+#-----------------------------------------------------------------------------------
+def _save_project_maybe(v):
+    '''  Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
+    sbot_project = _get_project(v)
+
+    if sbot_project is not None:
+        # Gather visual signets.
+        sig_rows = []
+
+        for row in _get_signet_rows(v):
+            sig_rows.append(row)
+            # sig_rows.append(row + 1) # Adjust to 1-based
+
+        if len(sig_rows) > 0:
+            sbot_project.signets[v.file_name()] = sig_rows
+        elif v.file_name() in sbot_project.signets:
+            del sbot_project.signets[v.file_name()]
+
+        # Save the project file.
+        sbot_project.save()
 
 
 # =========================================================================
@@ -275,36 +326,6 @@ class SbotPerfCounter(object):
 
 
 #-----------------------------------------------------------------------------------
-# class WindowEvent(sublime_plugin.EventListener):
-#     ''' Listener. '''
-    
-#     def xlog(self, text, view):
-#         s = '>>> {} view:{}'.format(text, 'None' if view is None else view.file_name())
-#         logging.info(s)
-
-#     def on_activated(self, view):
-#         self.xlog('on_activated()', view)
-
-#     def on_deactivated(self, view):
-#         self.xlog('on_deactivated()', view)
-
-#     def on_new(self, view):
-#         self.xlog('on_new()', view)
-
-#     def on_load(self, view):
-#         self.xlog('on_load()', view)
-
-#     def on_modified(self, view):
-#         self.xlog('on_modified()', view)
-
-#     def on_pre_close(self, view):
-#         self.xlog('on_pre_close()', view)
-
-#     def on_close(self, view):
-#         self.xlog('on_close()', view)
-                
-
-#-----------------------------------------------------------------------------------
 class ViewEvent(sublime_plugin.ViewEventListener):
     ''' Listener. '''
 
@@ -322,59 +343,6 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         ''' Show the abs position in the status bar for debugging. '''
         pos = self.view.sel()[0].begin()
         self.view.set_status("position", 'Pos {}'.format(pos))
-
-
-#-----------------------------------------------------------------------------------
-def _load_project_maybe(v):
-    ''' This is kind of crude but there is no project_loaded event (ST4 does though...) '''
-    sproj = None
-    global sbot_projects
-    id = v.window().id()
-
-    # Check for already loaded.
-    if not id in sbot_projects:
-        fn = v.window().project_file_name()
-        # Load the project file.
-        sproj = SbotProject(fn)
-        sbot_projects[id] = sproj
-    else:
-        sproj = sbot_projects[id]
-
-    # If this is the first time through and project has signets and/or highlights for this file, get them all.
-    if v.id() not in sproj.views_inited:
-        sproj.views_inited.add(v.id())
-
-        # Process signets to visual.
-        if v.file_name() in sproj.signets:
-            _toggle_signet(v, sproj.signets.get(v.file_name(), []))
-
-        # Process highlights to visual.
-        if v.file_name() in sproj.highlights:
-            for tok in sproj.highlights.get(v.file_name(), {}):
-                _highlight_one(v, tok['token'], tok['whole_word'], tok['scope'])
-
-
-#-----------------------------------------------------------------------------------
-def _save_project_maybe(v):
-    '''  Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (Fixed in ST4) '''
-    sbot_project = _get_project(v)
-
-    if sbot_project is not None:
-        # Gather visual signets.
-        sig_rows = []
-
-        for row in _get_signet_rows(v):
-            sig_rows.append(row)
-            # sig_rows.append(row + 1) # Adjust to 1-based
-
-        if len(sig_rows) > 0:
-            sbot_project.signets[v.file_name()] = sig_rows
-        elif v.file_name() in sbot_project.signets:
-            del sbot_project.signets[v.file_name()]
-
-        # Save the project file.
-        sbot_project.save()
-
 
 
 # =========================================================================
@@ -501,7 +469,7 @@ def _get_signet_rows(view):
     ''' Get all the signet row numbers in the view. Returns a sorted list. '''
     # Current signets in this view. 0-based.
     sig_rows = []
-    for reg in view.get_regions('signet'):
+    for reg in view.get_regions(SIGNET_REGION_NAME):
         row, _ = view.rowcol(reg.a)
         sig_rows.append(row)
     sig_rows.sort()
@@ -531,7 +499,6 @@ def _toggle_signet(view, rows, sel_row=-1):
     for r in signet_rows:
         pt = view.text_point(r, 0) # 0-based
         regions.append(sublime.Region(pt, pt))
-
     view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope', 'comment'), SIGNET_ICON)
 
 
@@ -542,7 +509,7 @@ def _toggle_signet(view, rows, sel_row=-1):
 
 #-----------------------------------------------------------------------------------
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
-    ''' TODOR Slow on large files. '''
+    ''' Make a pretty. '''
     def run(self, edit):
         v = self.view
         sproj = _get_project(v)
@@ -553,10 +520,30 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         html_background = settings.get('html_background', 'white')
         html_line_numbers = settings.get('html_line_numbers', True)
 
+        # Use tuples for everything as they can be hashable keys.
+        # my_style = (foreground, background, bold, italic)
+
+
         ## Collect scope/style info.
-        all_styles = [] # style
-        region_styles = [] # One [(Region, style(ref?))] per line
-        highlight_regions = [] # (Region, style(ref?))
+        all_styles = {} # k:style v:id
+        region_styles = [] # One [(Region, style)] per line
+        highlight_regions = [] # (Region, style))
+
+
+        ### Local helpers.
+        def _add_style(style):
+            # Add style to our collection.
+            if style not in all_styles:
+                all_styles[style] = len(all_styles)
+
+        def _get_style(style):
+                # Locate the style and return the id.
+                return all_styles.get(style, -1)
+
+        def _view_style_to_tuple(view_style):
+            # print(view_style)
+            tt = (view_style['foreground'], view_style.get('background', None), view_style.get('bold', False), view_style.get('italic', False))
+            return tt
 
         ## If there are highlights, collect them.
         highlight_scopes = settings.get('highlight_scopes')
@@ -568,13 +555,13 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             ss = v.style_for_scope(scope)
             background = ss['background'] if 'background' in ss else ss['foreground']
             foreground = html_background
-            ss['background'] = background
-            ss['foreground'] = foreground
+            hl_style = (foreground, background, False, False)
+            _add_style(hl_style)
 
             # Collect the highlight regions.
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             for region in v.get_regions(reg_name):
-                highlight_regions.append((region, ss))
+                highlight_regions.append((region, hl_style))
 
         # Put all in order.
         highlight_regions.sort(key=lambda v: v[0].a)
@@ -583,24 +570,8 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         has_selection = len(v.sel()[0]) > 0
         sel_reg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
         
-        # Local helpers. TODOR inefficient!
-        def _add_style(style):
-            # Add style to our list. 
-            if all_styles.count(style) == 0:
-                all_styles.append(style)
-
-        def _get_style(style):
-                # Locate the style and return the index.
-                st_index = -1
-                for i in range(len(all_styles)):
-                    if style == all_styles[i]:
-                        st_index = i
-                        break
-                return st_index
-
-
-        for line_region in v.split_by_newlines(sel_reg): # string.splitlines() seems to be about 3x faster but would double memory use.
-            line_styles = [] # (Region, style(ref?))
+        for line_region in v.split_by_newlines(sel_reg): # TODOC too slow ( 1 msec per line) string.splitlines() seems to be about 3x faster but would double memory use.
+            line_styles = [] # (Region, style))
 
             # Start a new line.
             current_style = None
@@ -611,7 +582,6 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             point = line_region.a
 
             while point < line_region.b:
-
                 # Check if it's a highlight first as they take precedence.
                 if len(highlight_regions) > 0 and point >= highlight_regions[0][0].a:
 
@@ -636,7 +606,8 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
                 else:
                     # Plain ordinary style. Did it change?
-                    new_style = v.style_for_scope(v.scope_name(point))
+                    new_style = _view_style_to_tuple(v.style_for_scope(v.scope_name(point)))
+
                     if new_style != current_style:
 
                         # Save last maybe.
@@ -660,23 +631,23 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         ## Create css.
         style_text = ""
-        st_index = 0
-        for style in all_styles:
-            props = '{{ color:{}; '.format(style['foreground'])
-            if 'background' in style:
-                props += 'background-color:{}; '.format(style['background'])
-            if style['bold']:
+        # print('all_styles', all_styles)
+        for style, id in all_styles.items():
+            props = '{{ color:{}; '.format(style[0])
+            if style[1] is not None:
+                props += 'background-color:{}; '.format(style[1])
+            if style[2]:
                 props += 'font-weight:bold; '
-            if style['italic']:
+            if style[3]:
                 props += 'font-style:italic; '
             props += '}'
-
-            style_text += '.st{} {}\n'.format(st_index, props)
-            st_index += 1
+            style_text += '.st{} {}\n'.format(id, props)
 
         ## Content text.
         content = []
         line_num = 1
+
+        ii = 0
 
         ## Iterate collected lines.
         gutter_size = math.ceil(math.log(len(region_styles), 10))
@@ -693,9 +664,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 text = v.substr(region)
 
                 # Locate the style.
-                st_index = _get_style(style)
-                if st_index >= 0:
-                    content.append('<span class=st{}>{}</span>'.format(st_index, escape(text)))
+                id = _get_style(style)
+                if id >= 0:
+                    content.append('<span class=st{}>{}</span>'.format(id, escape(text)))
                 else:
                     content.append(text) # plain text
 
@@ -830,7 +801,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
         scope = highlight_scopes[hl_index]
 
-        _highlight_one(v, token, whole_word, scope)
+        _highlight_view(v, token, whole_word, scope)
 
         # Add to persistence.
         sproj = _get_project(v)
@@ -898,10 +869,11 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         style_text = []
         content = []
         scopes = [
-            'comment', 'constant', 'constant.character.escape', 'constant.language', 'constant.numeric', 'entity.name', 'entity.name.section',
-            'entity.name.tag', 'entity.other', 'invalid', 'invalid.deprecated', 'invalid.illegal', 'keyword', 'keyword.control',
-            'keyword.declaration', 'keyword.operator', 'markup', 'punctuation', 'source', 'storage.modifier', 'storage.type', 'string',
-            'support', 'text', 'variable', 'variable.function', 'variable.language', 'variable.parameter']
+            'comment', 'constant', 'constant.character.escape', 'constant.language', 'constant.numeric', 'entity.name',
+            'entity.name.section', 'entity.name.tag', 'entity.other', 'invalid', 'invalid.deprecated', 'invalid.illegal',
+            'keyword', 'keyword.control', 'keyword.declaration', 'keyword.operator', 'markup', 'punctuation', 'source',
+            'storage.modifier', 'storage.type', 'string', 'support', 'text', 'variable', 'variable.function',
+            'variable.language', 'variable.parameter']
 
         for scope in scopes:
             style = v.style_for_scope(scope)
@@ -945,7 +917,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def _highlight_one(view, token, whole_word, scope):
+def _highlight_view(view, token, whole_word, scope):
 
     escaped = re.escape(token)
     if whole_word and escaped[0].isalnum():
