@@ -8,6 +8,7 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 
 ## Colorizing
 - Word colorizing similar to [StyleToken](https://github.com/vcharnahrebel/style-token).
+- Persists to sbot project file.
 - Also a handy scope popup that shows you the style associated with each scope.
 
 | Command                  | Description |
@@ -47,7 +48,7 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 
 ## Signets (bookmarks)
 Enhanced bookmarks:
-- Persisted per ST project.
+- Persists to sbot project file.
 - Next/previous (optionally) traverses files in project - like VS.
 - `Bookmark` and `mark` are already taken so I shall use `signet` which means in French:
 > "Petit ruban ou filet qu'on insère entre les feuillets d'un livre pour marquer l'endroit que l'on veut retrouver."
@@ -95,11 +96,18 @@ Leftovers that will eventually be deleted or subsumed.
 
 Accumulated notes that will probably eventually go away.
 
-## Misc Notes
+## Naming
 - In general `line` refers to editor lines and is 1-based. `row` refers to buffer contents as an array and is 0-based.
-- `package-metadata.json` is used for package management so remove it while developing/debugging plugins because PackageControl will delete the entire package.
-- Commands can't end with `_numeral` e.g. `my_cmd_1` should be `stpt_cmd1`.
+- Collections, variables, functions, etc use:
+  - `persisted` is the json compatible file format.
+  - `visual` is the way ST API handles elements.
+  - `internal` is the plugin format.
+- Commands can't end with `<underscore numeral>` e.g. `my_cmd_1` should be `stpt_cmd1`.
 - There is magic naming for Commands and InputHandlers to support mapping to the menu and key maps. e.g. a command like `big_brown_dog` is mapped to a handler named 'BigBrowwnDogCommand()'.
+
+
+## Misc Notes
+- `package-metadata.json` is used for package management so remove it while developing/debugging plugins because PackageControl will delete the entire package.
 - There's lots of good plugin examples in `Packages\Default`.
 - If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
 

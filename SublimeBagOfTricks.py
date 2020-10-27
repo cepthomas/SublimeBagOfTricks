@@ -14,7 +14,6 @@ import sublime
 import sublime_plugin
 
 
-
 # ====== Defs ========
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 MAX_HIGHLIGHTS = 6
@@ -66,7 +65,9 @@ def plugin_loaded():
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
     logging.info("plugin_unloaded()");
-    _save_sbot_projects()
+    # just in case...
+    for id in list(sbot_projects):
+        sbot_projects[id].save()
 
     
 # =========================================================================
@@ -75,7 +76,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class SbotProject(object):
-    ''' Container for persistence. Translates file json format to/from internal collections. TODOC refactor all '''
+    ''' Container for project info. Converts persisted to/from internal. TODOC refactor all '''
 
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
@@ -137,13 +138,6 @@ class SbotProject(object):
 
 
 #-----------------------------------------------------------------------------------
-def _save_sbot_projects():
-    ''' Save all projects to file. '''
-    for id in list(sbot_projects):
-        sbot_projects[id].save()
-
-
-#-----------------------------------------------------------------------------------
 def _get_project(view):
     ''' Get the sbot project for the view. None if invalid. '''
     sproj = None
@@ -155,12 +149,12 @@ def _get_project(view):
 
 #-----------------------------------------------------------------------------------
 def _load_project_maybe(v):
-    ''' This is kind of crude but there is no project_loaded event (ST4 has on_load_project() though...) '''
+    ''' This is kind of crude but there is no project loaded event (ST4 has on_load_project() though...) '''
     sproj = None
     global sbot_projects
     id = v.window().id()
 
-    # Check for already loaded.
+    # Persisted to internal. Check for already loaded.
     if not id in sbot_projects:
         fn = v.window().project_file_name()
         # Load the project file.
@@ -173,36 +167,14 @@ def _load_project_maybe(v):
     if v.id() not in sproj.views_inited:
         sproj.views_inited.add(v.id())
 
-        # Process signets to visual.
+        # Process signets internal to visual.
         if v.file_name() in sproj.signets:
             _toggle_signet(v, sproj.signets.get(v.file_name(), []))
 
-        # Process highlights to visual.
+        # Process highlights internal to visual.
         if v.file_name() in sproj.highlights:
             for tok in sproj.highlights.get(v.file_name(), {}):
                 _highlight_view(v, tok['token'], tok['whole_word'], tok['scope'])
-
-
-#-----------------------------------------------------------------------------------
-def _save_project_maybe(v):
-    '''  Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
-    sbot_project = _get_project(v)
-
-    if sbot_project is not None:
-        # Gather visual signets.
-        sig_rows = []
-
-        for row in _get_signet_rows(v):
-            sig_rows.append(row)
-            # sig_rows.append(row + 1) # Adjust to 1-based
-
-        if len(sig_rows) > 0:
-            sbot_project.signets[v.file_name()] = sig_rows
-        elif v.file_name() in sbot_project.signets:
-            del sbot_project.signets[v.file_name()]
-
-        # Save the project file.
-        sbot_project.save()
 
 
 # =========================================================================
@@ -260,70 +232,8 @@ class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
 
 
 # =========================================================================
-# ====================== Utilities ========================================
-# =========================================================================
-
-#-----------------------------------------------------------------------------------
-def _dump_view(preamble, view):
-    ''' Helper util. '''
-    s = []
-    s.append('view')
-    s.append(preamble)
-
-    s.append('view_id:')
-    s.append('None' if view is None else str(view.id()))
-
-    if view is not None:
-        w = view.window()
-        fn = view.file_name()
-
-        s.append('file_name:')
-        s.append('None' if fn is None else os.path.split(fn)[1])
-
-        s.append('project_file_name:')
-        s.append('None' if w is None or w.project_file_name() is None else os.path.split(w.project_file_name())[1])
-
-    logging.info(" ".join(s));
-            
-
-#-----------------------------------------------------------------------------------
-def _wait_load_file(view, line):
-    ''' Open file asynchronously then position at line. '''
-    if view.is_loading():
-        sublime.set_timeout(lambda: _wait_load_file(view, line), 100) # maybe not forever?
-    else: # good to go
-        view.run_command("goto_line", {"line": line})
-
-
-#-----------------------------------------------------------------------------------
-class SbotPerfCounter(object):
-    ''' Container for perf counter. '''
-
-    def __init__(self, id):
-        self.id = id
-        self.vals = []
-        self.start = 0
-
-    def start(self):
-        self.start = time.perf_counter()
-
-    def stop(self):
-        if self.start != 0:
-            self.vals.append(time.perf_counter() - self.start)
-            self.start = 0
-
-    def dump(self):
-        s =  '{}: {}'.format(self.id, sum(vals) / len(vals)) if len(self.vals) > 0 else '{}: No data'.format(self.id)
-        return s
-
-    def clear(self):
-        self.vals = []
-
-
-# =========================================================================
 # ====================== EventListeners ===================================
 # =========================================================================
-
 
 #-----------------------------------------------------------------------------------
 class ViewEvent(sublime_plugin.ViewEventListener):
@@ -335,9 +245,12 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         _load_project_maybe(self.view)
 
     def on_deactivated(self):
-        ''' When focus/tab lost. '''
+        ''' When focus/tab lost. Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
         # _dump_view('EventListener.on_deactivated', self.view)
-        _save_project_maybe(self.view)
+        sproj = _get_project(self.view)
+        if sproj is not None:
+            # Save the project file internal to persisted.
+            sproj.save()
 
     def on_selection_modified(self):
         ''' Show the abs position in the status bar for debugging. '''
@@ -360,7 +273,7 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def move_to_signet(view, dir):
+def _go_to_signet(view, dir):
     ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
     v = view
     w = view.window()
@@ -438,7 +351,7 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        move_to_signet(self.view, NEXT_SIG)
+        _go_to_signet(self.view, NEXT_SIG)
 
 
 #-----------------------------------------------------------------------------------
@@ -446,16 +359,15 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        move_to_signet(self.view, PREV_SIG)
+        _go_to_signet(self.view, PREV_SIG)
 
 
 #-----------------------------------------------------------------------------------
 class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
+        # Clear internal.
         sproj = _get_project(self.view)
-
-        # clear persistence
         if sproj is not None:
             sproj.signets.clear()
 
@@ -467,7 +379,6 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 def _get_signet_rows(view):
     ''' Get all the signet row numbers in the view. Returns a sorted list. '''
-    # Current signets in this view. 0-based.
     sig_rows = []
     for reg in view.get_regions(SIGNET_REGION_NAME):
         row, _ = view.rowcol(reg.a)
@@ -478,25 +389,25 @@ def _get_signet_rows(view):
 
 #-----------------------------------------------------------------------------------
 def _toggle_signet(view, rows, sel_row=-1):
-    signet_rows = []
-
     if sel_row != -1:
         # Is there one currently at the selected row?
-        existing = False
-        for row in rows:
-            if sel_row == row:
-                existing = True
-            else:
-                signet_rows.append(row)
+        existing = sel_row in rows
+        if existing:
+            rows.remove(sel_row)
+        else:
+            rows.append(sel_row)
 
-        if not existing:
-            signet_rows.append(sel_row)
-    else:
-        signet_rows = rows
+    # Update internal.
+    sproj = _get_project(view)
+    if sproj is not None:
+        if len(rows) > 0:
+            sproj.signets[view.file_name()] = rows
+        elif view.file_name() in sproj.signets:
+            del sproj.signets[view.file_name()]
 
     # Update visual signets, brutally. This is the ST way.
     regions = []
-    for r in signet_rows:
+    for r in rows:
         pt = view.text_point(r, 0) # 0-based
         regions.append(sublime.Region(pt, pt))
     view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope', 'comment'), SIGNET_ICON)
@@ -505,7 +416,6 @@ def _toggle_signet(view, rows, sel_row=-1):
 # =========================================================================
 # ====================== Rendering ========================================
 # =========================================================================
-
 
 #-----------------------------------------------------------------------------------
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
@@ -569,8 +479,19 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         ## Tokenize selection by syntax scope.
         has_selection = len(v.sel()[0]) > 0
         sel_reg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
+
+        pc = SbotPerfCounter('render_html')
+        pc.start()
         
-        for line_region in v.split_by_newlines(sel_reg): # TODOC too slow ( 1 msec per line) string.splitlines() seems to be about 3x faster but would double memory use.
+        # TODOC too slow ( ~1 msec per line) string.splitlines() seems to be about 3x faster but would double memory use.
+        line_regions = v.split_by_newlines(sel_reg)
+
+        pc.stop()
+        logging.info('split:' + pc.dump())
+        pc.clear()
+
+        for line_region in line_regions:
+            pc.start()
             line_styles = [] # (Region, style))
 
             # Start a new line.
@@ -628,6 +549,10 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
             # Add to master list.
             region_styles.append(line_styles)
+
+        # Done loop.
+        pc.stop()
+        logging.info('loop:' + pc.dump())
 
         ## Create css.
         style_text = ""
@@ -803,7 +728,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
         _highlight_view(v, token, whole_word, scope)
 
-        # Add to persistence.
+        # Add to internal.
         sproj = _get_project(v)
         if v.file_name() not in sproj.highlights:
             sproj.highlights[v.file_name()] = []
@@ -832,7 +757,7 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
                     highlight_scope = highlight_scopes[i]
                     v.erase_regions(reg_name)
 
-                    # Remove from persistence.
+                    # Remove from internal.
                     if v.file_name() in sproj.highlights:
                         for i in range(len(sproj.highlights[v.file_name()])):
                             if sproj.highlights[v.file_name()][i]['scope'] == highlight_scope:
@@ -855,7 +780,7 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             v.erase_regions(reg_name)
 
-        # Remove from persistence.
+        # Remove from internal.
         if v.file_name() in sproj.highlights:
             del sproj.highlights[v.file_name()]
 
@@ -961,6 +886,72 @@ class SbotOpenSiteCommand(sublime_plugin.ApplicationCommand):
 
     def run(self, url):
         webbrowser.open_new_tab(url)
+
+
+# =========================================================================
+# ====================== Utilities ========================================
+# =========================================================================
+
+#-----------------------------------------------------------------------------------
+def _dump_view(preamble, view):
+    ''' Helper util. '''
+    s = []
+    s.append('view')
+    s.append(preamble)
+
+    s.append('view_id:')
+    s.append('None' if view is None else str(view.id()))
+
+    if view is not None:
+        w = view.window()
+        fn = view.file_name()
+
+        s.append('file_name:')
+        s.append('None' if fn is None else os.path.split(fn)[1])
+
+        s.append('project_file_name:')
+        s.append('None' if w is None or w.project_file_name() is None else os.path.split(w.project_file_name())[1])
+
+    logging.info(" ".join(s));
+            
+
+#-----------------------------------------------------------------------------------
+def _wait_load_file(view, line):
+    ''' Open file asynchronously then position at line. '''
+    if view.is_loading():
+        sublime.set_timeout(lambda: _wait_load_file(view, line), 100) # maybe not forever?
+    else: # good to go
+        view.run_command("goto_line", {"line": line})
+
+
+#-----------------------------------------------------------------------------------
+class SbotPerfCounter(object):
+    ''' Container for perf counter. '''
+
+    def __init__(self, id):
+        self.id = id
+        self.vals = []
+        self.start_time = 0
+
+    def start(self):
+        self.start_time = time.perf_counter()
+
+    def stop(self):
+        if self.start_time != 0:
+            self.vals.append(time.perf_counter() - self.start_time)
+            self.start_time = 0
+
+    def dump(self):
+        avg = sum(self.vals) / len(self.vals)
+        s = self.id + ': '
+        if len(self.vals) > 0:
+            s += str(avg)
+        else:
+            s += 'No data'
+        return s
+
+    def clear(self):
+        self.vals = []
 
 
 # =========================================================================
