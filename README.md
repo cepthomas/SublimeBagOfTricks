@@ -44,6 +44,7 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 | md_font_size             | For rendered markdown |
 | md_background            | If you need to change the markdown bg color (not done automatically from color scheme) |
 | render_output            | One of: clipboard, new_file (view), default_file (original filename + .html), default_file_open (default_file + show) |
+| render_max_file          | Max file size to render |
 
 
 ## Signets (bookmarks)

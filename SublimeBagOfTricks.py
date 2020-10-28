@@ -33,6 +33,30 @@ sbot_projects = {} # {k:window_id v:SbotProject}
 # ====================== System stuff =====================================
 # =========================================================================
 
+
+#-----------------------------------------------------------------------------------
+class ViewEvent(sublime_plugin.ViewEventListener):
+    ''' Listener. '''
+
+    def on_activated(self):
+        ''' When focus/tab received. '''
+        # _dump_view('ViewEventListener.on_activated', self.view)
+        _load_project_maybe(self.view)
+
+    def on_deactivated(self):
+        ''' When focus/tab lost. Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
+        # _dump_view('EventListener.on_deactivated', self.view)
+        sproj = _get_project(self.view)
+        if sproj is not None:
+            # Save the project file internal to persisted.
+            sproj.save()
+
+    def on_selection_modified(self):
+        ''' Show the abs position in the status bar for debugging. '''
+        pos = self.view.sel()[0].begin()
+        self.view.set_status("position", 'Pos {}'.format(pos))
+
+
 #-----------------------------------------------------------------------------------
 class SbotTestTestTestCommand(sublime_plugin.TextCommand):
 
@@ -46,6 +70,14 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         #     print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
         # _get_project(v).dump() # These are not ordered like file.
 
+        image = r'file://C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\test\mark1.bmp'
+        html = '<body><p>Hello!</p><img src="' + image + '" width="90" height="145"></body>'
+
+        self.phantset = sublime.PhantomSet(v, "test")
+        phant = sublime.Phantom(v.sel()[0], html, sublime.LAYOUT_BLOCK)
+        phants = []
+        phants.append(phant)
+        self.phantset.update(phants)
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
@@ -76,7 +108,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class SbotProject(object):
-    ''' Container for project info. Converts persisted to/from internal. TODOC refactor all '''
+    ''' Container for project info. Converts persisted to/from internal. TODOC refactor all when ST4? '''
 
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
@@ -229,33 +261,6 @@ class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
                 if '.htm' in fn:
                     vis = True
         return vis
-
-
-# =========================================================================
-# ====================== EventListeners ===================================
-# =========================================================================
-
-#-----------------------------------------------------------------------------------
-class ViewEvent(sublime_plugin.ViewEventListener):
-    ''' Listener. '''
-
-    def on_activated(self):
-        ''' When focus/tab received. '''
-        # _dump_view('ViewEventListener.on_activated', self.view)
-        _load_project_maybe(self.view)
-
-    def on_deactivated(self):
-        ''' When focus/tab lost. Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
-        # _dump_view('EventListener.on_deactivated', self.view)
-        sproj = _get_project(self.view)
-        if sproj is not None:
-            # Save the project file internal to persisted.
-            sproj.save()
-
-    def on_selection_modified(self):
-        ''' Show the abs position in the status bar for debugging. '''
-        pos = self.view.sel()[0].begin()
-        self.view.set_status("position", 'Pos {}'.format(pos))
 
 
 # =========================================================================
@@ -429,10 +434,16 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         html_font_face = settings.get('html_font_face', 'Arial')
         html_background = settings.get('html_background', 'white')
         html_line_numbers = settings.get('html_line_numbers', True)
+        render_max_file = settings.get('render_max_file', 1)
+
+        fsize = v.size() / 1024.0 / 1024.0
+
+        if fsize > render_max_file:
+            sublime.message_dialog('File too large to render. If you really want to, change your settings')
+            return
 
         # Use tuples for everything as they can be hashable keys.
         # my_style = (foreground, background, bold, italic)
-
 
         ## Collect scope/style info.
         all_styles = {} # k:style v:id
@@ -454,6 +465,8 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             # print(view_style)
             tt = (view_style['foreground'], view_style.get('background', None), view_style.get('bold', False), view_style.get('italic', False))
             return tt
+
+        v.set_status('render', 'Render setting up')
 
         ## If there are highlights, collect them.
         highlight_scopes = settings.get('highlight_scopes')
@@ -481,17 +494,16 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         sel_reg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
         pc = SbotPerfCounter('render_html')
-        pc.start()
-        
-        # TODOC too slow ( ~1 msec per line) string.splitlines() seems to be about 3x faster but would double memory use.
-        line_regions = v.split_by_newlines(sel_reg)
 
-        pc.stop()
-        logging.info('split:' + pc.dump())
-        pc.clear()
+        rows, _ = v.rowcol(v.size() - 1)
+        row_num = 0
 
-        for line_region in line_regions:
+        # TODOC Kind of slow: ~1 msec per line
+        for line_region in v.split_by_newlines(sel_reg):
             pc.start()
+            self.view.set_status('render', 'Render {} of {}'.format(row_num, rows))
+            row_num += 1
+            
             line_styles = [] # (Region, style))
 
             # Start a new line.

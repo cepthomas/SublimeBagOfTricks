@@ -11,6 +11,8 @@
     "md_font_size": 14,
     // One of: new_file, clipboard, default_file, default_file_open.
     "render_output": "default_file_open",
+    // Max file size to render in Mb.
+    "render_max_file": 2,
 
     ///// Highlight settings /////
     // Scopes for marking text.
@@ -20,5 +22,5 @@
     // Scope for coloring gutter icon.
     "signet_scope": "keyword",
     // If true next/prev traverses all marked files, otherwise just the open file.
-    "signet_nav_files": true
+    "signet_nav_files": false
 }
