@@ -10,6 +10,8 @@ import time
 import traceback
 import subprocess
 import tempfile
+# from threading import Thread
+import threading
 import sublime
 import sublime_plugin
 
@@ -422,10 +424,89 @@ def _toggle_signet(view, rows, sel_row=-1):
 # ====================== Rendering ========================================
 # =========================================================================
 
+# class Background(threading.Thread):
+
+#     def __init__(self):
+#         if Background.__instance != None:
+#             raise Exception("Cannot create next instance of this class (singleton).")
+#         else:
+#             Background.__instance = self
+#             self.running = True
+#             self.counter = 1
+#             threading.Thread.__init__(self)
+
+#     def run(self):
+#         while self.running:
+#             print(str(self.counter))
+#             self.counter = self.counter + 1
+#             time.sleep(0.1)
+
+#     def stop(self):
+#         self.running = False
+
+# class TestCommand(sublime_plugin.WindowCommand):
+#     def run(self):
+#         bg = Background.get_instance()
+#         bg.start()
+
+# class StopCommand(sublime_plugin.WindowCommand):
+#     def run(self):
+#         bg = Background.get_instance()
+#         bg.stop()
+
+
+
 #-----------------------------------------------------------------------------------
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
+
+
+
+    def _install(self):
+        """
+        RUNS IN A THREAD
+
+        Downloads and then installs Package Control, alerting the user to
+        the result
+        """
+
+        try:
+            # do work
+            sublime.set_timeout(self._show_success, 10)
+
+        except (Exception) as e:
+            print(self.error_prefix + str(e))
+            sublime.set_timeout(self._show_error, 10)
+
+    def _show_success(self):
+        """
+        RUNS IN THE MAIN THREAD
+        """
+
+        sublime.message_dialog(
+            "Package Control was successfully installed\n\n"
+            "Use the Command Palette and type \"Install Package\" to get started")
+
+    def _show_error(self):
+        """
+        RUNS IN THE MAIN THREAD
+        """
+
+        sublime.error_message(
+            "An error occurred installing Package Control\n\n"
+            "Please check the Console for details\n\n"
+            "Visit https://packagecontrol.io/installation for manual instructions")
+
+
+
+
+
     ''' Make a pretty. '''
     def run(self, edit):
+
+        # threading.Thread(target=self._install).start()
+        # return
+
+
         v = self.view
         sproj = _get_project(v)
 
@@ -450,6 +531,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         region_styles = [] # One [(Region, style)] per line
         highlight_regions = [] # (Region, style))
 
+        rows, _ = v.rowcol(v.size())
+        row_num = 0
+
 
         ### Local helpers.
         def _add_style(style):
@@ -466,187 +550,215 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             tt = (view_style['foreground'], view_style.get('background', None), view_style.get('bold', False), view_style.get('italic', False))
             return tt
 
-        v.set_status('render', 'Render setting up')
+        def _update_status():
+            if row_num == 0:
+                v.set_status('render', 'Render setting up')
+                # sublime.set_timeout(lambda: _update_status(), 100)
+                sublime.set_timeout(_update_status, 100)
+            elif row_num >= rows:
+                v.set_status('render', 'Render done')
+            else:
+                v.set_status('render', 'Render {} of {}'.format(row_num, rows))
+                # sublime.set_timeout(lambda: _update_status(), 100)
+                sublime.set_timeout(_update_status, 100)
 
-        ## If there are highlights, collect them.
-        highlight_scopes = settings.get('highlight_scopes')
-        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
-        for i in range(num_highlights):
+        ### The worker thread.
+        def _worker():
 
-            # Get the style and invert for highlights.
-            scope = highlight_scopes[i]
-            ss = v.style_for_scope(scope)
-            background = ss['background'] if 'background' in ss else ss['foreground']
-            foreground = html_background
-            hl_style = (foreground, background, False, False)
-            _add_style(hl_style)
+            print('>>>> start worker')
 
-            # Collect the highlight regions.
-            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
-            for region in v.get_regions(reg_name):
-                highlight_regions.append((region, hl_style))
+            # Start progress.
+            # sublime.set_timeout(lambda: _update_status(), 100)
+            sublime.set_timeout(_update_status, 100)
 
-        # Put all in order.
-        highlight_regions.sort(key=lambda v: v[0].a)
-
-        ## Tokenize selection by syntax scope.
-        has_selection = len(v.sel()[0]) > 0
-        sel_reg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
-
-        pc = SbotPerfCounter('render_html')
-
-        rows, _ = v.rowcol(v.size() - 1)
-        row_num = 0
-
-        # TODOC Kind of slow: ~1 msec per line
-        for line_region in v.split_by_newlines(sel_reg):
-            pc.start()
-            self.view.set_status('render', 'Render {} of {}'.format(row_num, rows))
-            row_num += 1
             
-            line_styles = [] # (Region, style))
+            ## If there are highlights, collect them.
+            highlight_scopes = settings.get('highlight_scopes')
+            num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
+            for i in range(num_highlights):
 
-            # Start a new line.
-            current_style = None
-            # new_style = None
-            current_style_start = line_region.a # current chunk
+                # Get the style and invert for highlights.
+                scope = highlight_scopes[i]
+                ss = v.style_for_scope(scope)
+                background = ss['background'] if 'background' in ss else ss['foreground']
+                foreground = html_background
+                hl_style = (foreground, background, False, False)
+                _add_style(hl_style)
 
-            # Process the individual line chars.
-            point = line_region.a
+                # Collect the highlight regions.
+                reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+                for region in v.get_regions(reg_name):
+                    highlight_regions.append((region, hl_style))
 
-            while point < line_region.b:
-                # Check if it's a highlight first as they take precedence.
-                if len(highlight_regions) > 0 and point >= highlight_regions[0][0].a:
+            # Put all in order.
+            highlight_regions.sort(key=lambda v: v[0].a)
 
-                    # Start a highlight.
-                    new_style =  highlight_regions[0][1]
+            ## Tokenize selection by syntax scope.
+            has_selection = len(v.sel()[0]) > 0
+            sel_reg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-                    # Save last maybe.
-                    if point > current_style_start:
-                        line_styles.append((sublime.Region(current_style_start, point), current_style))
+            pc = SbotPerfCounter('render_html')
 
-                    # Save highlight info.
-                    line_styles.append((highlight_regions[0][0], new_style))
 
-                    _add_style(new_style)
+            # TODOC Kind of slow: ~1 msec per line
+            for line_region in v.split_by_newlines(sel_reg):
+                pc.start()
+                row_num += 1
 
-                    # Bump ahead.
-                    point = highlight_regions[0][0].b
-                    current_style = new_style
-                    current_style_start = point
+                line_styles = [] # (Region, style))
 
-                    del highlight_regions[0]
+                # Start a new line.
+                current_style = None
+                # new_style = None
+                current_style_start = line_region.a # current chunk
 
-                else:
-                    # Plain ordinary style. Did it change?
-                    new_style = _view_style_to_tuple(v.style_for_scope(v.scope_name(point)))
+                # Process the individual line chars.
+                point = line_region.a
 
-                    if new_style != current_style:
+                while point < line_region.b:
+                    # Check if it's a highlight first as they take precedence.
+                    if len(highlight_regions) > 0 and point >= highlight_regions[0][0].a:
+
+                        # Start a highlight.
+                        new_style =  highlight_regions[0][1]
 
                         # Save last maybe.
                         if point > current_style_start:
                             line_styles.append((sublime.Region(current_style_start, point), current_style))
 
-                        current_style = new_style
-                        current_style_start = point
+                        # Save highlight info.
+                        line_styles.append((highlight_regions[0][0], new_style))
 
                         _add_style(new_style)
 
-                    # Bump ahead.
-                    point += 1
+                        # Bump ahead.
+                        point = highlight_regions[0][0].b
+                        current_style = new_style
+                        current_style_start = point
 
-            # Done. Save last maybe.
-            if point > current_style_start:
-                line_styles.append((sublime.Region(current_style_start, point), current_style))
+                        del highlight_regions[0]
 
-            # Add to master list.
-            region_styles.append(line_styles)
+                    else:
+                        # Plain ordinary style. Did it change?
+                        new_style = _view_style_to_tuple(v.style_for_scope(v.scope_name(point)))
 
-        # Done loop.
-        pc.stop()
-        logging.info('loop:' + pc.dump())
+                        if new_style != current_style:
 
-        ## Create css.
-        style_text = ""
-        # print('all_styles', all_styles)
-        for style, id in all_styles.items():
-            props = '{{ color:{}; '.format(style[0])
-            if style[1] is not None:
-                props += 'background-color:{}; '.format(style[1])
-            if style[2]:
-                props += 'font-weight:bold; '
-            if style[3]:
-                props += 'font-style:italic; '
-            props += '}'
-            style_text += '.st{} {}\n'.format(id, props)
+                            # Save last maybe.
+                            if point > current_style_start:
+                                line_styles.append((sublime.Region(current_style_start, point), current_style))
 
-        ## Content text.
-        content = []
-        line_num = 1
+                            current_style = new_style
+                            current_style_start = point
 
-        ii = 0
+                            _add_style(new_style)
 
-        ## Iterate collected lines.
-        gutter_size = math.ceil(math.log(len(region_styles), 10))
-        padding = 1.4 + gutter_size * 0.5
+                        # Bump ahead.
+                        point += 1
 
-        for line_styles in region_styles:
-            if html_line_numbers:
-                content.append("<p>{:0{size}}  ".format(line_num, size=gutter_size))
-            else:
-                content.append("<p>")
+                # Done. Save last maybe.
+                if point > current_style_start:
+                    line_styles.append((sublime.Region(current_style_start, point), current_style))
 
-            for region, style in line_styles:
-                #[(Region, style(ref))]
-                text = v.substr(region)
+                # Add to master list.
+                region_styles.append(line_styles)
 
-                # Locate the style.
-                id = _get_style(style)
-                if id >= 0:
-                    content.append('<span class=st{}>{}</span>'.format(id, escape(text)))
+            # Done loop.
+            pc.stop()
+            logging.info('loop:' + pc.dump())
+
+            ## Create css.
+            style_text = ""
+            # print('all_styles', all_styles)
+            for style, id in all_styles.items():
+                props = '{{ color:{}; '.format(style[0])
+                if style[1] is not None:
+                    props += 'background-color:{}; '.format(style[1])
+                if style[2]:
+                    props += 'font-weight:bold; '
+                if style[3]:
+                    props += 'font-style:italic; '
+                props += '}'
+                style_text += '.st{} {}\n'.format(id, props)
+
+            ## Content text.
+            content = []
+            line_num = 1
+
+            ii = 0
+
+            ## Iterate collected lines.
+            gutter_size = math.ceil(math.log(len(region_styles), 10))
+            padding = 1.4 + gutter_size * 0.5
+
+            for line_styles in region_styles:
+                if html_line_numbers:
+                    content.append("<p>{:0{size}}  ".format(line_num, size=gutter_size))
                 else:
-                    content.append(text) # plain text
+                    content.append("<p>")
 
-            # Done line.
-            content.append('</p>\n')
-            line_num += 1
+                for region, style in line_styles:
+                    #[(Region, style(ref))]
+                    text = v.substr(region)
 
-        ## Output html. Lang tag? <html lang="en">
-        html1 = textwrap.dedent('''
-            <!DOCTYPE html>
-            <html>
-            <head>
-            <meta charset="utf-8">
-            <style  type="text/css">
-            .contentpane {{
-              font-family: {};
-              font-size: {}em;
-              background-color: {};
-              text-indent: -{}em;
-              padding-left: {}em;
-            }}
-            p {{
-              white-space:pre-wrap;
-              margin: 0em;
-            }}
-            '''.format(html_font_face, html_font_size / 16, html_background, padding, padding)) # em
+                    # Locate the style.
+                    id = _get_style(style)
+                    if id >= 0:
+                        content.append('<span class=st{}>{}</span>'.format(id, escape(text)))
+                    else:
+                        content.append(text) # plain text
 
-        html2 = textwrap.dedent('''
-            </style>
-            </head>
-            <body>
-            <div class="container">
-            <div class="contentpane">
-            ''')
+                # Done line.
+                content.append('</p>\n')
+                line_num += 1
 
-        html3 = textwrap.dedent('''
-            </div>
-            </div>
-            </body>
-            </html>
-            ''')
+            ## Output html. Lang tag? <html lang="en">
+            html1 = textwrap.dedent('''
+                <!DOCTYPE html>
+                <html>
+                <head>
+                <meta charset="utf-8">
+                <style  type="text/css">
+                .contentpane {{
+                  font-family: {};
+                  font-size: {}em;
+                  background-color: {};
+                  text-indent: -{}em;
+                  padding-left: {}em;
+                }}
+                p {{
+                  white-space:pre-wrap;
+                  margin: 0em;
+                }}
+                '''.format(html_font_face, html_font_size / 16, html_background, padding, padding)) # em
 
-        _output_html(edit, v, [html1, style_text, html2, "".join(content), html3])
+            html2 = textwrap.dedent('''
+                </style>
+                </head>
+                <body>
+                <div class="container">
+                <div class="contentpane">
+                ''')
+
+            html3 = textwrap.dedent('''
+                </div>
+                </div>
+                </body>
+                </html>
+                ''')
+
+            _output_html(edit, v, [html1, style_text, html2, "".join(content), html3])
+
+        # threading.start_new_thread(_worker, ())
+        t = threading.Thread(target=_worker) #, args=('MyStringHere',1)).start()
+        t.start()
+        # t.join()
+        
+        # sleep(5)
+
+        i = 1000
+        while(1 > 0):
+            i -= 1
 
 
 #-----------------------------------------------------------------------------------
