@@ -5,14 +5,16 @@ import math
 import json
 import webbrowser
 import logging
-from html import escape
 import time
 import traceback
 import subprocess
 import tempfile
 import threading
+from html import escape
 import sublime
 import sublime_plugin
+
+import SublimeBagOfTricks.glob_xxx as glob_xxx
 
 
 # ====== Defs ========
@@ -80,6 +82,11 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         # phants.append(phant)
         # self.phantset.update(phants)
 
+        global glob_xxx
+        print(glob_xxx.global_thing)
+        glob_xxx.global_thing['item' + str(len(glob_xxx.global_thing) + 5)] = 1234
+        v.show_popup(str(glob_xxx.global_thing))
+
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
@@ -91,7 +98,7 @@ def plugin_loaded():
     logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'sbot_log.txt')
     logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
     logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
-    logging.info("=============================== log start =========================================================");
+    logging.info("=============================== log start ===============================");
 
 
 #-----------------------------------------------------------------------------------
@@ -117,8 +124,8 @@ class SbotProject(object):
         self.views_inited = set()
 
         # Unpack persisted data into our internal convenience collections.
-        self.signets = {}     # k:filename v:[rows]
-        self.highlights = {}  # k:filename v:[tokens]  tokens={"token": "abc", "whole_word": true, "scope": "comment"}
+        self.signets = {} # k:filename v:[rows]
+        self.highlights = {} # k:filename v:[tokens]  tokens={"token": "abc", "whole_word": true, "scope": "comment"}
 
         try:
             with open(self.fn, 'r') as fp:
