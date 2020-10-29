@@ -10,7 +10,6 @@ import time
 import traceback
 import subprocess
 import tempfile
-# from threading import Thread
 import threading
 import sublime
 import sublime_plugin
@@ -34,7 +33,6 @@ sbot_projects = {} # {k:window_id v:SbotProject}
 # =========================================================================
 # ====================== System stuff =====================================
 # =========================================================================
-
 
 #-----------------------------------------------------------------------------------
 class ViewEvent(sublime_plugin.ViewEventListener):
@@ -63,23 +61,25 @@ class ViewEvent(sublime_plugin.ViewEventListener):
 class SbotTestTestTestCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, all=False):
-        # _save_sbot_projects()
         v = self.view
         w = self.view.window()
+        
         # for sheet in w.sheets():
         #     print('sheet:', sheet)
         # for view in w.views(): # These are in order L -> R.
         #     print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
         # _get_project(v).dump() # These are not ordered like file.
 
-        image = r'file://C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\test\mark1.bmp'
-        html = '<body><p>Hello!</p><img src="' + image + '" width="90" height="145"></body>'
+        # # Phantom phun
+        # image = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'test', 'mark1.bmp')
+        # print(image)
+        # html = '<body><p>Hello!</p><img src="file://' + image + '" width="90" height="145"></body>'
+        # self.phantset = sublime.PhantomSet(v, "test")
+        # phant = sublime.Phantom(v.sel()[0], html, sublime.LAYOUT_BLOCK)
+        # phants = []
+        # phants.append(phant)
+        # self.phantset.update(phants)
 
-        self.phantset = sublime.PhantomSet(v, "test")
-        phant = sublime.Phantom(v.sel()[0], html, sublime.LAYOUT_BLOCK)
-        phants = []
-        phants.append(phant)
-        self.phantset.update(phants)
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
@@ -88,12 +88,10 @@ def plugin_loaded():
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
     # Init logging.
-    ddir = r'{0}\SublimeBagOfTricks'.format(sublime.packages_path())
-    logf = ddir + r'\sbot_log.txt'
+    logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'sbot_log.txt')
     logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
-    logging.basicConfig(filename=logf, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
+    logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
     logging.info("=============================== log start =========================================================");
-    logging.info("ddir:" + ddir);
 
 
 #-----------------------------------------------------------------------------------
@@ -119,8 +117,8 @@ class SbotProject(object):
         self.views_inited = set()
 
         # Unpack persisted data into our internal convenience collections.
-        self.signets = {}  # k:filename v:[rows]  0-based (like ST)
-        self.highlights = {}  # k:filename v:[tokens]  tokens = {"token": "abc", "whole_word": true, "scope": "comment"}
+        self.signets = {}     # k:filename v:[rows]
+        self.highlights = {}  # k:filename v:[tokens]  tokens={"token": "abc", "whole_word": true, "scope": "comment"}
 
         try:
             with open(self.fn, 'r') as fp:
@@ -424,77 +422,45 @@ def _toggle_signet(view, rows, sel_row=-1):
 # ====================== Rendering ========================================
 # =========================================================================
 
-# class Background(threading.Thread):
-
-#     def __init__(self):
-#         if Background.__instance != None:
-#             raise Exception("Cannot create next instance of this class (singleton).")
-#         else:
-#             Background.__instance = self
-#             self.running = True
-#             self.counter = 1
-#             threading.Thread.__init__(self)
-
-#     def run(self):
-#         while self.running:
-#             print(str(self.counter))
-#             self.counter = self.counter + 1
-#             time.sleep(0.1)
-
-#     def stop(self):
-#         self.running = False
-
-# class TestCommand(sublime_plugin.WindowCommand):
-#     def run(self):
-#         bg = Background.get_instance()
-#         bg.start()
-
-# class StopCommand(sublime_plugin.WindowCommand):
-#     def run(self):
-#         bg = Background.get_instance()
-#         bg.stop()
-
-
-
 #-----------------------------------------------------------------------------------
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' Make a pretty. '''
     def run(self, edit):
         v = self.view
-        # sproj = _get_project(v)
 
         ## Get prefs.
         render_max_file = settings.get('render_max_file', 1)
 
         fsize = v.size() / 1024.0 / 1024.0
-
         if fsize > render_max_file:
             sublime.message_dialog('File too large to render. If you really want to, change your settings')
         else:
-            t = threading.Thread(target=self._worker) #, args=('MyStringHere',1)).start()
-            t.start()
+            self._do_work()
+            # TODOC would like to run in a thread but takes 10x time.
+            # t = threading.Thread(target=self._do_work)
+            # t.start()
 
     def _update_status(self):
         ''' Runs in main thread. '''
         v = self.view
 
         if self.row_num == 0:
-            # v.set_status('render', 'Render setting up')
-            v.show_popup('Render setting up')
+            v.set_status('render', 'Render setting up')
+            # v.show_popup('Render setting up')
             sublime.set_timeout(self._update_status, 100)
         elif self.row_num >= self.rows:
-            # v.set_status('render', 'Render done')
-            v.update_popup('Render done')
-            v.hide_popup()
+            v.set_status('render', 'Render done')
+            # v.update_popup('Render done')
+            # v.hide_popup()
         else:
             if self.rows % 100 == 0:
-                # v.set_status('render', 'Render {} of {}'.format(self.row_num, self.rows))
-                v.update_popup('Render {} of {}'.format(self.row_num, self.rows))
+                v.set_status('render', 'Render {} of {}'.format(self.row_num, self.rows))
+                # v.update_popup('Render {} of {}'.format(self.row_num, self.rows))
 
             # sublime.set_timeout(lambda: self._update_status(), 100)
             sublime.set_timeout(self._update_status, 100)
 
-    def _worker(self):
+    def _do_work(self):
         ''' The worker thread. '''
         v = self.view
 
@@ -527,7 +493,6 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 return all_styles.get(style, -1)
 
         def _view_style_to_tuple(view_style):
-            # print(view_style)
             tt = (view_style['foreground'], view_style.get('background', None), view_style.get('bold', False), view_style.get('italic', False))
             return tt
 
@@ -538,7 +503,6 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         highlight_scopes = settings.get('highlight_scopes')
         num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
         for i in range(num_highlights):
-
             # Get the style and invert for highlights.
             scope = highlight_scopes[i]
             ss = v.style_for_scope(scope)
@@ -561,10 +525,13 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         pc = SbotPerfCounter('render_html')
 
-        # TODOC Tooo slow for big files.
         for line_region in v.split_by_newlines(sel_reg):
             pc.start()
             self.row_num += 1
+
+            if self.row_num % 100 == 0:
+                time.sleep(0.01)
+                v.show_popup('!!!!!')
 
             line_styles = [] # (Region, style))
 
@@ -626,6 +593,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         # Done all lines.
         logging.info('loop:' + pc.dump())
+        # return
 
         ## Create css.
         style_text = ""
@@ -677,18 +645,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             <head>
             <meta charset="utf-8">
             <style  type="text/css">
-            .contentpane {{
-              font-family: {};
-              font-size: {}em;
-              background-color: {};
-              text-indent: -{}em;
-              padding-left: {}em;
-            }}
-            p {{
-              white-space:pre-wrap;
-              margin: 0em;
-            }}
-            '''.format(html_font_face, html_font_size / 16, html_background, padding, padding)) # em
+            .contentpane {{ font-family: {}; font-size: {}em; background-color: {}; text-indent: -{}em; padding-left: {}em; }}
+            p {{ white-space: pre-wrap; margin: 0em; }}
+            '''.format(html_font_face, html_font_size / 16, html_background, padding, padding))
 
         html2 = textwrap.dedent('''
             </style>
@@ -999,7 +958,7 @@ def _wait_load_file(view, line):
 
 #-----------------------------------------------------------------------------------
 class SbotPerfCounter(object):
-    ''' Container for perf counter. '''
+    ''' Container for perf counter. All times in msec. '''
 
     def __init__(self, id):
         self.id = id
@@ -1007,11 +966,11 @@ class SbotPerfCounter(object):
         self.start_time = 0
 
     def start(self):
-        self.start_time = time.perf_counter()
+        self.start_time = time.perf_counter() * 1000.0
 
     def stop(self):
         if self.start_time != 0:
-            self.vals.append(time.perf_counter() - self.start_time)
+            self.vals.append(time.perf_counter() * 1000.0 - self.start_time)
             self.start_time = 0
 
     def dump(self):
