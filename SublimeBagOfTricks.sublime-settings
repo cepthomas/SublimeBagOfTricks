@@ -12,7 +12,7 @@
     // One of: new_file, clipboard, default_file, default_file_open.
     "render_output": "default_file_open",
     // Max file size to render in Mb.
-    "render_max_file": 2,
+    "render_max_file": 5,
 
     ///// Highlight settings /////
     // Scopes for marking text.

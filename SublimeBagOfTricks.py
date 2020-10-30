@@ -432,6 +432,7 @@ def _toggle_signet(view, rows, sel_row=-1):
 #-----------------------------------------------------------------------------------
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' Make a pretty. '''
+
     def run(self, edit):
         v = self.view
 
@@ -443,7 +444,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             sublime.message_dialog('File too large to render. If you really want to, change your settings')
         else:
             self._do_work()
-            # TODOC would like to run in a thread but takes 10x time.
+            # TODOC Actually would like to run in a thread but takes 10x time. Probably the GIL apparently.
             # t = threading.Thread(target=self._do_work)
             # t.start()
 
@@ -1116,3 +1117,62 @@ class SbotExInputHandler(sublime_plugin.TextInputHandler):
         # Is it ok?
         # print("SbotExInputHandler.validate() name:{0} my_example:{1}".format(self.name(), my_example))
         return True
+
+
+#-----------------------------------------------------------------------------------
+class SbotToggleDisplayCommand(sublime_plugin.TextCommand):
+    # toggleDisplay.py
+    # { "keys": ["alt+d", "alt+w"], "command": "sbot_toggle_display", "args": {"action": "word_wrap"}},
+    # { "keys": ["alt+d", "alt+s"], "command": "sbot_toggle_display", "args": {"action": "white_space"}},
+    # { "keys": ["alt+d", "alt+l"], "command": "sbot_toggle_display", "args": {"action": "line_no"}},
+    # { "keys": ["alt+d", "alt+i"], "command": "sbot_toggle_display", "args": {"action": "indent_guide"}},
+    # { "keys": ["alt+d", "alt+g"], "command": "sbot_toggle_display", "args": {"action": "gutter"}},
+    # { "keys": ["alt+d", "alt+e"], "command": "sbot_toggle_display", "args": {"action": "eol"}},
+    # { "keys": ["alt+d", "alt+x"], "command": "toggle_scope_always"},
+    # { "keys": ["f12"], "command": "reindent"}
+
+    def run(self, edit, **kwargs):
+        action = kwargs['action']#.upper()
+        view = self.view
+        my_id = self.view.id()
+
+        settings = view.settings() # This view's settings.
+
+        if action == 'word_wrap':
+            propertyName, propertyValue1, propertyValue2 = "word_wrap", False, True
+
+        elif action == 'white_space':
+            propertyName, propertyValue1, propertyValue2 = "draw_white_space", "all", "selection"
+
+        elif action == 'gutter':
+            propertyName, propertyValue1, propertyValue2 = "gutter", False, True
+
+        elif action == 'line_no':
+            propertyName, propertyValue1, propertyValue2 = "line_numbers", False, True
+            # propertyName = "line_numbers"
+
+        elif action == 'indent_guide':
+            propertyName, propertyValue1, propertyValue2 = "draw_indent_guides", False, True
+
+        elif action == 'eol':
+            if not view.get_regions("eols"):
+                eols = []
+                p = 0
+                while 1:
+                    s = view.find('\n', p + 1)
+                    if not s:
+                        break
+                    eols.append(s)
+                    p = s.a
+
+                if eols:
+                    view.add_regions("eols", eols, "comment")
+            else:
+                view.erase_regions("eols")
+
+        else:
+            propertyValue = None
+
+        if propertyName:
+            propertyValue = propertyValue1 if settings.get(propertyName, propertyValue1) != propertyValue1 else propertyValue2
+            settings.set(propertyName, propertyValue)
