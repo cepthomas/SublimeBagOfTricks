@@ -2,16 +2,12 @@
     { "id": "sbot_sb_addons", "caption": "-" },
     { "caption": "Copy Name", "command": "sbot_sb_copy_name", "args": { "paths": [] }},
     { "caption": "Copy Path", "command": "sbot_sb_copy_path", "args": { "paths": [] }},
-
     { "caption": "-" },
-
     { "caption": "Open Terminal", "command": "sbot_sb_terminal", "args": { "paths": [] }},
     { "caption": "Open in Browser", "command": "sbot_sb_open_browser", "args": { "paths": [] }},
     { "caption": "Tree", "command": "sbot_sb_tree", "args": { "paths": [] }},
-
     { "caption": "-" },
-
-    { "caption": "Render Source", "command": "sbot_render_source" },
-    { "caption": "Render Markdown", "command": "sbot_render_markdown" },
-    { "caption": "Render To Html", "command": "sbot_render_to_html" }
+    { "caption": "Render To Html", "command": "sbot_render_to_html" },
+    { "caption": "Render Markdown", "command": "sbot_render_markdown" }
+    //TODOC add stuff like remove from project.
 ]

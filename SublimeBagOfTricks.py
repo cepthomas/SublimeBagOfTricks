@@ -14,7 +14,7 @@ from html import escape
 import sublime
 import sublime_plugin
 
-import SublimeBagOfTricks.glob_xxx as glob_xxx
+# import SublimeBagOfTricks.glob_xxx as glob_xxx
 
 
 # ====== Defs ========
@@ -82,10 +82,10 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         # phants.append(phant)
         # self.phantset.update(phants)
 
-        global glob_xxx
-        print(glob_xxx.global_thing)
-        glob_xxx.global_thing['item' + str(len(glob_xxx.global_thing) + 5)] = 1234
-        v.show_popup(str(glob_xxx.global_thing))
+        # global glob_xxx
+        # print(glob_xxx.global_thing)
+        # glob_xxx.global_thing['item' + str(len(glob_xxx.global_thing) + 5)] = 1234
+        # v.show_popup(str(glob_xxx.global_thing))
 
 
 #-----------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ def plugin_unloaded():
     for id in list(sbot_projects):
         sbot_projects[id].save()
 
-    
+
 # =========================================================================
 # ====================== SbotProject ======================================
 # =========================================================================
@@ -138,7 +138,7 @@ class SbotProject(object):
 
                 if 'highlights' in values:
                     for hl in values['highlights']:
-                        if os.path.exists(sig['filename']): # sanity check
+                        if os.path.exists(hl['filename']): # sanity check
                             self.highlights[hl['filename']] = hl['tokens']
 
         except FileNotFoundError as e:
@@ -194,11 +194,12 @@ def _load_project_maybe(v):
     id = v.window().id()
 
     # Persisted to internal. Check for already loaded.
-    if not id in sbot_projects:
+    if id not in sbot_projects:
         fn = v.window().project_file_name()
-        # Load the project file.
-        sproj = SbotProject(fn)
-        sbot_projects[id] = sproj
+        if fn is not None:
+            # Load the project file.
+            sproj = SbotProject(fn)
+            sbot_projects[id] = sproj
     else:
         sproj = sbot_projects[id]
 
