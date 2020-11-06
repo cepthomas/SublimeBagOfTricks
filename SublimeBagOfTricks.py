@@ -14,7 +14,9 @@ from html import escape
 import sublime
 import sublime_plugin
 
-# import SublimeBagOfTricks.glob_xxx as glob_xxx
+# TODOC Make into a package.
+
+# import SublimeBagOfTricks.glob_xxx as glob_xxx # TODOC
 
 
 # ====== Defs ========
@@ -168,8 +170,10 @@ class SbotProject(object):
                         hls.append({'filename': filename, 'tokens': tokens})
                 values['highlights'] = hls
 
-            with open(self.fn, 'w') as fp:
-                json.dump(values, fp, indent=4)
+            # Save if there is something there.
+            if len(values) > 0:
+                with open(self.fn, 'w') as fp:
+                    json.dump(values, fp, indent=4)
 
         except:
             s = 'bad thing!' + traceback.format_exc()
