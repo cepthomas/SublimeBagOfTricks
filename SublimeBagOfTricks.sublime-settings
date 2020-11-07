@@ -1,4 +1,10 @@
 {
+    ///// General settings /////
+    // Turn on for diagnostics.
+    "enable_log": false,
+    // Turn on to use sbot project files for signet and highlight persistence.
+    "enable_persistence": true,
+
     ///// Render settings /////
     "html_font_face": "Consolas",
     "html_font_size": 14,
@@ -12,7 +18,7 @@
     // One of: new_file, clipboard, default_file, default_file_open.
     "render_output": "default_file_open",
     // Max file size to render in Mb.
-    "render_max_file": 5,
+    "render_max_file": 1,
 
     ///// Highlight settings /////
     // Scopes for marking text.

@@ -6,6 +6,14 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 
 # Features
 
+## General
+
+| Setting                  | Description |
+|:--------                 |:-------     |
+| enable_log               | Turn on diagnostics - default is false |
+| enable_persistence       | Save/load signet/highlight persistence - default is true |
+
+
 ## Colorizing
 - Word colorizing similar to [StyleToken](https://github.com/vcharnahrebel/style-token).
 - Persists to sbot project file.
@@ -79,8 +87,9 @@ Commands added to the sidebar. Just the stuff I need.
 | sbot_sb_copy_name        | Copy file/dir name to clipboard |
 | sbot_sb_copy_path        | Copy full file/dir path to clipboard |
 | sbot_sb_terminal         | Open a Windows Terminal here |
+| sbot_sb_folder           | Open a Windows Explorer here |
 | sbot_sb_open_browser     | Open html file in your browser |
-| sbot_sb_tree             | Subdir tree in clipboard |
+| sbot_sb_tree             | Run tree cmd to clipboard |
 
 ## Examples
 Leftovers that will eventually be deleted or subsumed.

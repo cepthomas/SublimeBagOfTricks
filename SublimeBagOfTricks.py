@@ -97,10 +97,11 @@ def plugin_loaded():
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
     # Init logging.
-    logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'sbot_log.txt')
-    logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
-    logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
-    logging.info("=============================== log start ===============================");
+    if settings["enable_log"]:
+        logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'sbot_log.txt')
+        logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
+        logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
+        logging.info("=============================== log start ===============================");
 
 
 #-----------------------------------------------------------------------------------
@@ -125,59 +126,61 @@ class SbotProject(object):
         # Need this because ST window/view lifecycle is unreliable.
         self.views_inited = set()
 
-        # Unpack persisted data into our internal convenience collections.
+        # If enabled, unpack persisted data into our internal convenience collections. Otherwise create empties.
         self.signets = {} # k:filename v:[rows]
         self.highlights = {} # k:filename v:[tokens]  tokens={"token": "abc", "whole_word": true, "scope": "comment"}
 
-        try:
-            with open(self.fn, 'r') as fp:
-                values = json.load(fp)
+        if settings["enable_persistence"]:
+            try:
+                with open(self.fn, 'r') as fp:
+                    values = json.load(fp)
 
-                if 'signets' in values:
-                    for sig in values['signets']:
-                        if os.path.exists(sig['filename']): # sanity check
-                            self.signets[sig['filename']] = sig['rows']
+                    if 'signets' in values:
+                        for sig in values['signets']:
+                            if os.path.exists(sig['filename']): # sanity check
+                                self.signets[sig['filename']] = sig['rows']
 
-                if 'highlights' in values:
-                    for hl in values['highlights']:
-                        if os.path.exists(hl['filename']): # sanity check
-                            self.highlights[hl['filename']] = hl['tokens']
+                    if 'highlights' in values:
+                        for hl in values['highlights']:
+                            if os.path.exists(hl['filename']): # sanity check
+                                self.highlights[hl['filename']] = hl['tokens']
 
-        except FileNotFoundError as e:
-            # Assumes new file.
-            sublime.status_message('Creating new sbot project file')
+            except FileNotFoundError as e:
+                # Assumes new file.
+                sublime.status_message('Creating new sbot project file')
 
-        except:
-            s = 'bad thing!' + traceback.format_exc()
-            sublime.error_message(s)
+            except:
+                s = 'bad thing!' + traceback.format_exc()
+                sublime.error_message(s)
 
     def save(self):
-        try:
-            sigs = []
-            hls = []
-            values = {}
+        if settings["enable_persistence"]:
+            try:
+                sigs = []
+                hls = []
+                values = {}
 
-            # Persist our internal convenience collections as json.
-            for filename, rows in self.signets.items():
-                if len(rows) > 0:
-                    if filename is not None and os.path.exists(filename): # sanity check
-                        sigs.append({'filename': filename, 'rows': rows})
-                values['signets'] = sigs
+                # Persist our internal convenience collections as json.
+                for filename, rows in self.signets.items():
+                    if len(rows) > 0:
+                        if filename is not None and os.path.exists(filename): # sanity check
+                            sigs.append({'filename': filename, 'rows': rows})
+                    values['signets'] = sigs
 
-            for filename, tokens in self.highlights.items():
-                if len(tokens) > 0:
-                    if filename is not None and os.path.exists(filename): # sanity check
-                        hls.append({'filename': filename, 'tokens': tokens})
-                values['highlights'] = hls
+                for filename, tokens in self.highlights.items():
+                    if len(tokens) > 0:
+                        if filename is not None and os.path.exists(filename): # sanity check
+                            hls.append({'filename': filename, 'tokens': tokens})
+                    values['highlights'] = hls
 
-            # Save if there is something there.
-            if len(values) > 0:
-                with open(self.fn, 'w') as fp:
-                    json.dump(values, fp, indent=4)
+                # Save if there is something there.
+                if len(values) > 0:
+                    with open(self.fn, 'w') as fp:
+                        json.dump(values, fp, indent=4)
 
-        except:
-            s = 'bad thing!' + traceback.format_exc()
-            sublime.error_message(s)
+            except:
+                s = 'bad thing!' + traceback.format_exc()
+                sublime.error_message(s)
 
 
 #-----------------------------------------------------------------------------------
@@ -247,6 +250,19 @@ class SbotSbTerminalCommand(sublime_plugin.WindowCommand):
         if len(paths) > 0:
             dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
             subprocess.call(['wt', '-d', dir])
+
+
+#-----------------------------------------------------------------------------------
+class SbotSbFolderCommand(sublime_plugin.WindowCommand):
+
+    def run(self, paths):
+        if len(paths) > 0:
+            dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+            subprocess.call(['explorer', dir], shell=True)
+
+    def is_visible(self, paths):
+        vis = len(paths) > 0 and os.path.isdir(paths[0])
+        return vis
 
 
 #-----------------------------------------------------------------------------------
