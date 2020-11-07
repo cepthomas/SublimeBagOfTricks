@@ -15,7 +15,7 @@ import sublime
 import sublime_plugin
 
 # TODOC Make into a package.
-# import SublimeBagOfTricks.glob_xxx as glob_xxx # TODOC
+import SublimeBagOfTricks.glob_xxx as glob_xxx # TODOC
 
 
 # ====== Defs ========
@@ -83,10 +83,10 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         # phants.append(phant)
         # self.phantset.update(phants)
 
-        # global glob_xxx
-        # print(glob_xxx.global_thing)
-        # glob_xxx.global_thing['item' + str(len(glob_xxx.global_thing) + 5)] = 1234
-        # v.show_popup(str(glob_xxx.global_thing))
+        global glob_xxx
+        print(glob_xxx.global_thing)
+        glob_xxx.global_thing['item' + str(len(glob_xxx.global_thing) + 5)] = 1234
+        v.show_popup(str(glob_xxx.global_thing))
 
 
 #-----------------------------------------------------------------------------------
