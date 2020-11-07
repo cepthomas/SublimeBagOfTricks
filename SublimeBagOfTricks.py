@@ -15,7 +15,6 @@ import sublime
 import sublime_plugin
 
 # TODOC Make into a package.
-
 # import SublimeBagOfTricks.glob_xxx as glob_xxx # TODOC
 
 
@@ -97,16 +96,17 @@ def plugin_loaded():
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
     # Init logging.
-    if settings["enable_log"]:
+    if settings.get('enable_log', False):
         logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'sbot_log.txt')
+        print(logfn)
         logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
-        logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO) ### mode a/w
+        logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO) # filemode a/w
         logging.info("=============================== log start ===============================");
 
 
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
-    logging.info("plugin_unloaded()");
+    logging.info("plugin_unloaded()")
     # just in case...
     for id in list(sbot_projects):
         sbot_projects[id].save()
@@ -130,7 +130,7 @@ class SbotProject(object):
         self.signets = {} # k:filename v:[rows]
         self.highlights = {} # k:filename v:[tokens]  tokens={"token": "abc", "whole_word": true, "scope": "comment"}
 
-        if settings["enable_persistence"]:
+        if settings.get('enable_persistence', True):
             try:
                 with open(self.fn, 'r') as fp:
                     values = json.load(fp)
@@ -154,7 +154,7 @@ class SbotProject(object):
                 sublime.error_message(s)
 
     def save(self):
-        if settings["enable_persistence"]:
+        if settings.get('enable_persistence', True):
             try:
                 sigs = []
                 hls = []
@@ -454,7 +454,7 @@ def _toggle_signet(view, rows, sel_row=-1):
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' Make a pretty. '''
 
-    def run(self, edit):
+    def run(self, edit, paths):
         v = self.view
 
         ## Get prefs.
@@ -465,9 +465,13 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             sublime.message_dialog('File too large to render. If you really want to, change your settings')
         else:
             self._do_work()
-            # TODOC Actually would like to run in a thread but takes 10x time. Probably the GIL apparently.
+            # TODOC Actually would like to run in a thread but takes 10x time, probably the GIL.
             # t = threading.Thread(target=self._do_work)
             # t.start()
+
+    def is_visible(self, paths):
+        vis = len(paths) > 0 and os.path.isfile(paths[0])
+        return vis
 
     def _update_status(self):
         ''' Runs in main thread. '''
@@ -492,6 +496,11 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     def _do_work(self):
         ''' The worker thread. '''
         v = self.view
+        
+        # - html render msec per line:
+        #   - medium (5k dense lines) 1.248921079999997 (5000)
+        #   - small (1k sparse lines) 0.4043940577246477 (1178)
+        #   - biggish (20k dense lines = 3Mb) 1.3607864668223 (20616)
 
         ## Get prefs.
         html_font_size = settings.get('html_font_size', 12)

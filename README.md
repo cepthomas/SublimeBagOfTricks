@@ -1,8 +1,8 @@
 # What It Is
-A work-in-progress Sublime Text plugin containing odds and ends missing from other packages.
-The focus is not on code development but rather text processing. It's also an excuse to brush up on my python.
+A hodge-podge Sublime Text plugin containing odds and ends missing from or over-developed in other packages.
+The focus is not on code development but rather general text processing.
 
-Built for Windows and ST3 but most should work for other OSes and ST2.
+Built for Windows and ST3. Other OSes and ST2 would require some hacking.
 
 # Features
 
@@ -21,7 +21,7 @@ Built for Windows and ST3 but most should work for other OSes and ST2.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_highlight_text      | Highlight text using next in highlight_scopes |
+| sbot_highlight_text      | Highlight text 1 through 6 using highlight_scopes |
 | sbot_clear_highlight     | Remove highlight in selection |
 | sbot_clear_all_highlights| Remove all highlights |
 | sbot_show_scopes         | Popup that shows style for scopes |
@@ -131,7 +131,7 @@ Accumulated notes that will probably eventually go away.
 |       ...
 |       
 +---Lib
-|   \---python3.3  ???  empty - for adding other py libs?
+|   \---python3.3  ???  empty
 |
 +---Local
 |       License.sublime_license
