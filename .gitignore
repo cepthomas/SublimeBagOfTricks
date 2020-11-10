@@ -127,19 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-/sbot.code-workspace
-/sbot.sublime-project
-/sbot.sublime-workspace
-/sbot_log.txt
-/test
 
+# Project files
+sbot_log.txt
 
-*.code-workspace
-*.sbot-project*
-*.sublime-project
-*.sublime-workspace
-*.pyproj
-*.sln
-.vs
-
-/old

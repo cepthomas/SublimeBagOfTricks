@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 import textwrap
 import math
@@ -14,8 +15,11 @@ from html import escape
 import sublime
 import sublime_plugin
 
-# TODOC Make into a package.
-import SublimeBagOfTricks.glob_xxx as glob_xxx # TODOC
+
+
+# ====== Vars - global for all open Windows (not Views!) ====
+settings = None
+sbot_projects = {} # {k:window_id v:SbotProject}
 
 
 # ====== Defs ========
@@ -27,10 +31,6 @@ SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
 SBOT_PROJECT_EXT = '.sbot-project'
 NEXT_SIG = 1
 PREV_SIG = 2
-
-# ====== Vars - global for all open Windows (not Views!) ====
-settings = None
-sbot_projects = {} # {k:window_id v:SbotProject}
 
 
 # =========================================================================
@@ -83,10 +83,10 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         # phants.append(phant)
         # self.phantset.update(phants)
 
-        global glob_xxx
-        print(glob_xxx.global_thing)
-        glob_xxx.global_thing['item' + str(len(glob_xxx.global_thing) + 5)] = 1234
-        v.show_popup(str(glob_xxx.global_thing))
+        # global global_thing
+        # print(global_thing)
+        # global_thing['item' + str(len(global_thing) + 5)] = 1234
+        # v.show_popup(str(global_thing))
 
 
 #-----------------------------------------------------------------------------------
@@ -116,9 +116,9 @@ def plugin_unloaded():
 # ====================== SbotProject ======================================
 # =========================================================================
 
-#-----------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------
 class SbotProject(object):
-    ''' Container for project info. Converts persisted to/from internal. TODOC refactor all when ST4? '''
+    ''' Container for project info. Converts persisted to/from internal. '''
 
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
@@ -465,7 +465,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             sublime.message_dialog('File too large to render. If you really want to, change your settings')
         else:
             self._do_work()
-            # TODOC Actually would like to run in a thread but takes 10x time, probably the GIL.
+            # Actually would like to run in a thread but takes 10x time, probably the GIL.
             # t = threading.Thread(target=self._do_work)
             # t.start()
 
@@ -1163,7 +1163,7 @@ class SbotToggleDisplayCommand(sublime_plugin.TextCommand):
         view = self.view
         my_id = self.view.id()
 
-        settings = view.settings() # This view's settings.
+        v_settings = view.v_settings() # This view's v_settings.
 
         if action == 'word_wrap':
             propertyName, propertyValue1, propertyValue2 = "word_wrap", False, True
@@ -1201,5 +1201,5 @@ class SbotToggleDisplayCommand(sublime_plugin.TextCommand):
             propertyValue = None
 
         if propertyName:
-            propertyValue = propertyValue1 if settings.get(propertyName, propertyValue1) != propertyValue1 else propertyValue2
-            settings.set(propertyName, propertyValue)
+            propertyValue = propertyValue1 if v_settings.get(propertyName, propertyValue1) != propertyValue1 else propertyValue2
+            v_settings.set(propertyName, propertyValue)
