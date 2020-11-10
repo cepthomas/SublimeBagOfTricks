@@ -16,7 +16,6 @@
         ]
     },
     { "caption": "-" },
-    // { "caption": "Higlight Now", "command": "sbot_highlight_text" },
     {
         "caption": "Highlight",
         "children":
@@ -29,10 +28,10 @@
             { "caption": "HL 6", "command": "sbot_highlight_text", "args" : {"hl_index" : 5} },
             { "caption": "-" },
             { "caption": "Clear Highlight", "command": "sbot_clear_highlight" },
-            { "caption": "Clear All Highlights", "command": "sbot_clear_all_highlights" },
             { "caption": "Show Scopes", "command": "sbot_show_scopes" },
         ]
     },
+    { "caption": "Clear All Highlights", "command": "sbot_clear_all_highlights" },
     { "caption": "-" },
     { "caption": "Render To Html", "command": "sbot_render_to_html" },
     { "caption": "Render Markdown", "command": "sbot_render_markdown" }

@@ -98,7 +98,7 @@ def plugin_loaded():
     # Init logging.
     if settings.get('enable_log', False):
         logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'sbot_log.txt')
-        print(logfn)
+        print('Logfile:', logfn)
         logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
         logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO) # filemode a/w
         logging.info("=============================== log start ===============================");
@@ -198,20 +198,20 @@ def _load_project_maybe(v):
     ''' This is kind of crude but there is no project loaded event (ST4 has on_load_project() though...) '''
     sproj = None
     global sbot_projects
-    id = v.window().id()
+    winid = v.window().id()
 
     # Persisted to internal. Check for already loaded.
-    if id not in sbot_projects:
+    if winid not in sbot_projects:
         fn = v.window().project_file_name()
         if fn is not None:
             # Load the project file.
             sproj = SbotProject(fn)
-            sbot_projects[id] = sproj
+            sbot_projects[winid] = sproj
     else:
-        sproj = sbot_projects[id]
+        sproj = sbot_projects[winid]
 
     # If this is the first time through and project has signets and/or highlights for this file, get them all.
-    if v.id() not in sproj.views_inited:
+    if sproj is not None and v.id() not in sproj.views_inited:
         sproj.views_inited.add(v.id())
 
         # Process signets internal to visual.
@@ -454,7 +454,7 @@ def _toggle_signet(view, rows, sel_row=-1):
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' Make a pretty. '''
 
-    def run(self, edit, paths):
+    def run(self, edit):
         v = self.view
 
         ## Get prefs.
@@ -469,9 +469,6 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             # t = threading.Thread(target=self._do_work)
             # t.start()
 
-    def is_visible(self, paths):
-        vis = len(paths) > 0 and os.path.isfile(paths[0])
-        return vis
 
     def _update_status(self):
         ''' Runs in main thread. '''
