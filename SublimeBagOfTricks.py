@@ -173,10 +173,8 @@ class SbotProject(object):
                             hls.append({'filename': filename, 'tokens': tokens})
                     values['highlights'] = hls
 
-                # Save if there is something there.
-                if len(values) > 0:
-                    with open(self.fn, 'w') as fp:
-                        json.dump(values, fp, indent=4)
+                with open(self.fn, 'w') as fp:
+                    json.dump(values, fp, indent=4)
 
             except:
                 s = 'bad thing!' + traceback.format_exc()
