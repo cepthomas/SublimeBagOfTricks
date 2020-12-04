@@ -45,6 +45,19 @@
                                 "caption": "-"
                             },
                             {
+                                "caption": "Keymap – Default",
+                                "command": "open_file",
+                                "args": {"file": "${packages}/SublimeBagOfTricks/Default (Windows).sublime-keymap"}
+                            },
+                            {
+                                "caption": "Keymap – User",
+                                "command": "open_file",
+                                "args": {"file": "${packages}/User/SublimeBagOfTricks.sublime-keymap"}
+                            },
+                            {
+                                "caption": "-"
+                            },
+                            {
                                 "caption": "Documentation",
                                 "command": "sbot_open_site",
                                 "args": { "url": "https://github.com/cepthomas/SublimeBagOfTricks/blob/master/README.md"  }
