@@ -71,22 +71,24 @@
 
     ////// New top level menu. For some reason this needs to be after the preceding sections.
     {
-        "caption": "Examples",
-        "id": "sbot_ex",
+        "caption": "Dont Look Here",
+        "id": "sbot_extra",
         "children":
         [
-            { "command": "sbot_ex_menu", "caption": "Menu" },
-            { "command": "sbot_ex_user_input", "caption": "User Input" },
-            { "command": "sbot_ex_list_select", "caption": "List Select" },
-            {
-                "caption": "Menu Dropdown",
-                "id": "sbot_ex_dropdown",
-                "children":
-                [
-                    { "command": "sbot_ex_msg_box", "caption": "Message Box" },
-                    { "command": "sbot_ex_get_number", "caption": "Get Number" },
-                ]
-            }
+            { "command": "open_file", "caption": "Notes", "args": {"file": "${packages}/SublimeBagOfTricks/notes.txt"} },
+            
+            // { "command": "sbot_example_menu", "caption": "Menu" },
+            // { "command": "sbot_example_user_input", "caption": "User Input" },
+            // { "command": "sbot_example_list_select", "caption": "List Select" },
+            // {
+            //     "caption": "Menu Dropdown",
+            //     "id": "sbot_example_dropdown",
+            //     "children":
+            //     [
+            //         { "command": "sbot_example_msg_box", "caption": "Message Box" },
+            //         { "command": "sbot_example_get_number", "caption": "Get Number" },
+            //     ]
+            // }
         ]
     },
 ]

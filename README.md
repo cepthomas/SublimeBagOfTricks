@@ -4,6 +4,11 @@ The focus is not on code development but rather general text processing.
 
 Built for Windows and ST3. Other OSes and ST2 would require some hacking.
 
+Note that there are some liberties taken that are not quite sublime-proper. Since this is primarily a personal project,
+I don't mind. However if others take interest in this being a proper package, I would be happy to clean
+everything up.
+
+
 # Features
 
 ## General
@@ -38,8 +43,8 @@ Built for Windows and ST3. Other OSes and ST2 would require some hacking.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_render_to_html      | Render current file including scope colors and highlights to html |
-| sbot_render_markdown     | Render current markdown file to html |
+| sbot_render_to_html      | Render current open file including scope colors and highlights to html |
+| sbot_render_markdown     | Render current open markdown file to html |
 
 
 | Setting                  | Description |
@@ -96,11 +101,11 @@ Leftovers that will eventually be deleted or subsumed.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_ex_menu             |             |
-| sbot_ex_get_number       |             |
-| sbot_ex_user_input       |             |
-| sbot_ex_list_select      |             |
-| sbot_ex_msg_box          |             |
+| sbot_example_menu        |             |
+| sbot_example_get_number  |             |
+| sbot_example_user_input  |             |
+| sbot_example_list_select |             |
+| sbot_example_msg_box     |             |
 
 # Notes
 

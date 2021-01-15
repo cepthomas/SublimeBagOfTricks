@@ -845,7 +845,7 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             v.erase_regions(reg_name)
 
-        # Remove from internal.
+        # Remove from internal. TODOC options for in file/whole project?
         if v.file_name() in sproj.highlights:
             del sproj.highlights[v.file_name()]
 
@@ -924,7 +924,7 @@ def _highlight_view(view, token, whole_word, scope):
 
 #-----------------------------------------------------------------------------------
 class SbotSplitViewCommand(sublime_plugin.WindowCommand):
-    ''' Toggles betweensplit file in new row.'''
+    ''' Toggles between split file views.'''
 
     def run(self):
         lo = self.window.layout()
@@ -1025,8 +1025,8 @@ class SbotPerfCounter(object):
 # =========================================================================
 
 #-----------------------------------------------------------------------------------
-class SbotExUserInputCommand(sublime_plugin.TextCommand):
-    ''' Command: Get input from user. sbot_ex_user_input
+class SbotExampleUserInputCommand(sublime_plugin.TextCommand):
+    ''' Command: Get input from user. sbot_example_user_input
     When a command with arguments is called without them, but it defines an input() method, Sublime will call
     the input() method to see if there is an input handler that can be used to gather the arguments instead.
     Every input handler represents an argument to the command, and once the entire chain of them is finished, 
@@ -1034,7 +1034,7 @@ class SbotExUserInputCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit, my_example):
-        # print("!!!StptUserInputCommand.run() name:{0} my_example:{1}".format(self.name(), my_example)) # self.name is "sbot_ex_user_input"
+        # print("!!!StptUserInputCommand.run() name:{0} my_example:{1}".format(self.name(), my_example)) # self.name is "sbot_example_user_input"
         for i in range(len(self.view.sel())):
             sel = self.view.sel()[i]
             data = self.view.substr(sel)
@@ -1044,12 +1044,12 @@ class SbotExUserInputCommand(sublime_plugin.TextCommand):
 
     def input(self, args):
         # print("!!!StptUserInputCommand.input() " + str(args))
-        return SbotExInputHandler(self.view)
+        return SbotExampleInputHandler(self.view)
 
 
 #-----------------------------------------------------------------------------------
-class SbotExGetNumberCommand(sublime_plugin.WindowCommand):
-    ''' A window command. sbot_ex_get_number '''
+class SbotExampleGetNumberCommand(sublime_plugin.WindowCommand):
+    ''' A window command. sbot_example_get_number '''
 
     def run(self):
         # Bottom input area.
@@ -1066,8 +1066,8 @@ class SbotExGetNumberCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotExMsgBoxCommand(sublime_plugin.TextCommand):
-    ''' Command: Simple message box. sbot_ex_msg_box '''
+class SbotExampleMsgBoxCommand(sublime_plugin.TextCommand):
+    ''' Command: Simple message box. sbot_example_msg_box '''
 
     def run(self, edit, cmd=None):
         # print("MsgBox! {0} {1}".format(self.name(), edit))
@@ -1075,8 +1075,8 @@ class SbotExMsgBoxCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotExListSelectCommand(sublime_plugin.TextCommand):
-    ''' Command: Select from list. sbot_ex_list_select '''
+class SbotExampleListSelectCommand(sublime_plugin.TextCommand):
+    ''' Command: Select from list. sbot_example_list_select '''
 
     def run(self, edit, cmd=None):
         # print("ListSelect! {0} {1}".format(self.name(), edit))
@@ -1091,15 +1091,15 @@ class SbotExListSelectCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotExMenuCommand(sublime_plugin.TextCommand):
-    ''' Container for other menu items. sbot_ex_menu '''
+class SbotExampleMenuCommand(sublime_plugin.TextCommand):
+    ''' Container for other menu items. sbot_example_menu '''
 
     def run(self, edit, cmd=None):
         # Individual menu items.
-        CMD1 = {'text': 'UserInput',  'command' : 'sbot_ex_user_input'}
-        CMD2 = {'text': 'GetNumber',  'command' : 'sbot_ex_get_number'}
-        CMD3 = {'text': 'MsgBox',     'command' : 'sbot_ex_msg_box'}
-        CMD4 = {'text': 'ListSelect', 'command' : 'sbot_ex_list_select'}
+        CMD1 = {'text': 'UserInput',  'command' : 'sbot_example_user_input'}
+        CMD2 = {'text': 'GetNumber',  'command' : 'sbot_example_get_number'}
+        CMD3 = {'text': 'MsgBox',     'command' : 'sbot_example_msg_box'}
+        CMD4 = {'text': 'ListSelect', 'command' : 'sbot_example_list_select'}
 
         menu_items = [CMD1, CMD2, CMD3, CMD4]
 
@@ -1111,7 +1111,7 @@ class SbotExMenuCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotExInputHandler(sublime_plugin.TextInputHandler):
+class SbotExampleInputHandler(sublime_plugin.TextInputHandler):
     ''' Generic user input handler. '''
 
     def __init__(self, view):
@@ -1121,7 +1121,7 @@ class SbotExInputHandler(sublime_plugin.TextInputHandler):
         return "placeholder - optional"
 
     def description(self, sdef):
-        return "description for SbotExInputHandler"
+        return "description for SbotExampleInputHandler"
 
     def initial_text(self):
         # Check if something selected.
@@ -1135,12 +1135,12 @@ class SbotExInputHandler(sublime_plugin.TextInputHandler):
 
     def preview(self, my_example):
         # Optional peek at current value.
-        # print("SbotExInputHandler.preview() name:{0} my_example:{1}".format(self.name(), my_example))
+        # print("SbotExampleInputHandler.preview() name:{0} my_example:{1}".format(self.name(), my_example))
         return my_example
 
     def validate(self, my_example):
         # Is it ok?
-        # print("SbotExInputHandler.validate() name:{0} my_example:{1}".format(self.name(), my_example))
+        # print("SbotExampleInputHandler.validate() name:{0} my_example:{1}".format(self.name(), my_example))
         return True
 
 
