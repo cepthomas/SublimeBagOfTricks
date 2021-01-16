@@ -9,7 +9,7 @@ I don't mind. However if others take interest in this being a proper package, I 
 everything up.
 
 
-![logo](https://github.com/cepthomas/SublimeBagOfTricks/blob/master/felix.jpg)
+![logo](felix.jpg)
 
 # Features
 
