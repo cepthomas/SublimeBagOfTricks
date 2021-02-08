@@ -273,6 +273,20 @@ class SbotSbTreeCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
+class SbotSbExecCommand(sublime_plugin.WindowCommand):
+
+    def run(self, paths):
+        if len(paths) > 0:
+            # print(paths[0])
+            subprocess.call([paths[0]], shell=True)
+
+    def is_visible(self, paths):
+        # print(os.path.splitext(paths[0]))
+        vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']
+        return vis
+
+
+#-----------------------------------------------------------------------------------
 class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):

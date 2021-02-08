@@ -7,4 +7,5 @@
     { "caption": "Open Terminal", "command": "sbot_sb_terminal", "args": { "paths": [] }},
     { "caption": "Open in Browser", "command": "sbot_sb_open_browser", "args": { "paths": [] }},
     { "caption": "Tree", "command": "sbot_sb_tree", "args": { "paths": [] }},
+    { "caption": "Exec", "command": "sbot_sb_exec", "args": { "paths": [] }},
 ]
