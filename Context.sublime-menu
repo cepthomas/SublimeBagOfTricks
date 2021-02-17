@@ -1,7 +1,7 @@
 
 [
-    { "caption": "-" },
-    { "command": "sbot_test_test_test" },
+    // { "caption": "-" },
+    // { "command": "sbot_test_test_test" },
     { "caption": "-" },
     { "caption": "Split View", "command": "sbot_split_view" },
     { "caption": "-" },

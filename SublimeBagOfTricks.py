@@ -118,7 +118,7 @@ def plugin_unloaded():
 
 # #-----------------------------------------------------------------------------------
 class SbotProject(object):
-    ''' Container for project info. Converts persisted to/from internal. '''
+    ''' Container for project (sbot, not st) info. Converts persisted to/from internal. '''
 
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
@@ -223,11 +223,11 @@ def _load_project_maybe(v):
 
 
 # =========================================================================
-# ====================== SideBarStuff =====================================
+# ====================== SideBar Stuff ====================================
 # =========================================================================
 
 #-----------------------------------------------------------------------------------
-class SbotSbCopyNameCommand(sublime_plugin.WindowCommand):
+class SbotSidebarCopyNameCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         names = (os.path.split(path)[1] for path in paths)
@@ -235,14 +235,14 @@ class SbotSbCopyNameCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotSbCopyPathCommand(sublime_plugin.WindowCommand):
+class SbotSidebarCopyPathCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         sublime.set_clipboard('\n'.join(paths))
 
 
 #-----------------------------------------------------------------------------------
-class SbotSbTerminalCommand(sublime_plugin.WindowCommand):
+class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
@@ -251,7 +251,7 @@ class SbotSbTerminalCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotSbFolderCommand(sublime_plugin.WindowCommand):
+class SbotSidebarFolderCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
@@ -264,21 +264,25 @@ class SbotSbFolderCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotSbTreeCommand(sublime_plugin.WindowCommand):
+class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
             dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
             subprocess.call(['tree', dir, '/a', '/f', '|', 'clip'], shell=True)
 
+    def is_visible(self, paths):
+        vis = len(paths) > 0 and os.path.isdir(paths[0])
+        return vis
+
 
 #-----------------------------------------------------------------------------------
-class SbotSbExecCommand(sublime_plugin.WindowCommand):
+class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
             # print(paths[0])
-            subprocess.call([paths[0]], shell=True)
+            subprocess.call([paths[0]], shell=True) #TODOC collect stdout/stderr
 
     def is_visible(self, paths):
         # print(os.path.splitext(paths[0]))
@@ -287,7 +291,67 @@ class SbotSbExecCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotSbOpenBrowserCommand(sublime_plugin.WindowCommand):
+class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
+
+    def __init__(self, window):
+        self.fn = window.project_file_name()
+        self.window = window
+
+    def run(self, paths):
+        if len(paths) > 0:
+            pdata = self.window.project_data()
+
+            exclude = paths[0]
+            dir = exclude if os.path.isdir(exclude) else os.path.split(exclude)[0]
+            fn = '' if os.path.isdir(exclude) else os.path.split(exclude)[1]
+
+            # Locate the folder.
+            found = False
+            for folder in pdata["folders"]:
+                fpath = folder["path"]
+                apath = os.path.split(self.fn)[0] if(fpath == '.') else os.path.abspath(fpath)
+
+                if dir.startswith(apath):
+                    # Make a relative ref.
+                    rpath = os.path.relpath(exclude, apath)
+                    patfold = "folder_exclude_patterns" if os.path.isdir(exclude) else "file_exclude_patterns"
+
+                    try:
+                        folder[patfold].append(rpath)
+                    except:
+                        folder[patfold] = [rpath]
+                    found = True
+                    break
+
+            # Finish up.
+            if found:
+                self.window.set_project_data(pdata)
+            else:
+                logging.info('not found:' + paths[0])
+
+    def is_visible(self, paths):
+        # Disallow project folders - they should use builtin remove_folder.
+        vis = True
+        if len(paths) > 0:
+            if os.path.isdir(paths[0]):
+                pdata = self.window.project_data()
+                dir = paths[0]
+
+                for folder in pdata["folders"]:
+                    fpath = folder["path"]
+                    apath = os.path.split(self.fn)[0] if fpath == '.' else os.path.abspath(fpath)
+                    if dir == apath:
+                        vis = False
+                        break
+            # else: Just a file = ok.
+        else:
+            vis = False
+
+        return vis
+
+
+#-----------------------------------------------------------------------------------
+class SbotSidebarOpenBrowserCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         webbrowser.open_new_tab(paths[0])
@@ -941,8 +1005,8 @@ class SbotSplitViewCommand(sublime_plugin.WindowCommand):
     ''' Toggles between split file views.'''
 
     def run(self):
-        lo = self.window.layout()
         w = self.window
+        lo = w.layout()
 
         if(len(lo['rows']) > 2):
             # Remove split.

@@ -71,7 +71,7 @@
 
     ////// New top level menu. For some reason this needs to be after the preceding sections.
     {
-        "caption": "Dont Look Here",
+        "caption": "Extra",
         "id": "sbot_extra",
         "children":
         [

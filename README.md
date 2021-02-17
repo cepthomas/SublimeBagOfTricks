@@ -97,17 +97,18 @@ Commands added to the sidebar. Just the stuff I need.
 | sbot_sb_folder           | Open a Windows Explorer here |
 | sbot_sb_open_browser     | Open html file in your browser |
 | sbot_sb_tree             | Run tree cmd to clipboard |
+| sbot_sidebar_exclude     | Hide selected file/dir in project |
 
 ## Examples
 Leftovers that will eventually be deleted or subsumed.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_example_menu        |             |
-| sbot_example_get_number  |             |
-| sbot_example_user_input  |             |
-| sbot_example_list_select |             |
-| sbot_example_msg_box     |             |
+| sbot_example_menu        | Menu        |
+| sbot_example_get_number  | User input |
+| sbot_example_user_input  | User input |
+| sbot_example_list_select | User list sel |
+| sbot_example_msg_box     | User message |
 
 # Notes
 
