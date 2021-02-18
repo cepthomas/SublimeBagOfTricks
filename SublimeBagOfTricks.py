@@ -16,9 +16,17 @@ import sublime
 import sublime_plugin
 
 
+# Need to insert the path to this project.
+directory = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(directory)
+# Then we can...
+import SbotCommon
+
+
+
 
 # ====== Vars - global for all open Windows (not Views!) ====
-settings = None
+# settings = None
 sbot_projects = {} # {k:window_id v:SbotProject}
 
 
@@ -94,6 +102,8 @@ def plugin_loaded():
     ''' Initialize module global stuff. '''
     global settings
     settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
+
+    print(SbotCommon.global_thing)
 
     # Init logging.
     if settings.get('enable_log', False):
@@ -1279,3 +1289,15 @@ class SbotToggleDisplayCommand(sublime_plugin.TextCommand):
         if propertyName:
             propertyValue = propertyValue1 if v_settings.get(propertyName, propertyValue1) != propertyValue1 else propertyValue2
             v_settings.set(propertyName, propertyValue)
+
+
+
+
+if __name__ == '__main__':
+    try:
+        unittest.main()
+    except SystemExit as e:
+        # print("ok")
+        pass
+    except:
+        print("Something else went wrong")    
