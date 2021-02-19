@@ -40,9 +40,9 @@ def plugin_loaded():
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
     logging.info("plugin_unloaded()")
-    # TODOC just in case...
-    # for id in list(sbot_projects):
-    #     sbot_projects[id].save()
+
+    # just in case...
+    SbotProject.save_all()
 
 
 #-----------------------------------------------------------------------------------
@@ -101,11 +101,3 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 if __name__ == '__main__':
     print("Hello from __main__")
-
-    # try:
-    #     unittest.main()
-    # except SystemExit as e:
-    #     # print("ok")
-    #     pass
-    # except:
-    #     print("Something else went wrong")    

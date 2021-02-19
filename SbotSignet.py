@@ -55,6 +55,16 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
+def init_signets(view, rows):
+    # Update visual signets, brutally. This is the ST way.
+    regions = []
+    for r in rows:
+        pt = view.text_point(r, 0) # 0-based
+        regions.append(sublime.Region(pt, pt))
+    view.add_regions(SIGNET_REGION_NAME, regions, SbotCommon.settings.get('signet_scope', 'comment'), SIGNET_ICON)
+
+
+#-----------------------------------------------------------------------------------
 def _go_to_signet(view, dir):
     ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
     v = view

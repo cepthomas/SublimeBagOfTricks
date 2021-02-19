@@ -5,10 +5,12 @@ import json
 import sublime
 import sublime_plugin
 import SbotCommon
+import SbotSignet
+import SbotHighlight
 
 
 # All the projects.
-sbot_projects = {} # {k:window_id v:SbotProject}
+sbot_projects = {} # k:window_id v:SbotProject
 
 SBOT_PROJECT_EXT = '.sbot-project'
 
@@ -25,7 +27,7 @@ class SbotProject(object):
 
         # If enabled, unpack persisted data into our internal convenience collections. Otherwise create empties.
         self.signets = {} # k:filename v:[rows]
-        self.highlights = {} # k:filename v:[tokens]  tokens={"token": "abc", "whole_word": true, "scope": "comment"}
+        self.highlights = {} # k:filename v:[tokens] where: tokens={"token": "abc", "whole_word": true, "scope": "comment"}
 
         if SbotCommon.settings.get('enable_persistence', True):
             try:
@@ -92,7 +94,7 @@ def get_project(view):
 def load_project_maybe(v):
     ''' This is kind of crude but there is no project loaded event (ST4 has on_load_project() though...) '''
     sproj = None
-    global sbot_projects
+    #global sbot_projects
     winid = v.window().id()
 
     # Persisted to internal. Check for already loaded.
@@ -105,16 +107,14 @@ def load_project_maybe(v):
     else:
         sproj = sbot_projects[winid]
 
-    # If this is the first time through and project has signets and/or highlights for this file, get them all.
+    # If this is the first time through and project has signets and/or highlights for this file, set them all.
     if sproj is not None and v.id() not in sproj.views_inited:
         sproj.views_inited.add(v.id())
+        SbotSignet.init_signets(v, sproj.signets.get(v.file_name(), []))
+        SbotHighlight.init_highlights(v,  sproj.highlights.get(v.file_name(), []))
 
-        # Process signets internal to visual.
-        if v.file_name() in sproj.signets:
-            _toggle_signet(v, sproj.signets.get(v.file_name(), []))
 
-        # Process highlights internal to visual.
-        if v.file_name() in sproj.highlights:
-            for tok in sproj.highlights.get(v.file_name(), {}):
-                highlight_view(v, tok['token'], tok['whole_word'], tok['scope'])
-
+#-----------------------------------------------------------------------------------
+def save_all():
+    for id in list(sbot_projects):
+        sbot_projects[id].save()

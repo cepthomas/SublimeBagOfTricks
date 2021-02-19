@@ -36,7 +36,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
         scope = highlight_scopes[hl_index]
 
-        highlight_view(v, token, whole_word, scope)
+        _highlight_view(v, token, whole_word, scope)
 
         # Add to internal.
         sproj = SbotProject.get_project(v)
@@ -152,7 +152,14 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def highlight_view(view, token, whole_word, scope):
+def init_highlights(view, tokens):
+
+    for tok in tokens:
+        _highlight_view(view, tok['token'], tok['whole_word'], tok['scope'])
+
+
+#-----------------------------------------------------------------------------------
+def _highlight_view(view, token, whole_word, scope):
 
     escaped = re.escape(token)
     if whole_word and escaped[0].isalnum():
@@ -161,4 +168,3 @@ def highlight_view(view, token, whole_word, scope):
     highlight_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
     if len(highlight_regions) > 0:
         view.add_regions(SbotCommon.HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)
-
