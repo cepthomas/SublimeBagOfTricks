@@ -66,7 +66,6 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
             for b in out:
                 if b == '\\n':
                     sys.stdout.write('\n')
-                    sys.stdout.write('\n')
                 elif b == '\\r':
                     pass
                 else:

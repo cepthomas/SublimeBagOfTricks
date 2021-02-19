@@ -6,12 +6,14 @@
     "enable_persistence": true,
 
     ///// Render settings /////
+    // Html cosmetics.
     "html_font_face": "Consolas",
     "html_font_size": 14,
     // If you need to change the bg color. Not done automatically from color scheme.
     "html_background": "white",
     // Optionally add line numbers.
     "html_line_numbers": true,
+    // Markdown cosmetics.
     "md_background": "OldLace",
     "md_font_face": "Calibri",
     "md_font_size": 14,
