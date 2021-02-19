@@ -62,7 +62,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             # print(paths[0])
-            subprocess.call([paths[0]], shell=True) #TODOC collect stdout/stderr
+            subprocess.call([paths[0]], shell=True) #TODOC collect stdout/stderr, dump to console.
 
     def is_visible(self, paths):
         # print(os.path.splitext(paths[0]))

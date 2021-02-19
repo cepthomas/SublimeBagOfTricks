@@ -32,30 +32,18 @@
                         "children":
                         [
                             {
-                                "caption": "Settings – Default",
-                                "command": "open_file",
-                                "args": {"file": "${packages}/SublimeBagOfTricks/SublimeBagOfTricks.sublime-settings"}
+                                "command": "edit_settings", "args": {
+                                    "base_file": "${packages}/SublimeBagOfTricks/SublimeBagOfTricks.sublime-settings",
+                                    "default": "{\n$0\n}\n"
+                                },
+                                "caption": "Settings"
                             },
                             {
-                                "caption": "Settings – User",
-                                "command": "open_file",
-                                "args": {"file": "${packages}/User/SublimeBagOfTricks.sublime-settings"}
-                            },
-                            {
-                                "caption": "-"
-                            },
-                            {
-                                "caption": "Keymap – Default",
-                                "command": "open_file",
-                                "args": {"file": "${packages}/SublimeBagOfTricks/Default (Windows).sublime-keymap"}
-                            },
-                            {
-                                "caption": "Keymap – User",
-                                "command": "open_file",
-                                "args": {"file": "${packages}/User/SublimeBagOfTricks.sublime-keymap"}
-                            },
-                            {
-                                "caption": "-"
+                                "command": "edit_settings", "args": {
+                                    "base_file": "${packages}/SublimeBagOfTricks/Default (Windows).sublime-keymap",
+                                    "default": "{\n$0\n}\n"
+                                },
+                                "caption": "Keymap"
                             },
                             {
                                 "caption": "Documentation",
