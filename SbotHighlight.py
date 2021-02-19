@@ -7,6 +7,9 @@ import SbotCommon
 import SbotProject
 
 
+HIGHLIGHT_REGION_NAME = 'highlight_%s'
+MAX_HIGHLIGHTS = 6
+
 
 #-----------------------------------------------------------------------------------
 class SbotHighlightTextCommand(sublime_plugin.TextCommand):
@@ -31,7 +34,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
             region = v.word(region)
         token = v.substr(region)
 
-        num_highlights = min(len(highlight_scopes), SbotCommon.MAX_HIGHLIGHTS)
+        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
         hl_index = min(hl_index, num_highlights)
 
         scope = highlight_scopes[hl_index]
@@ -54,14 +57,14 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
         v = self.view
         sproj = SbotProject.get_project(v)
         highlight_scopes = SbotCommon.settings.get('highlight_scopes')
-        num_highlights = min(len(highlight_scopes), SbotCommon.MAX_HIGHLIGHTS)
+        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
         point = v.sel()[0].a
 
         highlight_scope = ''
 
         for i in range(num_highlights):
-            reg_name = SbotCommon.HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             for region in v.get_regions(reg_name):
                 if region.contains(point):
                     highlight_scope = highlight_scopes[i]
@@ -84,13 +87,13 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
         v = self.view
         sproj = SbotProject.get_project(v)
         highlight_scopes = SbotCommon.settings.get('highlight_scopes')
-        num_highlights = min(len(highlight_scopes), SbotCommon.MAX_HIGHLIGHTS)
+        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
         for i in range(num_highlights):
-            reg_name = SbotCommon.HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             v.erase_regions(reg_name)
 
-        # Remove from internal. TODOC options for in file/whole project?
+        # Remove from internal. TODOC option for in file/whole project?
         if v.file_name() in sproj.highlights:
             del sproj.highlights[v.file_name()]
 
@@ -167,4 +170,4 @@ def _highlight_view(view, token, whole_word, scope):
 
     highlight_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
     if len(highlight_regions) > 0:
-        view.add_regions(SbotCommon.HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)
+        view.add_regions(HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)

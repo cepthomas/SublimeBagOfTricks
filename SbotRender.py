@@ -12,6 +12,9 @@ import SbotCommon
 import SbotMisc
 
 
+HIGHLIGHT_REGION_NAME = 'highlight_%s' # TODOC duplicate
+
+
 #-----------------------------------------------------------------------------------
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' Make a pretty. '''
@@ -97,8 +100,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         
         ## If there are highlights, collect them.
         highlight_scopes = SbotCommon.settings.get('highlight_scopes')
-        num_highlights = min(len(highlight_scopes), SbotCommon.MAX_HIGHLIGHTS)
-        for i in range(num_highlights):
+        for i in range(len(highlight_scopes)):
             # Get the style and invert for highlights.
             scope = highlight_scopes[i]
             ss = v.style_for_scope(scope)
@@ -108,7 +110,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             _add_style(hl_style)
 
             # Collect the highlight regions.
-            reg_name = SbotCommon.HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             for region in v.get_regions(reg_name):
                 highlight_regions.append((region, hl_style))
 
