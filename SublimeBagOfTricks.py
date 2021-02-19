@@ -18,8 +18,6 @@ import SbotExtra
 
 # All the core and system stuff.
 
-# TODOC Combined prefs editor.
-
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
@@ -27,6 +25,7 @@ def plugin_loaded():
     SbotCommon.initialize()
     SbotCommon.settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
     # print(sys.path)
+    print(sys.version)
 
     # Init logging.
     if SbotCommon.settings.get('enable_log', False):

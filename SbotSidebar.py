@@ -49,7 +49,7 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            subprocess.call(['tree', dir, '/a', '/f', '|', 'clip'], shell=True)
+            subprocess.call(['tree', dir, '/a', '/f', '|', 'clip'])#, shell=True)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.isdir(paths[0])
@@ -61,11 +61,18 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
-            # print(paths[0])
-            subprocess.call([paths[0]], shell=True) #TODOC collect stdout/stderr, dump to console.
+            out = subprocess.check_output([paths[0]])
+
+            for b in out:
+                if b == '\\n':
+                    sys.stdout.write('\n')
+                    sys.stdout.write('\n')
+                elif b == '\\r':
+                    pass
+                else:
+                    sys.stdout.write(chr(b));
 
     def is_visible(self, paths):
-        # print(os.path.splitext(paths[0]))
         vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']
         return vis
 

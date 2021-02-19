@@ -12,7 +12,7 @@ import SbotCommon
 import SbotMisc
 
 
-HIGHLIGHT_REGION_NAME = 'highlight_%s' # TODOC duplicate
+HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from SbotHighlight. My bad.
 
 
 #-----------------------------------------------------------------------------------
