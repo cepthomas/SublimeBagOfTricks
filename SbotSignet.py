@@ -2,6 +2,8 @@ import os
 import sys
 import sublime
 import sublime_plugin
+import SbotCommon
+import SbotProject
 
 
 # Defs
@@ -57,7 +59,7 @@ def _go_to_signet(view, dir):
     ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
     v = view
     w = view.window()
-    signet_nav_files = settings.get('signet_nav_files', True)
+    signet_nav_files = SbotCommon.settings.get('signet_nav_files', True)
 
     signet_nav_files
     done = False
@@ -160,4 +162,4 @@ def _toggle_signet(view, rows, sel_row=-1):
     for r in rows:
         pt = view.text_point(r, 0) # 0-based
         regions.append(sublime.Region(pt, pt))
-    view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope', 'comment'), SIGNET_ICON)
+    view.add_regions(SIGNET_REGION_NAME, regions, SbotCommon.settings.get('signet_scope', 'comment'), SIGNET_ICON)

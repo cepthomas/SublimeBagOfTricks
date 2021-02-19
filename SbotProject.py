@@ -1,6 +1,7 @@
 import os
 import sys
 import traceback
+import json
 import sublime
 import sublime_plugin
 import SbotCommon

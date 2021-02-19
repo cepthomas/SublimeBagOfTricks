@@ -114,7 +114,6 @@ Leftovers that will eventually be deleted or subsumed.
 
 Accumulated notes that will probably eventually go away.
 
-## Naming
 - In general `line` refers to editor lines and is 1-based. `row` refers to buffer contents as an array and is 0-based.
 - Collections, variables, functions, etc use:
   - `persisted` is the json compatible file format.
@@ -122,15 +121,12 @@ Accumulated notes that will probably eventually go away.
   - `internal` is the plugin format.
 - Commands can't end with `<underscore numeral>` e.g. `my_cmd_1` should be `stpt_cmd1`.
 - There is magic naming for Commands and InputHandlers to support mapping to the menu and key maps. e.g. a command like `big_brown_dog` is mapped to a handler named 'BigBrowwnDogCommand()'.
-
-
-## Misc Notes
 - `package-metadata.json` is used for package management so remove it while developing/debugging plugins because PackageControl will delete the entire package.
 - There's lots of good plugin examples in `Packages\Default`.
 - If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
 
 
-## Directories
+## Sublime Directories
 ```
 %data_dir%
 +---Installed Packages
