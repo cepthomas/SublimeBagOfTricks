@@ -67,6 +67,7 @@ def init_signets(view, rows):
 #-----------------------------------------------------------------------------------
 def _go_to_signet(view, dir):
     ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
+
     v = view
     w = view.window()
     signet_nav_files = SbotCommon.settings.get('signet_nav_files', True)
@@ -141,6 +142,7 @@ def _go_to_signet(view, dir):
 #-----------------------------------------------------------------------------------
 def _get_signet_rows(view):
     ''' Get all the signet row numbers in the view. Returns a sorted list. '''
+    
     sig_rows = []
     for reg in view.get_regions(SIGNET_REGION_NAME):
         row, _ = view.rowcol(reg.a)

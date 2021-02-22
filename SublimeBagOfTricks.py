@@ -22,6 +22,7 @@ import SbotExtra
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
+
     SbotCommon.initialize()
     SbotCommon.settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
     # print(sys.path)
@@ -50,11 +51,13 @@ class ViewEvent(sublime_plugin.ViewEventListener):
 
     def on_activated(self):
         ''' When focus/tab received. '''
+
         # dump_view('ViewEventListener.on_activated', self.view)
         SbotProject.load_project_maybe(self.view)
 
     def on_deactivated(self):
-        ''' When focus/tab lost. Save to file. Also crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
+        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
+
         # dump_view('EventListener.on_deactivated', self.view)
         sproj = SbotProject.get_project(self.view)
         if sproj is not None:
@@ -63,6 +66,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
 
     def on_selection_modified(self):
         ''' Show the abs position in the status bar for debugging. '''
+        
         pos = self.view.sel()[0].begin()
         self.view.set_status("position", 'Pos {}'.format(pos))
 

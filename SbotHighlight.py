@@ -22,8 +22,6 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, hl_index):
         v = self.view
-
-        # Prefs.
         highlight_scopes = SbotCommon.settings.get('highlight_scopes')
 
         # Get whole word or specific span.

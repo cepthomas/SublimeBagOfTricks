@@ -42,15 +42,6 @@ class SbotOpenSiteCommand(sublime_plugin.ApplicationCommand):
 #-----------------------------------------------------------------------------------
 class SbotToggleDisplayCommand(sublime_plugin.TextCommand):
 
-    # { "keys": ["alt+d", "alt+w"], "command": "sbot_toggle_display", "args": {"action": "word_wrap"}},
-    # { "keys": ["alt+d", "alt+s"], "command": "sbot_toggle_display", "args": {"action": "white_space"}},
-    # { "keys": ["alt+d", "alt+l"], "command": "sbot_toggle_display", "args": {"action": "line_no"}},
-    # { "keys": ["alt+d", "alt+i"], "command": "sbot_toggle_display", "args": {"action": "indent_guide"}},
-    # { "keys": ["alt+d", "alt+g"], "command": "sbot_toggle_display", "args": {"action": "gutter"}},
-    # { "keys": ["alt+d", "alt+e"], "command": "sbot_toggle_display", "args": {"action": "eol"}},
-    # { "keys": ["alt+d", "alt+x"], "command": "toggle_scope_always"},
-    # { "keys": ["f12"], "command": "reindent"}
-
     def run(self, edit, **kwargs):
         action = kwargs['action']#.upper()
         view = self.view
@@ -101,6 +92,7 @@ class SbotToggleDisplayCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 def dump_view(preamble, view):
     ''' Helper util. '''
+
     s = []
     s.append('view')
     s.append(preamble)
@@ -124,6 +116,7 @@ def dump_view(preamble, view):
 #-----------------------------------------------------------------------------------
 def wait_load_file(view, line):
     ''' Open file asynchronously then position at line. '''
+    
     if view.is_loading():
         sublime.set_timeout(lambda: wait_load_file(view, line), 100) # maybe not forever?
     else: # good to go

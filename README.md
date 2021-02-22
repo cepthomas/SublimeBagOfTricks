@@ -104,7 +104,7 @@ Leftovers that will eventually be deleted or subsumed.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_example_menu        | Menu        |
+| sbot_example_menu        | Menu |
 | sbot_example_get_number  | User input |
 | sbot_example_user_input  | User input |
 | sbot_example_list_select | User list sel |
@@ -114,19 +114,22 @@ Leftovers that will eventually be deleted or subsumed.
 
 Accumulated notes that will probably eventually go away.
 
+## This Project
 - In general `line` refers to editor lines and is 1-based. `row` refers to buffer contents as an array and is 0-based.
-- Collections, variables, functions, etc use:
+- Project collections, variables, functions, etc use:
   - `persisted` is the json compatible file format.
   - `visual` is the way ST API handles elements.
   - `internal` is the plugin format.
 - Commands can't end with `<underscore numeral>` e.g. `my_cmd_1` should be `stpt_cmd1`.
-- There is magic naming for Commands and InputHandlers to support mapping to the menu and key maps. e.g. a command like `big_brown_dog` is mapped to a handler named 'BigBrowwnDogCommand()'.
+- There is magic naming for Commands and InputHandlers to support mapping to the menu and key maps. e.g. a command like `big_brown_dog` is mapped to a handler named 'BigBrownDogCommand()'.
 - `package-metadata.json` is used for package management so remove it while developing/debugging plugins because PackageControl will delete the entire package.
 - There's lots of good plugin examples in `Packages\Default`.
 - If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
 
 
-## Sublime Directories
+## Sublime
+
+### Directories
 ```
 %data_dir%
 +---Installed Packages
@@ -179,7 +182,7 @@ Accumulated notes that will probably eventually go away.
 ```
 
 
-## Files
+### Files
 - `%executable_dir%`: C:\Program Files\Sublime Text
 - `%data_dir%`: %APPDATA%\Sublime Text 3 (C:\Users\%user%\AppData\Roaming\Sublime Text 3)
 - Nearly all of the interesting files for users live under `%data_dir%`.
@@ -198,7 +201,7 @@ Accumulated notes that will probably eventually go away.
   - Color-schemes are responsible for the syntax-highlighting e.g. `Visual Studio Bold.tmTheme`.
 
 
-## Menus
+### Menus
 Sublime Text has seven menus that may be customized:
 - Main.sublime-menu: Primary menu for the application
 - Side Bar Mount Point.sublime-menu: Context menu for top-level folders in the side bar
@@ -209,8 +212,8 @@ Sublime Text has seven menus that may be customized:
 - Widget Context.sublime-menu: Context menu for text inputs in various panels. Technically this file name can be changed via the "context_menu" setting inside of Widget.sublime-settings.
 
 
-## API - Core Components
-These are in sublime Module.
+### API - Core Components
+These are in sublime module.
 
 - sublime.Window Class: One instance of app/window.
 - sublime.Sheet Class: Represents a content container, i.e. a tab, within a window. Sheets may contain a View, or an image preview.
@@ -223,8 +226,8 @@ These are in sublime Module.
 - sublime.Settings Class:
 
 
-## API - Plugin Extension Points
-These are in sublime_plugin Module.
+### API - Plugin Extension Points
+These are in sublime_plugin module.
 If you are going to interact with the current view, use TextCommand, otherwise use WindowCommand. I have yet to see a use case for ApplicationCommand, but I guess if you need to interact with all windows.
 
 - sublime_plugin.EventListener Class: Note that many of these events are triggered by the buffer underlying the view, and thus the method is only called once, with the first view as the parameter.

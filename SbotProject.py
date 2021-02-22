@@ -83,6 +83,7 @@ class SbotProject(object):
 #-----------------------------------------------------------------------------------
 def get_project(view):
     ''' Get the sbot project for the view. None if invalid. '''
+
     sproj = None
     id = view.window().id()
     if id in sbot_projects:
@@ -93,6 +94,7 @@ def get_project(view):
 #-----------------------------------------------------------------------------------
 def load_project_maybe(v):
     ''' This is kind of crude but there is no project loaded event (ST4 has on_load_project() though...) '''
+    
     sproj = None
     #global sbot_projects
     winid = v.window().id()

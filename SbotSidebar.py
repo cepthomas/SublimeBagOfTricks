@@ -62,7 +62,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             out = subprocess.check_output([paths[0]])
-
+            # TODOC This is crude...
             for b in out:
                 if b == '\\n':
                     sys.stdout.write('\n')
@@ -129,7 +129,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
                     if dir == apath:
                         vis = False
                         break
-            # else: Just a file = ok.
+            # else: Just a file is ok.
         else:
             vis = False
 

@@ -36,6 +36,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
     def _update_status(self):
         ''' Runs in main thread. '''
+
         v = self.view
 
         if self.row_num == 0:
@@ -56,6 +57,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
     def _do_work(self):
         ''' The worker thread. '''
+        
         v = self.view
         
         # - html render msec per line:
@@ -270,11 +272,8 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     ''' Turn md into html.'''
 
     def is_visible(self):
-        v = self.view
-        vis = False
-        fn = v.file_name()
-        if fn is not None:
-            vis = v.file_name().endswith('.md')
+        fn = self.view.file_name()
+        vis = False if fn is None else self.view.file_name().endswith('.md')
         return vis
 
     def run(self, edit):
