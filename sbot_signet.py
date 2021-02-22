@@ -2,8 +2,8 @@ import os
 import sys
 import sublime
 import sublime_plugin
-import SbotCommon
-import SbotProject
+import sbot_common
+import sbot_project
 
 
 # Defs
@@ -45,7 +45,7 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         # Clear internal.
-        sproj = SbotProject.get_project(self.view)
+        sproj = sbot_project.get_project(self.view)
         if sproj is not None:
             sproj.signets.clear()
 
@@ -61,7 +61,7 @@ def init_signets(view, rows):
     for r in rows:
         pt = view.text_point(r, 0) # 0-based
         regions.append(sublime.Region(pt, pt))
-    view.add_regions(SIGNET_REGION_NAME, regions, SbotCommon.settings.get('signet_scope', 'comment'), SIGNET_ICON)
+    view.add_regions(SIGNET_REGION_NAME, regions, sbot_common.settings.get('signet_scope', 'comment'), SIGNET_ICON)
 
 
 #-----------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ def _go_to_signet(view, dir):
 
     v = view
     w = view.window()
-    signet_nav_files = SbotCommon.settings.get('signet_nav_files', True)
+    signet_nav_files = sbot_common.settings.get('signet_nav_files', True)
 
     signet_nav_files
     done = False
@@ -114,7 +114,7 @@ def _go_to_signet(view, dir):
     # 3) PREV_SIG: Else if there is a signet file in the project that is not open >>> open it, focus tab, goto last signet
     if not done:
         sig_files = []
-        sproj = SbotProject.get_project(v)
+        sproj = sbot_project.get_project(v)
         if sproj is not None:
             for sig_fn, sig_rows in sproj.signets.items():
                 if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
@@ -162,7 +162,7 @@ def _toggle_signet(view, rows, sel_row=-1):
             rows.append(sel_row)
 
     # Update internal.
-    sproj = SbotProject.get_project(view)
+    sproj = sbot_project.get_project(view)
     if sproj is not None:
         if len(rows) > 0:
             sproj.signets[view.file_name()] = rows
@@ -174,4 +174,4 @@ def _toggle_signet(view, rows, sel_row=-1):
     for r in rows:
         pt = view.text_point(r, 0) # 0-based
         regions.append(sublime.Region(pt, pt))
-    view.add_regions(SIGNET_REGION_NAME, regions, SbotCommon.settings.get('signet_scope', 'comment'), SIGNET_ICON)
+    view.add_regions(SIGNET_REGION_NAME, regions, sbot_common.settings.get('signet_scope', 'comment'), SIGNET_ICON)

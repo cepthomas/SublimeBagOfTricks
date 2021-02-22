@@ -4,9 +4,9 @@ import traceback
 import json
 import sublime
 import sublime_plugin
-import SbotCommon
-import SbotSignet
-import SbotHighlight
+import sbot_common
+import sbot_signet
+import sbot_highlight
 
 
 # All the projects.
@@ -29,7 +29,7 @@ class SbotProject(object):
         self.signets = {} # k:filename v:[rows]
         self.highlights = {} # k:filename v:[tokens] where: tokens={"token": "abc", "whole_word": true, "scope": "comment"}
 
-        if SbotCommon.settings.get('enable_persistence', True):
+        if sbot_common.settings.get('enable_persistence', True):
             try:
                 with open(self.fn, 'r') as fp:
                     values = json.load(fp)
@@ -53,7 +53,7 @@ class SbotProject(object):
                 sublime.error_message(s)
 
     def save(self):
-        if SbotCommon.settings.get('enable_persistence', True):
+        if sbot_common.settings.get('enable_persistence', True):
             try:
                 sigs = []
                 hls = []
@@ -112,8 +112,8 @@ def load_project_maybe(v):
     # If this is the first time through and project has signets and/or highlights for this file, set them all.
     if sproj is not None and v.id() not in sproj.views_inited:
         sproj.views_inited.add(v.id())
-        SbotSignet.init_signets(v, sproj.signets.get(v.file_name(), []))
-        SbotHighlight.init_highlights(v,  sproj.highlights.get(v.file_name(), []))
+        sbot_signet.init_signets(v, sproj.signets.get(v.file_name(), []))
+        sbot_highlight.init_highlights(v,  sproj.highlights.get(v.file_name(), []))
 
 
 #-----------------------------------------------------------------------------------

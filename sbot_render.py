@@ -5,14 +5,14 @@ import logging
 import math
 import textwrap
 import webbrowser
+from html import escape
 import sublime
 import sublime_plugin
-from html import escape
-import SbotCommon
-import SbotMisc
+import sbot_common
+import sbot_misc
 
 
-HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from SbotHighlight. My bad.
+HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
 
 
 #-----------------------------------------------------------------------------------
@@ -23,11 +23,11 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         v = self.view
 
         ## Get prefs.
-        render_max_file = SbotCommon.settings.get('render_max_file', 1)
+        render_max_file = sbot_common.settings.get('render_max_file', 1)
 
         fsize = v.size() / 1024.0 / 1024.0
         if fsize > render_max_file:
-            sublime.message_dialog('File too large to render. If you really want to, change your SbotCommon.settings')
+            sublime.message_dialog('File too large to render. If you really want to, change your SublimeBagOfTricks.sublime-settings')
         else:
             self._do_work()
             # Actually would like to run in a thread but takes 10x time, probably the GIL.
@@ -66,11 +66,11 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         #   - biggish (20k dense lines = 3Mb) 1.3607864668223 (20616)
 
         ## Get prefs.
-        html_font_size = SbotCommon.settings.get('html_font_size', 12)
-        html_font_face = SbotCommon.settings.get('html_font_face', 'Arial')
-        html_background = SbotCommon.settings.get('html_background', 'white')
-        html_line_numbers = SbotCommon.settings.get('html_line_numbers', True)
-        html_background = SbotCommon.settings.get('html_background', 'white')
+        html_font_size = sbot_common.settings.get('html_font_size', 12)
+        html_font_face = sbot_common.settings.get('html_font_face', 'Arial')
+        html_background = sbot_common.settings.get('html_background', 'white')
+        html_line_numbers = sbot_common.settings.get('html_line_numbers', True)
+        html_background = sbot_common.settings.get('html_background', 'white')
 
         # Use tuples for everything as they can be hashable keys.
         # my_style = (foreground, background, bold, italic)
@@ -101,7 +101,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         sublime.set_timeout(self._update_status, 100)
         
         ## If there are highlights, collect them.
-        highlight_scopes = SbotCommon.settings.get('highlight_scopes')
+        highlight_scopes = sbot_common.settings.get('highlight_scopes')
         for i in range(len(highlight_scopes)):
             # Get the style and invert for highlights.
             scope = highlight_scopes[i]
@@ -123,7 +123,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         has_selection = len(v.sel()[0]) > 0
         sel_reg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
 
-        pc = SbotMisc.SbotPerfCounter('render_html')
+        pc = sbot_misc.SbotPerfCounter('render_html')
 
         for line_region in v.split_by_newlines(sel_reg):
             pc.start()
@@ -279,9 +279,9 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = self.view
         ##### Get prefs.
-        md_background = SbotCommon.settings.get('md_background', 'white')
-        md_font_size = SbotCommon.settings.get('md_font_size', 12)
-        md_font_face = SbotCommon.settings.get('md_font_face', 'Arial')
+        md_background = sbot_common.settings.get('md_background', 'white')
+        md_font_size = sbot_common.settings.get('md_font_size', 12)
+        md_font_face = sbot_common.settings.get('md_font_face', 'Arial')
 
         html = []
         html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
@@ -300,7 +300,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 def _output_html(view, content=[]):
-    output_type = SbotCommon.settings.get('render_output', 'new_file')
+    output_type = sbot_common.settings.get('render_output', 'new_file')
 
     if output_type == 'clipboard':
         sublime.set_clipboard("".join(content))

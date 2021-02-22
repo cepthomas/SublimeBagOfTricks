@@ -3,8 +3,8 @@ import sys
 import re
 import sublime
 import sublime_plugin
-import SbotCommon
-import SbotProject
+import sbot_common
+import sbot_project
 
 
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
@@ -22,7 +22,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, hl_index):
         v = self.view
-        highlight_scopes = SbotCommon.settings.get('highlight_scopes')
+        highlight_scopes = sbot_common.settings.get('highlight_scopes')
 
         # Get whole word or specific span.
         region = v.sel()[0]
@@ -40,7 +40,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
         _highlight_view(v, token, whole_word, scope)
 
         # Add to internal.
-        sproj = SbotProject.get_project(v)
+        sproj = sbot_project.get_project(v)
         if v.file_name() not in sproj.highlights:
             sproj.highlights[v.file_name()] = []
         sproj.highlights[v.file_name()].append( { "token": token, "whole_word": whole_word, "scope": scope } )
@@ -53,8 +53,8 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Locate specific region, crudely.
         v = self.view
-        sproj = SbotProject.get_project(v)
-        highlight_scopes = SbotCommon.settings.get('highlight_scopes')
+        sproj = sbot_project.get_project(v)
+        highlight_scopes = sbot_common.settings.get('highlight_scopes')
         num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
         point = v.sel()[0].a
@@ -83,8 +83,8 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
-        sproj = SbotProject.get_project(v)
-        highlight_scopes = SbotCommon.settings.get('highlight_scopes')
+        sproj = sbot_project.get_project(v)
+        highlight_scopes = sbot_common.settings.get('highlight_scopes')
         num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
         for i in range(num_highlights):

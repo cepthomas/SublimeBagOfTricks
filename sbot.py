@@ -7,14 +7,14 @@ import traceback
 import threading
 import sublime
 import sublime_plugin
-import SbotCommon
-import SbotProject
-import SbotMisc
-import SbotRender
-import SbotHighlight
-import SbotSidebar
-import SbotSignet
-import SbotExtra
+import sbot_common
+import sbot_project
+import sbot_misc
+import sbot_render
+import sbot_highlight
+import sbot_sidebar
+import sbot_signet
+import sbot_extra
 
 # All the core and system stuff.
 
@@ -23,13 +23,13 @@ import SbotExtra
 def plugin_loaded():
     ''' Initialize module global stuff. '''
 
-    SbotCommon.initialize()
-    SbotCommon.settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
+    sbot_common.initialize()
+    sbot_common.settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
     # print(sys.path)
     print(sys.version)
 
     # Init logging.
-    if SbotCommon.settings.get('enable_log', False):
+    if sbot_common.settings.get('enable_log', False):
         logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'sbot_log.txt')
         print('Logfile:', logfn)
         logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
@@ -42,7 +42,7 @@ def plugin_unloaded():
     logging.info("plugin_unloaded()")
 
     # just in case...
-    SbotProject.save_all()
+    sbot_project.save_all()
 
 
 #-----------------------------------------------------------------------------------
@@ -53,13 +53,13 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         ''' When focus/tab received. '''
 
         # dump_view('ViewEventListener.on_activated', self.view)
-        SbotProject.load_project_maybe(self.view)
+        sbot_project.load_project_maybe(self.view)
 
     def on_deactivated(self):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
 
         # dump_view('EventListener.on_deactivated', self.view)
-        sproj = SbotProject.get_project(self.view)
+        sproj = sbot_project.get_project(self.view)
         if sproj is not None:
             # Save the project file internal to persisted.
             sproj.save()
