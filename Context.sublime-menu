@@ -1,4 +1,3 @@
-
 [
     // { "caption": "-" },
     // { "command": "sbot_test_test_test" },
@@ -33,16 +32,18 @@
     },
     { "caption": "Clear All Highlights", "command": "sbot_clear_all_highlights" },
 
-    { "caption": "-" },
-    { "caption": "Trimmer: Trim trailing whitespace.", "command": "TODO_better_home_for_these" },
-    { "caption": "Trimmer: Trim trailing whitespace.", "command": "trim_trailing_whitespace" },
-    { "caption": "Trimmer: Trim leading whitespace.", "command": "trim_leading_whitespace" },
-    { "caption": "Trimmer: Trim leading AND trailing whitespace.", "command": "trim_leading_trailing_whitespace" },
-    { "caption": "Trimmer: Trim selections.", "command": "trim_selections" },
-    { "caption": "Trimmer: Delete empty lines.", "command": "delete_empty_lines" },
-    { "caption": "Trimmer: Collapse lines.", "command": "collapse_lines" },
-    { "caption": "Trimmer: Collapse spaces.", "command": "collapse_spaces" },
-    { "caption": "Trimmer: Remove blank spaces.", "command": "remove_blank_spaces" },
+    { "caption": "- TODOC_better_home_for_these" },
+    { "caption": "Trim Both Ends WS", "command": "sbot_trim_both" },
+    { "caption": "Trim Trailing WS", "command": "sbot_trim_trailing" },
+    { "caption": "Trim Leading WS", "command": "sbot_trim_leading" },
+    
+    // { "caption": "Trim selections", "command": "trim_selections" },
 
+    { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : {"residual" : 0} },
+    { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : {"residual" : 0} },
+    // { "caption": "Collapse lines", "command": "collapse_lines" },
+    // { "caption": "Collapse spaces", "command": "collapse_spaces" },
 
+    { "caption": "Find Non-ascii", "command": "sbot_find_non_ascii" },
+    { "caption": "Replace Non-ascii", "command": "sbot_replace_non_ascii", "args" : {"repval" : ""} },
 ]

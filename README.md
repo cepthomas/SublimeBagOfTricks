@@ -84,7 +84,7 @@ Enhanced bookmarks:
 ## Miscellany
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_split_view          | Toggles simple horizontal split screen, like MS products |
+| sbot_split_view          | Toggles simple horizontal split screen, like e.g. Word |
 
 ## SideBar
 Commands added to the sidebar. Just the stuff I need.

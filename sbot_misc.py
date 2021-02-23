@@ -5,7 +5,7 @@ import sublime
 import sublime_plugin
 
 
-# Misc commands and Utilities 
+# Misc commands and utilities.
 
 
 #-----------------------------------------------------------------------------------
@@ -40,53 +40,45 @@ class SbotOpenSiteCommand(sublime_plugin.ApplicationCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotToggleDisplayCommand(sublime_plugin.TextCommand):
+class SbotToggleDisplayCommand(sublime_plugin.TextCommand): #TODOC useful?
+    ''' Toggles between two values. '''
 
     def run(self, edit, **kwargs):
-        action = kwargs['action']#.upper()
-        view = self.view
-        my_id = self.view.id()
+        action = kwargs['action']
+        v = self.view
 
-        v_settings = view.v_settings() # This view's v_settings.
-
-        if action == 'word_wrap':
-            propertyName, propertyValue1, propertyValue2 = "word_wrap", False, True
-
-        elif action == 'white_space':
-            propertyName, propertyValue1, propertyValue2 = "draw_white_space", "all", "selection"
-
+        if action == 'white_space':
+            pname, pval1, pval2 = "draw_white_space", "all", "selection"
         elif action == 'gutter':
-            propertyName, propertyValue1, propertyValue2 = "gutter", False, True
-
+            pname, pval1, pval2 = "gutter", False, True
         elif action == 'line_no':
-            propertyName, propertyValue1, propertyValue2 = "line_numbers", False, True
-            # propertyName = "line_numbers"
-
+            pname, pval1, pval2 = "line_numbers", False, True
+            # pname = "line_numbers"
         elif action == 'indent_guide':
-            propertyName, propertyValue1, propertyValue2 = "draw_indent_guides", False, True
-
+            pname, pval1, pval2 = "draw_indent_guides", False, True
+        # elif action == 'word_wrap':
+        #     pname, pval1, pval2 = "word_wrap", False, True
         elif action == 'eol':
-            if not view.get_regions("eols"):
+            if not v.get_regions("eols"):
                 eols = []
                 p = 0
                 while 1:
-                    s = view.find('\n', p + 1)
+                    s = v.find('\n', p + 1)
                     if not s:
                         break
                     eols.append(s)
                     p = s.a
 
                 if eols:
-                    view.add_regions("eols", eols, "comment")
+                    v.add_regions("eols", eols, "comment")
             else:
-                view.erase_regions("eols")
-
+                v.erase_regions("eols")
         else:
             propertyValue = None
 
-        if propertyName:
-            propertyValue = propertyValue1 if v_settings.get(propertyName, propertyValue1) != propertyValue1 else propertyValue2
-            v_settings.set(propertyName, propertyValue)
+        if pname:
+            propertyValue = pval1 if v.settings().get(pname, pval1) != pval1 else pval2
+            v.settings().set(pname, propertyValue)
 
 
 #-----------------------------------------------------------------------------------
