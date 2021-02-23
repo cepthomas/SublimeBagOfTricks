@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 # Project files
-sbot_log.txt
+_log.txt
 

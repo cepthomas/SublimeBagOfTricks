@@ -53,11 +53,8 @@ class SbotToggleDisplayCommand(sublime_plugin.TextCommand): #TODOC useful?
             pname, pval1, pval2 = "gutter", False, True
         elif action == 'line_no':
             pname, pval1, pval2 = "line_numbers", False, True
-            # pname = "line_numbers"
         elif action == 'indent_guide':
             pname, pval1, pval2 = "draw_indent_guides", False, True
-        # elif action == 'word_wrap':
-        #     pname, pval1, pval2 = "word_wrap", False, True
         elif action == 'eol':
             if not v.get_regions("eols"):
                 eols = []

@@ -20,32 +20,6 @@ sbot_format_xml
 sbot_format_html
 
 
-- trimmer:
-    - Trim whitespace at the end of each line. "caption": "Trimmer: Trim trailing whitespace.", "command": "trimmer"
-    - Trim whitespace at the start of each line.  "caption": "Trimmer: Trim leading whitespace.", "command": "trim_leading_whitespace"
-    - Trim whitespace at the start and end of each line. "caption": "Trimmer: Trim leading AND trailing whitespace.",  "command": "trim_leading_trailing_whitespace"
-    - Trim whitespace from selection(s).  "caption": "Trimmer: Trim selections.", "command": "trim_selections"
-    - Delete empty, whitespace only lines.  "caption": "Trimmer: Delete empty lines.",  "command": "delete_empty_lines"
-    - Collapse multiple consecutive empty lines into one empty line.  "caption": "Trimmer: Collapse lines.", "command": "collapse_lines"
-    - Collapse multiple consecutive spaces into one space.  "caption": "Trimmer: Collapse spaces.", "command": "collapse_spaces"
-    - Remove blank space characters.  "caption": "Trimmer: Remove blank spaces.", "command": "remove_blank_spaces"
-collapse_lines
-collapse_spaces
-delete_empty_lines
-remove_blank_spaces
-trim_leading_trailing_whitespace
-trim_leading_whitespace
-trim_selections
-trim_trailing_whitespace
-
-
-- display/remove non-ascii
-    - like binsniff.cs
-    - ??? RemoveNonAsciiChars.sublime-package - uses unicodedata.normalize()
-sbot_find_non_ascii
-sbot_replace_non_ascii  ,,remove
-
-
 """  
 
 #-----------------------------------------------------------------------------------

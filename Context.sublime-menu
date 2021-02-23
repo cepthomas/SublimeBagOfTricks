@@ -32,18 +32,22 @@
     },
     { "caption": "Clear All Highlights", "command": "sbot_clear_all_highlights" },
 
-    { "caption": "- TODOC_better_home_for_these" },
-    { "caption": "Trim Both Ends WS", "command": "sbot_trim_both" },
-    { "caption": "Trim Trailing WS", "command": "sbot_trim_trailing" },
-    { "caption": "Trim Leading WS", "command": "sbot_trim_leading" },
-    
-    // { "caption": "Trim selections", "command": "trim_selections" },
-
-    { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : {"residual" : 0} },
-    { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : {"residual" : 0} },
-    // { "caption": "Collapse lines", "command": "collapse_lines" },
-    // { "caption": "Collapse spaces", "command": "collapse_spaces" },
+    { "caption": "-" },
+    { "caption": "TODOC_better_home_for_these" },
 
     { "caption": "Find Non-ascii", "command": "sbot_find_non_ascii" },
-    { "caption": "Replace Non-ascii", "command": "sbot_replace_non_ascii", "args" : {"repval" : ""} },
+    { "caption": "Replace Non-ascii", "command": "sbot_find_non_ascii", "args" : {"replval" : ""} },
+
+    // { "caption": "Trim Both Ends WS", "command": "sbot_trim_both" },
+    // { "caption": "Trim Trailing WS", "command": "sbot_trim_trailing" },
+    // { "caption": "Trim Leading WS", "command": "sbot_trim_leading" },
+
+    { "caption": "Trim Leading WS", "command": "sbot_trim", "args" : {"which" : "leading"}  },
+    { "caption": "Trim Trailing WS", "command": "sbot_trim", "args" : {"which" : "trailing"}  },
+    { "caption": "Trim Both Ends WS", "command": "sbot_trim", "args" : {"which" : "both"}  },
+    
+    { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : {"collapse" : false} },
+    { "caption": "Collapse Empty Lines", "command": "sbot_remove_empty_lines", "args" : {"collapse" : true} },
+    { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : {"collapse" : false} },
+    { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : {"collapse" : true} },
 ]
