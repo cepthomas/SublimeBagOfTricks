@@ -1,7 +1,6 @@
 [
+    // { "caption": "TEST TEST TEST", "command": "sbot_test" },
     // { "caption": "-" },
-    // { "command": "sbot_test_test_test" },
-    { "caption": "-" },
     { "caption": "Split View", "command": "sbot_split_view" },
     { "caption": "-" },
     {
@@ -33,21 +32,18 @@
     { "caption": "Clear All Highlights", "command": "sbot_clear_all_highlights" },
 
     { "caption": "-" },
-    { "caption": "TODOC_better_home_for_these" },
+    { "caption": "TODO2_better_home_for_these" },
 
-    { "caption": "Find Non-ascii", "command": "sbot_find_non_ascii" },
-    { "caption": "Replace Non-ascii", "command": "sbot_find_non_ascii", "args" : {"replval" : ""} },
-
-    // { "caption": "Trim Both Ends WS", "command": "sbot_trim_both" },
-    // { "caption": "Trim Trailing WS", "command": "sbot_trim_trailing" },
-    // { "caption": "Trim Leading WS", "command": "sbot_trim_leading" },
+    { "caption": "Find Non-ascii", "command": "sbot_find_non_ascii", "args" : {"mode" : "find"} },
+    { "caption": "Replace Non-ascii", "command": "sbot_find_non_ascii", "args" : {"mode" : "replace"} },
 
     { "caption": "Trim Leading WS", "command": "sbot_trim", "args" : {"which" : "leading"}  },
     { "caption": "Trim Trailing WS", "command": "sbot_trim", "args" : {"which" : "trailing"}  },
     { "caption": "Trim Both Ends WS", "command": "sbot_trim", "args" : {"which" : "both"}  },
     
-    { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : {"collapse" : false} },
-    { "caption": "Collapse Empty Lines", "command": "sbot_remove_empty_lines", "args" : {"collapse" : true} },
-    { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : {"collapse" : false} },
-    { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : {"collapse" : true} },
+    { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : {"normalize" : false} },
+    { "caption": "Collapse Empty Lines", "command": "sbot_remove_empty_lines", "args" : {"normalize" : true} },
+
+    { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : {"normalize" : false} },
+    { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : {"normalize" : true} },
 ]

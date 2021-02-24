@@ -6,90 +6,103 @@ import sublime_plugin
 import sbot_common
 
 
-# [Trimmer](https://github.com/jonlabelle/Trimmer) is a [Sublime Text](http://www.sublimetext.com) plug-in for cleaning up whitespace.
-# [Jon LaBelle](https://jonlabelle.com)
-# Trimmer is licensed under the [MIT license](http://opensource.org/licenses/MIT).
-
-
 #-----------------------------------------------------------------------------------
-def _dosub(v, e, reobj, sub):
-    regions = [r for r in v.sel() if not r.empty()]  #TODOC global setting?
-    if not regions and default_to_all:
-        regions = [sublime.Region(0, v.size())]
+def _dosub(v, e, reo, sub):
+    # Generic substitution function. TODO2 if no selections, process all?
 
-    for region in regions:
-        orig = v.substr(region)
-        trimmed = reobj.sub('', orig)
-        if orig != trimmed: #TODOC efficient?
-            v.replace(e, region, trimmed)
+    for reg in v.sel():
+        orig = v.substr(reg)
+        new = reo.sub(sub, orig)
+        if orig != new: #TODO2 efficient?
+            v.replace(e, reg, new)
 
 
 #-----------------------------------------------------------------------------------
 class SbotTrimCommand(sublime_plugin.TextCommand):
     def run(self, edit, which):
+        sub = ''
         if which == 'leading':
-            reobj = re.compile('^[ \t]+', re.MULTILINE)
+            reo = re.compile('^[ \t]+', re.MULTILINE)
         elif which == 'trailing':
-            reobj = re.compile('[\t ]+$', re.MULTILINE)
+            reo = re.compile('[\t ]+$', re.MULTILINE)
         else: # both
-            reobj = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
-        _dosub(self.view, edit, reobj, '')
+            reo = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
+        _dosub(self.view, edit, reo, sub)
 
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
-    def run(self, edit, collapse):
-        if collapse: #TODOC not quite right
-            reobj = re.compile(r'(?:\s*)(\r?\n)(?:\s*)(?:\r?\n+)')
+    def run(self, edit, normalize):
+        if normalize:
+            reo = re.compile(r'(?:\s*)(\r?\n)(?:\s*)(?:\r?\n+)', re.MULTILINE)
             sub = r'\1\1'
         else:
-            reobj = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
+            reo = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
             sub = ''
-        _dosub(self.view, edit, reobj, sub)
+        _dosub(self.view, edit, reo, sub)
 
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveWsCommand(sublime_plugin.TextCommand):
-    def run(self, edit, collapse):
-        if collapse:
-            reobj = re.compile('([ ])[ ]+')
+    def run(self, edit, normalize):
+        if normalize:
+            reo = re.compile('([ ])[ ]+')
             sub = r'\1'
         else:
-            reobj = re.compile(r'[ \t\r\n\v\f]')
+            reo = re.compile(r'[ \t\r\n\v\f]')
             sub = ''
-        _dosub(self.view, edit, reobj, sub)
+        _dosub(self.view, edit, reo, sub)
 
 
 #-----------------------------------------------------------------------------------
-#-----------------------------------------------------------------------------------
-#-----------------------------------------------------------------------------------
-#-----------------------------------------------------------------------------------
-#-----------------------------------------------------------------------------------
-class SbotFindNonAsciiCommand(sublime_plugin.TextCommand): # TODOC
-    def run(self, edit, replval): #replval=None if cump
+class SbotFindNonAsciiCommand(sublime_plugin.TextCommand): # TODO1 prob need a real hex editor
+    def run(self, edit, mode): # find replace
         v = self.view
-# class SbotTrimSelectionsXXXXCommand(sublime_plugin.TextCommand): #TODOC example of brute force way.
-#     def run(self, edit):
-#         """
-#         Trim leading and trailing whitespace from selections.
-#         Originally from the 'Multi​Edit​Utils' Plug-in >>>>>>> https://github.com/philippotto/Sublime-MultiEditUtils
-#         """
-#         v = self.view
-#         sel = v.sel()
-#         new_regions = []
-#         for reg in sel:
-#             text = v.substr(reg)
-#             l_stripped_text = text.lstrip()
-#             r_stripped_text = l_stripped_text.rstrip()
-#             l_stripped_count = len(text) - len(l_stripped_text)
-#             r_stripped_count = len(l_stripped_text) - len(r_stripped_text)
-#             a = reg.begin() + l_stripped_count
-#             b = reg.end() - r_stripped_count
-#             if a == b:
-#                 # the region only contained whitespace
-#                 # use the old sel end to avoid jumping of cursor
-#                 a = b = reg.b
-#             new_regions.append(sublime.Region(a, b))
-#         sel.clear()
-#         for region in new_regions:
-#             sel.add(region)
+
+        find = []
+
+        reg = sublime.Region(0, v.size())
+        s = v.substr(reg)
+
+        row = 1
+        col = 1
+
+        if mode == 'replace':
+            sys.stdout.write('----------- replace non-ascii ---------------\n')
+
+        for c in s:
+            if c == '\n':
+                # Valid.
+                if mode == 'replace':
+                    sys.stdout.write(r'<\n>')
+                row += 1
+                col += 1
+            elif c == '\r':
+                # Valid.
+                if mode == 'replace':
+                    sys.stdout.write(r'<\r>')
+                col = 1
+            elif c == '\t':
+                # Valid.
+                if mode == 'replace':
+                    sys.stdout.write(r'<\t>')
+                col += 1
+            elif c < ' ' or c > '~': # 32  SPACE  126  ~
+                # Invalid.
+                if mode == 'replace':
+                    sys.stdout.write('<{}>'.format(c))
+                else:
+                    find.append('row:{} col:{} i:{}'.format(row, col, c))
+                col += 1
+            else:
+                # Valid.
+                if mode == 'replace':
+                    sys.stdout.write(c)
+                col += 1
+
+                
+        if mode == 'find':
+            sys.stdout.write('----------- find non-ascii ---------------\n')
+            for d in find:
+                sys.stdout.write(d)
+                sys.stdout.write('\n')

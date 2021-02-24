@@ -28,7 +28,7 @@ def plugin_loaded():
     # print(sys.path)
     print(sys.version)
 
-    # Init logging. TODOC Add mode=a|w, level, filename, 
+    # Init logging. TODO2 Add mode=a|w, level, filename, 
     if sbot_common.settings.get('enable_log', False):
         logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', '_log.txt')
         print('Logfile:', logfn)
@@ -72,7 +72,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
 
 
 #-----------------------------------------------------------------------------------
-class SbotTestTestTestCommand(sublime_plugin.TextCommand):
+class SbotTestCommand(sublime_plugin.TextCommand):
     ''' Just for hack testing. '''
 
     def run(self, edit, all=False):
@@ -99,6 +99,37 @@ class SbotTestTestTestCommand(sublime_plugin.TextCommand):
         # print(global_thing)
         # global_thing['item' + str(len(global_thing) + 5)] = 1234
         # v.show_popup(str(global_thing))
+
+
+        # if action == 'white_space':
+        #     pname, pval1, pval2 = "draw_white_space", "all", "selection"
+        # elif action == 'gutter':
+        #     pname, pval1, pval2 = "gutter", False, True
+        # elif action == 'line_no':
+        #     pname, pval1, pval2 = "line_numbers", False, True
+        # elif action == 'indent_guide':
+        #     pname, pval1, pval2 = "draw_indent_guides", False, True
+        # if pname:
+        #     propertyValue = pval1 if v.settings().get(pname, pval1) != pval1 else pval2
+        #     v.settings().set(pname, propertyValue)
+
+
+        # class SbotShowEolCommand(sublime_plugin.TextCommand): #TODO1 useful?
+        if not v.get_regions("eols"):
+            eols = []
+            ind = 0
+            while 1:
+                freg = v.find('[\n\r]', ind)
+                if freg is not None and not freg.empty(): # second condition is not documented!!
+                    eols.append(freg)
+                    ind = freg.end() + 1
+                else:
+                    break
+            if eols:
+                # "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
+                v.add_regions("eols", eols, "invalid")
+        else:
+            v.erase_regions("eols")
 
 
 #-----------------------------------------------------------------------------------

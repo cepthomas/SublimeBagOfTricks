@@ -62,7 +62,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             out = subprocess.check_output([paths[0]])
-            # TODOC This is crude...
+            # TODO2 This is crude... leaves extra nls too
             for b in out:
                 if b == '\\n':
                     sys.stdout.write('\n')
