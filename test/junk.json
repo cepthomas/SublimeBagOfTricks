@@ -1,0 +1,109 @@
+{
+    "MarkPitch": {
+        "Original": 0,
+        "Value": 10
+    },
+
+    "Material": "Stuff is \"comportium\", finest kind!",
+
+
+
+    "MarksPerPage": {      
+        "Original": 0,                        
+        "Value": 45         
+    },         
+    //   This \n is a single line comment...
+
+
+
+    "MinGoodMarks": {    
+        "Original": 0,
+        "Value": 36
+    },
+
+    
+    /* Multiline
+    comment for
+    "RepeatLength": {
+    },*/
+    "RepeatLength": {
+        "Original": 0,    
+        "Value": 479.425
+    },
+    "SpecLimits": [
+        {              
+            "ItKeystone": {
+                "Original": 105,
+                // This \n also is a single line comment...
+                "Value": 110
+            },
+            "ItMagnification": {
+                "Original": 122,
+                "Value": 133
+            },
+                /* Multiline
+                comment for
+                other */
+            "ItPosition": {
+                "Original": 134,
+                "Value": 166
+            },
+            "ItSkew": {
+                "Original": 176,
+                "Value": 189
+            },
+        },
+
+        "Some true Thing" : true,
+
+        {
+            "ItMagnification": {
+                "Original": 256,
+                "Value": 208
+            },
+
+            "Some null Thing" : null,
+
+            "ItSkew": {
+                "Original": 639,
+                "Value": 767676
+            },
+        },
+
+        "Plain string",
+        98765,
+        5.5509,
+        true,
+        false,
+        null
+
+        {
+            "ItKeystone": {
+                "Original": 845,
+                "Value": 9090909
+            },
+            "ItMagnification": {
+                "Original": 61235,
+                "Some false Thing" : false,
+                "Value": -45
+            },
+            "ItPosition": {
+                "Original": 777,
+                "Value": 931
+            },
+            "ItSkew": {
+                "Original": 609,
+                "Value": 278
+            },
+        },
+    ],
+    "TiffVersion": "ABC-123",
+    "TrackSpacing": {
+        "Original": 0,
+        "Value": 252
+    },
+    "XtBarcodeOffset": {
+        "Original": 0,
+        "Value": -160
+    },
+}

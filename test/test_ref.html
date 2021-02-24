@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style  type="text/css">
+        .contentpane { font-family: Consolas; font-size: 0.875em; background-color: white; text-indent: -2.9em; padding-left: 2.9em; }
+        p { white-space: pre-wrap; margin: 0em; }
+        .st6 { color:#0000ff; font-weight:bold; }
+        .st2 { color:white; background-color:#008000; }
+        .st0 { color:white; background-color:#a31515; }
+        .st3 { color:white; background-color:#b90690; }
+        .st7 { color:#000000; }
+        .st10 { color:#a31515; background-color:#e1a09f; }
+        .st11 { color:#26b31a; }
+        .st1 { color:white; background-color:#0000ff; }
+        .st9 { color:#008000; }
+        .st5 { color:white; background-color:#e1a09f; }
+        .st4 { color:white; background-color:#000000; }
+        .st8 { color:#a31515; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="contentpane">
+                <p>001  <span class=st6>import</span><span class=st7> sublime</span></p>
+                <p>002  <span class=st6>import</span><span class=st7> sublime_plugin</span></p>
+                <p>003  <span class=st6>import</span><span class=st7> re</span></p>
+                <p>004  <span class=st6>import</span><span class=st7> json</span></p>
+                <p>005  <span class=st6>from</span><span class=st7> xml.dom.minidom </span><span class=st6>import</span><span class=st7> parseString</span></p>
+                <p>006  <span class=st6>from</span><span class=st7> xml.parsers.expat </span><span class=st6>import</span><span class=st7> ExpatError, errors</span></p>
+                <p>007  <span class=st6>from</span><span class=st7> os.path </span><span class=st6>import</span><span class=st7> basename, splitext</span></p>
+                <p>008  </p>
+                <p>009  </p>
+                <p>010  <span class=st6>class</span><span class=st7> BaseIndentCommand(sublime_plugin.TextCommand):</span></p>
+                <p>011  <span class=st7>    </span><span class=st6>def</span><span class=st7> __init__(self, view):</span></p>
+                <p>012  <span class=st7>        self.view = view</span></p>
+                <p>013  <span class=st7>        self.language = self.get_language()</span></p>
+                <p>014  </p>
+                <p>015  <span class=st7>    </span><span class=st6>def</span><span class=st7> get_language(self):</span></p>
+                <p>016  <span class=st7>        syntax = self.view.settings().get(</span><span class=st8>&#x27;syntax&#x27;</span><span class=st7>)</span></p>
+                <p>017  <span class=st7>        language = splitext(basename(syntax))[</span><span class=st8>0</span><span class=st7>].lower() </span><span class=st6>if</span><span class=st7> syntax </span><span class=st6>is</span><span class=st7> </span><span class=st6>not</span><span class=st7> </span><span class=st6>None</span><span class=st7> </span><span class=st6>else</span><span class=st7> </span><span class=st8>&quot;plain text&quot;</span></p>
+                <p>018  <span class=st7>        </span><span class=st6>return</span><span class=st7> language</span></p>
+                <p>019  </p>
+                <p>020  <span class=st7>    </span><span class=st6>def</span><span class=st7> check_enabled(self, lang):</span></p>
+                <p>021  <span class=st7>        </span><span class=st6>return</span><span class=st7> </span><span class=st6>True</span></p>
+                <p>022  </p>
+                <p>023  <span class=st7>    </span><span class=st6>def</span><span class=st7> is_enabled(self):</span></p>
+                <p>024  <span class=st7>        </span><span class=st9>&quot;&quot;&quot;</span></p>
+                <p>025  <span class=st9>        Enables or disables the &#x27;indent&#x27; command. Command will be disabled if</span></p>
+                <p>026  <span class=st9>        there are currently no text selections and current file is not &#x27;XML&#x27; or</span></p>
+                <p>027  <span class=st9>        &#x27;Plain Text&#x27;. This helps clarify to the user about when the command can</span></p>
+                <p>028  <span class=st9>        be executed, especially useful for UI controls.</span></p>
+                <p>029  <span class=st9>        &quot;&quot;&quot;</span></p>
+                <p>030  <span class=st7>        </span><span class=st6>if</span><span class=st7> self.view </span><span class=st6>is</span><span class=st7> </span><span class=st6>None</span><span class=st7>:</span></p>
+                <p>031  <span class=st7>            </span><span class=st6>return</span><span class=st7> </span><span class=st6>False</span></p>
+                <p>032  </p>
+                <p>033  <span class=st7>        </span><span class=st6>return</span><span class=st7> self.check_enabled(self.get_language())</span></p>
+                <p>034  </p>
+                <p>035  <span class=st7>    </span><span class=st6>def</span><span class=st7> run(self, edit):</span></p>
+                <p>036  <span class=st7>        </span><span class=st9>&quot;&quot;&quot;</span></p>
+                <p>037  <span class=st9>        Main plugin logic for the &#x27;indent&#x27; command.</span></p>
+                <p>038  <span class=st9>        &quot;&quot;&quot;</span></p>
+                <p>039  <span class=st7>        view = self.view</span></p>
+                <p>040  <span class=st7>        regions = view.sel()</span></p>
+                <p>041  <span class=st7>        </span><span class=st9># if there are more than 1 region or region one and it&#x27;s not empty</span></p>
+                <p>042  <span class=st7>        </span><span class=st6>if</span><span class=st7> len(regions) &gt; </span><span class=st8>1</span><span class=st7> </span><span class=st6>or</span><span class=st7> </span><span class=st6>not</span><span class=st7> regions[</span><span class=st8>0</span><span class=st7>].empty():</span></p>
+                <p>043  <span class=st7>            </span><span class=st6>for</span><span class=st7> region </span><span class=st6>in</span><span class=st7> view.sel():</span></p>
+                <p>044  <span class=st7>                </span><span class=st6>if</span><span class=st7> </span><span class=st6>not</span><span class=st7> region.empty():</span></p>
+                <p>045  <span class=st7>                    s = view.substr(region).strip()</span></p>
+                <p>046  <span class=st7>                    s = self.indent(s)</span></p>
+                <p>047  <span class=st7>                    view.replace(edit, region, s)</span></p>
+                <p>048  <span class=st7>        </span><span class=st6>else</span><span class=st7>:  </span><span class=st9># format all text</span></p>
+                <p>049  <span class=st7>            alltextreg = sublime.Region(</span><span class=st8>0</span><span class=st7>, view.size())</span></p>
+                <p>050  <span class=st7>            s = view.substr(alltextreg).strip()</span></p>
+                <p>051  <span class=st7>            s = self.indent(s)</span></p>
+                <p>052  <span class=st7>            </span><span class=st6>if</span><span class=st7> s:</span></p>
+                <p>053  <span class=st7>                view.replace(edit, alltextreg, s)</span></p>
+                <p>054  </p>
+                <p>055  <span class=st7>    </span><span class=st6>def</span><span class=st7> indent(self, s):</span></p>
+                <p>056  <span class=st7>        </span><span class=st6>return</span><span class=st7> s</span></p>
+                <p>057  </p>
+                <p>058  </p>
+                <p>059  <span class=st6>class</span><span class=st7> AutoIndentCommand(BaseIndentCommand):</span></p>
+                <p>060  <span class=st7>    </span><span class=st6>def</span><span class=st7> get_text_type(self, s):</span></p>
+                <p>061  <span class=st7>        language = self.language</span></p>
+                <p>062  <span class=st7>        </span><span class=st6>if</span><span class=st7> language == </span><span class=st8>&#x27;xml&#x27;</span><span class=st7>:</span></p>
+                <p>063  <span class=st7>            </span><span class=st6>return</span><span class=st7> </span><span class=st8>&#x27;xml&#x27;</span></p>
+                <p>064  <span class=st7>        </span><span class=st6>if</span><span class=st7> language == </span><span class=st8>&#x27;json&#x27;</span><span class=st7>:</span></p>
+                <p>065  <span class=st7>            </span><span class=st6>return</span><span class=st7> </span><span class=st8>&#x27;json&#x27;</span></p>
+                <p>066  <span class=st7>        </span><span class=st6>if</span><span class=st7> language == </span><span class=st8>&#x27;plain text&#x27;</span><span class=st7> </span><span class=st6>and</span><span class=st7> s:</span></p>
+                <p>067  <span class=st7>            </span><span class=st6>if</span><span class=st7> s[</span><span class=st8>0</span><span class=st7>] == </span><span class=st8>&#x27;&lt;&#x27;</span><span class=st7>:</span></p>
+                <p>068  <span class=st7>                </span><span class=st6>return</span><span class=st7> </span><span class=st8>&#x27;xml&#x27;</span></p>
+                <p>069  <span class=st7>            </span><span class=st6>if</span><span class=st7> s[</span><span class=st8>0</span><span class=st7>] == </span><span class=st8>&#x27;{&#x27;</span><span class=st7> </span><span class=st6>or</span><span class=st7> s[</span><span class=st8>0</span><span class=st7>] == </span><span class=st8>&#x27;[&#x27;</span><span class=st7>:</span></p>
+                <p>070  <span class=st7>                </span><span class=st6>return</span><span class=st7> </span><span class=st8>&#x27;json&#x27;</span></p>
+                <p>071  </p>
+                <p>072  <span class=st7>        </span><span class=st6>return</span><span class=st7> </span><span class=st8>&#x27;notsupported&#x27;</span></p>
+                <p>073  </p>
+                <p>074  <span class=st7>    </span><span class=st6>def</span><span class=st7> indent(self, s):</span></p>
+                <p>075  <span class=st7>        text_type = self.get_text_type(s)</span></p>
+                <p>076  <span class=st7>        </span><span class=st6>if</span><span class=st7> text_type == </span><span class=st8>&#x27;xml&#x27;</span><span class=st7>:</span></p>
+                <p>077  <span class=st7>            command = IndentXmlCommand(self.view)</span></p>
+                <p>078  <span class=st7>        </span><span class=st6>if</span><span class=st7> text_type == </span><span class=st8>&#x27;json&#x27;</span><span class=st7>:</span></p>
+                <p>079  <span class=st7>            command = IndentJsonCommand(self.view)</span></p>
+                <p>080  <span class=st7>        </span><span class=st6>if</span><span class=st7> text_type == </span><span class=st8>&#x27;notsupported&#x27;</span><span class=st7>:</span></p>
+                <p>081  <span class=st7>            </span><span class=st6>return</span><span class=st7> s</span></p>
+                <p>082  </p>
+                <p>083  <span class=st7>        </span><span class=st6>return</span><span class=st7> command.indent(s)</span></p>
+                <p>084  </p>
+                <p>085  <span class=st7>    </span><span class=st6>def</span><span class=st7> check_enabled(self, lang):</span></p>
+                <p>086  <span class=st7>        </span><span class=st6>return</span><span class=st7> </span><span class=st6>True</span></p>
+                <p>087  </p>
+                <p>088  </p>
+                <p>089  <span class=st6>class</span><span class=st7> IndentXmlCommand(BaseIndentCommand):</span></p>
+                <p>090  <span class=st7>    </span><span class=st6>def</span><span class=st7> indent(self, s):</span></p>
+                <p>091  <span class=st7>        </span><span class=st9># figure out encoding</span></p>
+                <p>092  <span class=st7>        utfEncoded = s.encode(</span><span class=st8>&quot;utf-8&quot;</span><span class=st7>)</span></p>
+                <p>093  <span class=st7>        encoding = </span><span class=st8>&quot;utf-8&quot;</span></p>
+                <p>094  <span class=st7>        encoding_match = re.compile(</span><span class=st6>b</span><span class=st8>&quot;&lt;</span><span class=st10>\?</span><span class=st8>.*encoding=</span><span class=st11>\&quot;</span><span class=st8>(.*?)</span><span class=st11>\&quot;</span><span class=st8>.*</span><span class=st10>\?</span><span class=st8>&gt;&quot;</span><span class=st7>).match(utfEncoded)</span></p>
+                <p>095  <span class=st7>        </span><span class=st6>if</span><span class=st7> encoding_match:</span></p>
+                <p>096  <span class=st7>            encoding = encoding_match.group(</span><span class=st8>1</span><span class=st7>).decode(</span><span class=st8>&quot;utf-8&quot;</span><span class=st7>).lower()</span></p>
+                <p>097  </p>
+                <p>098  <span class=st7>        s = s.encode(encoding)</span></p>
+                <p>099  <span class=st7>        xml_header = re.compile(</span><span class=st6>b</span><span class=st8>&quot;&lt;</span><span class=st10>\?</span><span class=st8>.*</span><span class=st10>\?</span><span class=st8>&gt;&quot;</span><span class=st7>).match(s)</span></p>
+                <p>100  <span class=st7>        </span><span class=st9># convert to plain string without indents and spaces</span></p>
+                <p>101  <span class=st7>        s = re.compile(</span><span class=st6>b</span><span class=st8>&#x27;&gt;</span><span class=st10>\s</span><span class=st8>+([^</span><span class=st10>\s</span><span class=st8>])&#x27;</span><span class=st7>, re.DOTALL).sub(</span><span class=st6>b</span><span class=st8>&#x27;&gt;</span><span class=st10>\g</span><span class=st8>&lt;1&gt;&#x27;</span><span class=st7>, s)</span></p>
+                <p>102  <span class=st7>        </span><span class=st6>try</span><span class=st7>:</span></p>
+                <p>103  <span class=st7>            s = parseString(s).toprettyxml()</span></p>
+                <p>104  <span class=st7>        </span><span class=st6>except</span><span class=st7> ExpatError </span><span class=st6>as</span><span class=st7> err:</span></p>
+                <p>105  <span class=st7>            message = </span><span class=st8>&quot;Invalid XML: </span><span class=st7>%s</span><span class=st8> line:</span><span class=st7>%d</span><span class=st8>:col:</span><span class=st7>%d</span><span class=st8>&quot;</span><span class=st7> % (errors.messages[err.code], err.lineno, err.offset)</span></p>
+                <p>106  <span class=st7>            sublime.status_message(message)</span></p>
+                <p>107  <span class=st7>            </span><span class=st6>return</span></p>
+                <p>108  <span class=st7>        </span><span class=st9># remove line breaks</span></p>
+                <p>109  <span class=st7>        s = re.compile(</span><span class=st8>&#x27;&gt;</span><span class=st11>\n</span><span class=st10>\s</span><span class=st8>+([^&lt;&gt;</span><span class=st10>\s</span><span class=st8>].*?)</span><span class=st11>\n</span><span class=st10>\s</span><span class=st8>+&lt;/&#x27;</span><span class=st7>, re.DOTALL).sub(</span><span class=st8>&#x27;&gt;</span><span class=st10>\g</span><span class=st8>&lt;1&gt;&lt;/&#x27;</span><span class=st7>, s)</span></p>
+                <p>110  <span class=st7>        </span><span class=st9># remove xml header</span></p>
+                <p>111  <span class=st7>        s = s.replace(</span><span class=st8>&quot;&lt;?xml version=</span><span class=st11>\&quot;</span><span class=st8>1.0</span><span class=st11>\&quot;</span><span class=st8> ?&gt;&quot;</span><span class=st7>, </span><span class=st8>&quot;&quot;</span><span class=st7>).strip()</span></p>
+                <p>112  <span class=st7>        </span><span class=st6>if</span><span class=st7> xml_header:</span></p>
+                <p>113  <span class=st7>            s = xml_header.group().decode(encoding) + </span><span class=st8>&quot;</span><span class=st11>\n</span><span class=st8>&quot;</span><span class=st7> + s</span></p>
+                <p>114  <span class=st7>        </span><span class=st6>return</span><span class=st7> s</span></p>
+                <p>115  </p>
+                <p>116  <span class=st7>    </span><span class=st6>def</span><span class=st7> check_enabled(self, language):</span></p>
+                <p>117  <span class=st7>        </span><span class=st6>return</span><span class=st7> (language == </span><span class=st8>&quot;xml&quot;</span><span class=st7>) </span><span class=st6>or</span><span class=st7> (language == </span><span class=st8>&quot;plain text&quot;</span><span class=st7>)</span></p>
+                <p>118  </p>
+                <p>119  </p>
+                <p>120  <span class=st6>class</span><span class=st7> IndentJsonCommand(BaseIndentCommand):</span></p>
+                <p>121  <span class=st7>    </span><span class=st6>def</span><span class=st7> check_enabled(self, language):</span></p>
+                <p>122  <span class=st7>        </span><span class=st6>return</span><span class=st7> (language == </span><span class=st8>&quot;json&quot;</span><span class=st7>) </span><span class=st6>or</span><span class=st7> (language == </span><span class=st8>&quot;plain text&quot;</span><span class=st7>)</span></p>
+                <p>123  </p>
+                <p>124  <span class=st7>    </span><span class=st6>def</span><span class=st7> indent(self, s):</span></p>
+                <p>125  <span class=st7>        parsed = json.loads(s)</span></p>
+                <p>126  <span class=st7>        </span><span class=st6>return</span><span class=st7> json.dumps(parsed, sort_keys=</span><span class=st6>True</span><span class=st7>, indent=</span><span class=st8>4</span><span class=st7>, separators=(</span><span class=st8>&#x27;,&#x27;</span><span class=st7>, </span><span class=st8>&#x27;: &#x27;</span><span class=st7>), ensure_ascii=</span><span class=st6>False</span><span class=st7>)</span></p>
+            </div>
+        </div>
+    </body>
+</html>
