@@ -12,7 +12,7 @@ import sbot_common
 
 """
 
-- xml/html/json formatter: From *** indentxml (also does json), jsformat, htmlbeautify.
+TODO1 - xml/html/json formatter: From *** indentxml (also does json), jsformat, htmlbeautify.
     https://www.askpython.com/python-modules/htmlparser-in-python
     https://docs.python.org/3/library/html.parser.html
 sbot_format_json

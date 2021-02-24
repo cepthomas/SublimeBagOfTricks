@@ -85,6 +85,11 @@ Enhanced bookmarks:
 | Command                  | Description |
 |:--------                 |:-------     |
 | sbot_split_view          | Toggles simple horizontal split screen, like e.g. Word |
+| sbot_show_eol            | Toggles showing EOLs |
+
+| Setting                  | Description |
+|:--------                 |:-------     |
+| eol_scope                | ST scope name for EOL marker |
 
 ## SideBar
 Commands added to the sidebar. Just the stuff I need.
@@ -98,6 +103,16 @@ Commands added to the sidebar. Just the stuff I need.
 | sbot_sb_open_browser     | Open html file in your browser |
 | sbot_sb_tree             | Run tree cmd to clipboard |
 | sbot_sidebar_exclude     | Hide selected file/dir in project |
+
+## Cleaning
+Trimming etc.
+
+| Command                  | Description |
+|:--------                 |:-------     |
+| sbot_trim                | Line end ws trim, arg:which should be leading or trailing or both |
+| sbot_remove_empty_lines  | Like it says, arg:normalize=True leaves one |
+| sbot_remove_ws           | Like it says, arg:normalize=True leaves one |
+
 
 ## Examples
 Leftovers that will eventually be deleted or subsumed.

@@ -114,24 +114,6 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         #     v.settings().set(pname, propertyValue)
 
 
-        # class SbotShowEolCommand(sublime_plugin.TextCommand): #TODO1 useful?
-        if not v.get_regions("eols"):
-            eols = []
-            ind = 0
-            while 1:
-                freg = v.find('[\n\r]', ind)
-                if freg is not None and not freg.empty(): # second condition is not documented!!
-                    eols.append(freg)
-                    ind = freg.end() + 1
-                else:
-                    break
-            if eols:
-                # "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
-                v.add_regions("eols", eols, "invalid")
-        else:
-            v.erase_regions("eols")
-
-
 #-----------------------------------------------------------------------------------
 if __name__ == '__main__':
     print("Hello from __main__")

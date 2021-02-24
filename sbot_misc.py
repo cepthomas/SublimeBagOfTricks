@@ -3,6 +3,7 @@ import sys
 import time
 import sublime
 import sublime_plugin
+import sbot_common
 
 
 # Misc commands and utilities.
@@ -37,6 +38,31 @@ class SbotOpenSiteCommand(sublime_plugin.ApplicationCommand):
 
     def run(self, url):
         webbrowser.open_new_tab(url)
+
+
+#-----------------------------------------------------------------------------------
+class SbotShowEolCommand(sublime_plugin.TextCommand):
+    ''' Show line ends. '''
+
+    def run(self, edit, all=False):
+        v = self.view
+        w = self.view.window()
+
+        if not v.get_regions("eols"):
+            eols = []
+            ind = 0
+            while 1:
+                freg = v.find('[\n\r]', ind)
+                if freg is not None and not freg.empty(): # second condition is not documented!!
+                    eols.append(freg)
+                    ind = freg.end() + 1
+                else:
+                    break
+            if eols:
+                # "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
+                v.add_regions("eols", eols, sbot_common.settings.get('eol_scope', "comment"))
+        else:
+            v.erase_regions("eols")
 
 
 #-----------------------------------------------------------------------------------

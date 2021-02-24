@@ -1,4 +1,3 @@
 
-rem dir > _out.txt
-
+@echo off
 dir

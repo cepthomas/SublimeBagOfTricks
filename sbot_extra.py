@@ -4,7 +4,46 @@ import sublime
 import sublime_plugin
 
 
-# Holding tank for examples 
+# Holding tank for examples + leftovers.
+
+
+#-----------------------------------------------------------------------------------
+class SbotFindNonAsciiCommand(sublime_plugin.TextCommand): # TODO2 prob need a real hex editor
+    def run(self, edit):
+        v = self.view
+
+        find = []
+
+        reg = sublime.Region(0, v.size())
+        s = v.substr(reg)
+
+        row = 1
+        col = 1
+
+        for c in s:
+            if c == '\n':
+                # Valid.
+                row += 1
+                col = 1
+            elif c == '\r':
+                # Valid.
+                col = 1
+            elif c == '\t':
+                # Valid.
+                col += 1
+            elif c < ' ' or c > '~': # 32  SPACE  126  ~
+                # Invalid.
+                find.append('row:{} col:{} char:{}'.format(row, col, int(c)))
+                col += 1
+            else:
+                # Valid.
+                col += 1
+
+                
+        print('----------- find non-ascii ---------------\n')
+        for d in find:
+            print(d)
+
 
 #-----------------------------------------------------------------------------------
 class SbotExampleUserInputCommand(sublime_plugin.TextCommand):
