@@ -46,7 +46,7 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, all=False):
         v = self.view
-        w = self.view.window()
+        w = v.window()
 
         if not v.get_regions("eols"):
             eols = []
@@ -63,6 +63,17 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 v.add_regions("eols", eols, sbot_common.settings.get('eol_scope', "comment"))
         else:
             v.erase_regions("eols")
+
+
+#-----------------------------------------------------------------------------------
+def get_regions(v):
+    # Generic function.
+    regions = []    
+    if len(v.sel()[0]) > 0: # user sel
+        regions = v.sel()
+    elif sbot_common.settings.get('sel_all', True): # defaultsel?
+        regions = [sublime.Region(0, v.size())]
+    return regions
 
 
 #-----------------------------------------------------------------------------------

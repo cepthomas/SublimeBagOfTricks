@@ -32,9 +32,10 @@
     { "caption": "Clear All Highlights", "command": "sbot_clear_all_highlights" },
 
     { "caption": "-" },
-    { "caption": "TODO2_better_home_for_these" },
 
-    { "caption": "EOLs", "command": "sbot_show_eol" },
+    { "caption": "Format json", "command": "sbot_format_json" },
+    { "caption": "Format xml", "command": "sbot_format_xml" },
+    { "caption": "Format html", "command": "sbot_format_html" },
 
     { "caption": "Trim Leading WS", "command": "sbot_trim", "args" : {"which" : "leading"}  },
     { "caption": "Trim Trailing WS", "command": "sbot_trim", "args" : {"which" : "trailing"}  },
@@ -45,4 +46,7 @@
 
     { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : {"normalize" : false} },
     { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : {"normalize" : true} },
+
+    { "caption": "-" },
+    { "caption": "EOLs", "command": "sbot_show_eol" },
 ]

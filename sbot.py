@@ -28,12 +28,12 @@ def plugin_loaded():
     # print(sys.path)
     print(sys.version)
 
-    # Init logging. TODO2 Add mode=a|w, level, filename, 
+    # Init logging. TODO Add filemode=a|w, level, filename, 
     if sbot_common.settings.get('enable_log', False):
         logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', '_log.txt')
         print('Logfile:', logfn)
         logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
-        logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO) # filemode a/w
+        logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO)
         logging.info("=============================== log start ===============================");
 
 
@@ -56,7 +56,7 @@ class ViewEvent(sublime_plugin.ViewEventListener):
         sbot_project.load_project_maybe(self.view)
 
     def on_deactivated(self):
-        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. (ST4 has on_pre_save_project()) '''
+        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. TODO-ST4 has on_pre_save_project()) '''
 
         # dump_view('EventListener.on_deactivated', self.view)
         sproj = sbot_project.get_project(self.view)

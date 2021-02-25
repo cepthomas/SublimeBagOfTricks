@@ -2,11 +2,9 @@
 A hodge-podge Sublime Text plugin containing odds and ends missing from or over-developed in other packages.
 The focus is not on code development but rather general text processing.
 
-Built for Windows and ST3. Other OSes and ST2 would require some hacking.
+No support as yet for PackageControl.
 
-Note that there are some liberties taken that are not quite sublime-proper. Since this is primarily a personal project,
-I don't mind. However if others take interest in this being a proper package, I would be happy to clean
-everything up.
+Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 
 
 ![logo](felix.jpg)
@@ -60,7 +58,7 @@ everything up.
 | md_background            | If you need to change the markdown bg color (not done automatically from color scheme) |
 | render_output            | One of: clipboard, new_file (view), default_file (original filename + .html), default_file_open (default_file + show) |
 | render_max_file          | Max file size to render |
-
+| sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
 
 ## Signets (bookmarks)
 Enhanced bookmarks:
@@ -112,6 +110,16 @@ Trimming etc.
 | sbot_trim                | Line end ws trim, arg:which should be leading or trailing or both |
 | sbot_remove_empty_lines  | Like it says, arg:normalize=True leaves one |
 | sbot_remove_ws           | Like it says, arg:normalize=True leaves one |
+
+
+## Format
+Prettify json. xml, html later when ST4.
+
+| Command                  | Description |
+|:--------                 |:-------     |
+| sbot_format_json         | Format json content and show in new view |
+| sbot_format_xml          | Format xml content and show in new view |
+| sbot_format_html         | Format html content and show in new view |
 
 
 ## Examples

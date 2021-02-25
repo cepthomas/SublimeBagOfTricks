@@ -4,7 +4,7 @@ import re
 import sublime
 import sublime_plugin
 import sbot_common
-import sbot_project #TODO2 remove dependency
+import sbot_project
 
 
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
@@ -91,7 +91,7 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             v.erase_regions(reg_name)
 
-        # Remove from internal. TODO2 option for in file/whole project?
+        # Remove from internal. TODO option for in file/whole project?
         if v.file_name() in sproj.highlights:
             del sproj.highlights[v.file_name()]
 

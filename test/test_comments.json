@@ -1,4 +1,4 @@
-﻿{
+{
     "MarkPitch": {
         "Original": 0,
 
@@ -8,7 +8,7 @@
     },
 
 
-
+// This file also has trailing commas
 
     "Material": "Stuff is \"comportium\", finest kind!",           
 
@@ -20,12 +20,16 @@
 
 
 
-    "Comment": "This \n is a line comment...",
+    //   This \n is a single line comment...          
 
     "MinGoodMarks": {
         "Original": 0,
         "Value": 36
     },
+    /* Multiline
+    comment for
+    "RepeatLength": {
+    },*/
     "RepeatLength": {
         "Original": 0,
         "Value": 479.425
@@ -34,13 +38,16 @@
         {
             "ItKeystone": {
                 "Original": 105,
-                "Comment": "This \n is also a line comment...",
+                // This \n also is a single line comment...
                 "Value": 110
             },
             "ItMagnification": {
                 "Original": 122,
                 "Value": 133
             },
+                /* Multiline
+                comment for
+                other */
 
             "ItPosition": {
                 "Original": 134,
@@ -49,10 +56,10 @@
             "ItSkew": {
                 "Original": 176,
                 "Value": 189
-            }
+            },
         },
 
-        {"Some true Thing" : true},
+        "Some true Thing" : true,
 
         {
             "ItMagnification": {
@@ -65,7 +72,7 @@
             "ItSkew": {
                 "Original": 639,
                 "Value": 767676
-            }
+            },
         },
 
         "Plain string",
@@ -73,7 +80,7 @@
         5.5509,
         true,
         false,
-        null,
+        null
 
         {
             "ItKeystone": {
@@ -92,8 +99,8 @@
             "ItSkew": {
                 "Original": 609,
                 "Value": 278
-            }
-        }
+            },
+        },
     ],
     "TiffVersion": "ABC-123",
     "TrackSpacing": {
@@ -103,5 +110,5 @@
     "XtBarcodeOffset": {
         "Original": 0,
         "Value": -160
-    }
+    },
 }

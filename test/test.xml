@@ -2,27 +2,17 @@
 <RedundantAnalyticValidationMessageLog>
 <Column AssaySpecId="10544" ColumnType="Anti-IgG (PEG)" TestSpec="08 ABSCR4 IgG" DumpTime="02/05/2020 11:30:53" Test="Test  [Test:c52c1f8c-6929-4f81-a4df-a16f09747ec3]&#xA;    TestSpecification [TestSpecification:37ff1761-c467-4cc9-afe7-e8884dbce3b3]">
 <ValidationMessages>
-<ValidationMessage MessageIndex="0" Message="RAV log: Column [0] of cassette [AHG anti-IgG] passed quality check during inspection." />
-<ValidationMessage MessageIndex="1" Message="RAV log: Column [CassetteColumnSpecification  16787135] for Assay [10544] punched once." />
-<ValidationMessage MessageIndex="2" Message="RAV log: Correct Punch Tool [B33A1E] used for Cassette [AHG anti-IgG]." />
-<ValidationMessage MessageIndex="3" Message="RAV log: Correct Punch Tool Pin used for Cassette Column [Anti-IgG (PEG)] with punch offset [0]" />
-<ValidationMessage MessageIndex="4" Message="RAV log: Correct cassette type [AHG anti-IgG] used for Assay [10544]." />
-<ValidationMessage MessageIndex="5" Message="RAV log: Correct column type [Anti-IgG (PEG)] used for Assay [10544]." />
-<ValidationMessage MessageIndex="6" Message="RAV log: Shelf expiration checking is disabled." />
-<ValidationMessage MessageIndex="7" Message="RAV log: Cassette placed in correct incubator type [Heated]." />
-<ValidationMessage MessageIndex="8" Message="RAV log: Number of centrifugation cycles (1) is correct." />
-<ValidationMessage MessageIndex="9" Message="RAV log: Correct duration [75 s] and rotation speed [793 revolutions/min] applied in profile [0]." />
+<ValidationMessage MessageIndex="0" Message="RAV log: Column [0] of cassette [AHG anti-IgG] passed quality check during inspection." /><ValidationMessage MessageIndex="1" Message="RAV log: Column [CassetteColumnSpecification  16787135] for Assay [10544] punched once." /><ValidationMessage MessageIndex="2" Message="RAV log: Correct Punch Tool [B33A1E] used for Cassette [AHG anti-IgG]." /><ValidationMessage MessageIndex="3" Message="RAV log: Correct Punch Tool Pin used for Cassette Column [Anti-IgG (PEG)] with punch offset [0]" />
+<ValidationMessage MessageIndex="4" Message="RAV log: Correct cassette type [AHG anti-IgG] used for Assay [10544]." /><ValidationMessage MessageIndex="5" Message="RAV log: Correct column type [Anti-IgG (PEG)] used for Assay [10544]." /><ValidationMessage MessageIndex="6" Message="RAV log: Shelf expiration checking is disabled." />
+<ValidationMessage MessageIndex="7" Message="RAV log: Cassette placed in correct incubator type [Heated]." /><ValidationMessage MessageIndex="8" Message="RAV log: Number of centrifugation cycles (1) is correct." /><ValidationMessage MessageIndex="9" Message="RAV log: Correct duration [75 s] and rotation speed [793 revolutions/min] applied in profile [0]." />
 <ValidationMessage MessageIndex="10" Message="RAV log: Correct duration [225 s] and rotation speed [1509 revolutions/min] applied in profile [1]." />
 <ValidationMessage MessageIndex="11" Message="RAV log: Total centrifugation duration [00:05:00] within minimum required duration [00:04:40] and maximum required duration [00:05:20]." />
 <ValidationMessage MessageIndex="12" Message="RAV log: Correct wash sequence and wash parameters applied for column." />
 <ValidationMessage MessageIndex="13" Message="RAV log: All pipetting parameters and liquids correct for Assay [10544] of Test [08 ABSCR4 IgG]." />
-<ValidationMessage MessageIndex="14" Message="RAV log: Sensor [CHAS:1/TEMP:AMBIENT] minimum value [24.2 °C] and maximum value [24.4 °C] were within critical limits [0 °C/100 °C] from [2/5/2020 11:07:41 AM] to [2/5/2020 11:30:24 AM]." />
-<ValidationMessage MessageIndex="15" Message="RAV log: Sensor [CHAS:1/HUMIDITY:AMBIENT] minimum value [30 %] and maximum value [30.3 %] were within critical limits [0 %/100 %] from [2/5/2020 11:07:41 AM] to [2/5/2020 11:30:24 AM]." />
-<ValidationMessage MessageIndex="16" Message="RAV log: Sensor [CHAS:1/TEMP:EBOX] minimum value [26.7 °C] and maximum value [28.2 °C] were within critical limits [15 °C/45 °C] from [2/5/2020 11:07:41 AM] to [2/5/2020 11:30:24 AM]." />
-<ValidationMessage MessageIndex="17" Message="RAV log: Sensor [CHAS:1/TEMP:CCLA] minimum value [24.6 °C] and maximum value [24.8 °C] were within critical limits [0 °C/100 °C] from [2/5/2020 11:07:41 AM] to [2/5/2020 11:30:24 AM]." />
+<ValidationMessage MessageIndex="14" Message="RAV log: Sensor [CHAS:1/TEMP:AMBIENT] minimum value [24.2 °C] and maximum value [24.4 °C] were within critical limits [0 °C/100 °C] from [2/5/2020 11:07:41 AM] to [2/5/2020 11:30:24 AM]." /><ValidationMessage MessageIndex="15" Message="RAV log: Sensor [CHAS:1/HUMIDITY:AMBIENT] minimum value [30 %] and maximum value [30.3 %] were within critical limits [0 %/100 %] from [2/5/2020 11:07:41 AM] to [2/5/2020 11:30:24 AM]." />
+<ValidationMessage MessageIndex="16" Message="RAV log: Sensor [CHAS:1/TEMP:EBOX] minimum value [26.7 °C] and maximum value [28.2 °C] were within critical limits [15 °C/45 °C] from [2/5/2020 11:07:41 AM] to [2/5/2020 11:30:24 AM]." /><ValidationMessage MessageIndex="17" Message="RAV log: Sensor [CHAS:1/TEMP:CCLA] minimum value [24.6 °C] and maximum value [24.8 °C] were within critical limits [0 °C/100 °C] from [2/5/2020 11:07:41 AM] to [2/5/2020 11:30:24 AM]." />
 <ValidationMessage MessageIndex="18" Message="RAV log: Sensor [CINC:1/TEMP:HEATINGFOIL] minimum value [36.6 °C] and maximum value [36.9 °C] were within critical limits [35 °C/39 °C] from [2/5/2020 11:07:30 AM] to [2/5/2020 11:24:16 AM]." />
-<ValidationMessage MessageIndex="19" Message="RAV log: Used time span [00:00:35.0532616] is conform with TimeConstraint (type [Maximum], start anchor [EnteredIncubator], end anchor [EndDispense1], time span [01:30:00])." />
-<ValidationMessage MessageIndex="20" Message="RAV log: Used time span [00:00:21.4812378] is conform with TimeConstraint (type [Maximum], start anchor [EndPunch], end anchor [EndDispense1], time span [00:40:00])." />
+<ValidationMessage MessageIndex="19" Message="RAV log: Used time span [00:00:35.0532616] is conform with TimeConstraint (type [Maximum], start anchor [EnteredIncubator], end anchor [EndDispense1], time span [01:30:00])." /><ValidationMessage MessageIndex="20" Message="RAV log: Used time span [00:00:21.4812378] is conform with TimeConstraint (type [Maximum], start anchor [EndPunch], end anchor [EndDispense1], time span [00:40:00])." />
 <ValidationMessage MessageIndex="21" Message="RAV log: Used time span [00:00:36.2700637] is conform with TimeConstraint (type [Maximum], start anchor [EndDispense1], end anchor [EndDispense2], time span [00:40:00])." />
 <ValidationMessage MessageIndex="22" Message="RAV log: Used time span [00:15:35.5024431] is conform with TimeConstraint (type [Minimum], start anchor [EndDispense2], end anchor [EndIncubation], time span [00:15:00])." />
 <ValidationMessage MessageIndex="23" Message="RAV log: Used time span [00:15:35.5024431] is conform with TimeConstraint (type [Maximum], start anchor [EndDispense2], end anchor [EndIncubation], time span [00:40:00])." />
@@ -43,11 +33,7 @@
 <EndTime>2020-02-05T16:07:27.9967837Z</EndTime>
 <BarcodeString>05121933308455055603</BarcodeString>
 <GradeTypes>
-<AssayResultValue>GradeTypeOK</AssayResultValue>
-<AssayResultValue>GradeTypeOK</AssayResultValue>
-<AssayResultValue>GradeTypeOK</AssayResultValue>
-<AssayResultValue>GradeTypeOK</AssayResultValue>
-<AssayResultValue>GradeTypeOK</AssayResultValue>
+<AssayResultValue>GradeTypeOK</AssayResultValue><AssayResultValue>GradeTypeOK</AssayResultValue><AssayResultValue>GradeTypeOK</AssayResultValue><AssayResultValue>GradeTypeOK</AssayResultValue><AssayResultValue>GradeTypeOK</AssayResultValue>
 <AssayResultValue>GradeTypeOK</AssayResultValue>
 </GradeTypes>
 </RavInspectCassette>

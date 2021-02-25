@@ -22,21 +22,12 @@ p { white-space: pre-wrap; margin: 0em; }
 <body>
 <div class="container">
 <div class="contentpane">
-<p>001  <span class=st6>import</span><span class=st7> sublime</span></p>
-<p>002  <span class=st6>import</span><span class=st7> sublime_plugin</span></p>
-<p>003  <span class=st6>import</span><span class=st7> re</span></p>
-<p>004  <span class=st6>import</span><span class=st7> json</span></p>
-<p>005  <span class=st6>from</span><span class=st7> xml.dom.minidom </span><span class=st6>import</span><span class=st7> parseString</span></p>
+<p>001  <span class=st6>import</span><span class=st7> sublime</span></p><p>002  <span class=st6>import</span><span class=st7> sublime_plugin</span></p><p>003  <span class=st6>import</span><span class=st7> re</span></p><p>004  <span class=st6>import</span><span class=st7> json</span></p><p>005  <span class=st6>from</span><span class=st7> xml.dom.minidom </span><span class=st6>import</span><span class=st7> parseString</span></p>
 <p>006  <span class=st6>from</span><span class=st7> xml.parsers.expat </span><span class=st6>import</span><span class=st7> ExpatError, errors</span></p>
 <p>007  <span class=st6>from</span><span class=st7> os.path </span><span class=st6>import</span><span class=st7> basename, splitext</span></p>
 <p>008  </p>
 <p>009  </p>
-<p>010  <span class=st6>class</span><span class=st7> BaseIndentCommand(sublime_plugin.TextCommand):</span></p>
-<p>011  <span class=st7>    </span><span class=st6>def</span><span class=st7> __init__(self, view):</span></p>
-<p>012  <span class=st7>        self.view = view</span></p>
-<p>013  <span class=st7>        self.language = self.get_language()</span></p>
-<p>014  </p>
-<p>015  <span class=st7>    </span><span class=st6>def</span><span class=st7> get_language(self):</span></p>
+<p>010  <span class=st6>class</span><span class=st7> BaseIndentCommand(sublime_plugin.TextCommand):</span></p><p>011  <span class=st7>    </span><span class=st6>def</span><span class=st7> __init__(self, view):</span></p><p>012  <span class=st7>        self.view = view</span></p><p>013  <span class=st7>        self.language = self.get_language()</span></p><p>014  </p><p>015  <span class=st7>    </span><span class=st6>def</span><span class=st7> get_language(self):</span></p>
 <p>016  <span class=st7>        syntax = self.view.settings().get(</span><span class=st8>&#x27;syntax&#x27;</span><span class=st7>)</span></p>
 <p>017  <span class=st7>        language = splitext(basename(syntax))[</span><span class=st8>0</span><span class=st7>].lower() </span><span class=st6>if</span><span class=st7> syntax </span><span class=st6>is</span><span class=st7> </span><span class=st6>not</span><span class=st7> </span><span class=st6>None</span><span class=st7> </span><span class=st6>else</span><span class=st7> </span><span class=st8>&quot;plain text&quot;</span></p>
 <p>018  <span class=st7>        </span><span class=st6>return</span><span class=st7> language</span></p>

@@ -62,7 +62,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             out = subprocess.check_output([paths[0]]) # not a string
-            # This is crude... TODO2 also adds an extra LF/CR
+            # This is crude... TODO also adds an extra LF/CR
             for b in out:
                 if b == r'\n':
                     sys.stdout.write('\n')

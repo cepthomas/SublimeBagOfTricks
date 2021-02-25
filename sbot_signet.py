@@ -3,7 +3,7 @@ import sys
 import sublime
 import sublime_plugin
 import sbot_common
-import sbot_project #TODO2 remove dependency
+import sbot_project
 
 
 # Defs

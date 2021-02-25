@@ -8,9 +8,18 @@ import sublime_plugin
 
 
 #-----------------------------------------------------------------------------------
-class SbotFindNonAsciiCommand(sublime_plugin.TextCommand): # TODO2 prob need a real hex editor
+class SbotFindNonAsciiCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = self.view
+
+        # TODO hex processor/editor
+        # Files containing null bytes are opened as hexadecimal by default In your User or Default Settings file:
+        # "enable_hexadecimal_encoding": false
+        # OR
+        # In your User or Default Settings file(s):
+        # "preview_on_click": false
+
+        # Go to File -> Reopen with Encoding and select UTF-8. This will bring back the normal text view.
 
         find = []
 
