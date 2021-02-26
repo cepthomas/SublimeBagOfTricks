@@ -16,7 +16,7 @@ HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
 
 
 #-----------------------------------------------------------------------------------
-class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
+class SbotRenderToHtmlCommand(sublime_plugin.TextCommand): #TODO these should be WindowCommand!
     ''' Make a pretty. '''
 
     def run(self, edit):
@@ -271,11 +271,6 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     ''' Turn md into html.'''
 
-    def is_visible(self):
-        fn = self.view.file_name()
-        vis = False if fn is None else self.view.file_name().endswith('.md')
-        return vis
-
     def run(self, edit):
         v = self.view
         ##### Get prefs.
@@ -297,6 +292,11 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
         _output_html(v, content)
 
+    def is_visible(self):
+        fn = self.view.file_name()
+        vis = False if fn is None else self.view.file_name().endswith('.md')
+        return vis
+
 
 #-----------------------------------------------------------------------------------
 def _output_html(view, content=[]):
@@ -306,11 +306,10 @@ def _output_html(view, content=[]):
         sublime.set_clipboard("".join(content))
 
     elif output_type == 'new_file':
-        new_view = sublime.active_window().new_file()
-        new_view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
-        edit = new_view.begin_edit() 
-        new_view.insert(edit, 0, "".join(content))
-        new_view.end_edit(edit)
+        v = sublime.active_window().new_file()
+        v.set_syntax_file('Packages/HTML/HTML.tmLanguage')
+        v.set_scratch(True)
+        v.run_command('insert', {'characters': "".join(content) })
 
     elif output_type == 'default_file' or output_type == 'default_file_open':
         if view.file_name() is None:

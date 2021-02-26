@@ -6,7 +6,7 @@ import sublime_plugin
 import sbot_common
 
 
-# Misc commands and utilities.
+# Misc commands and utilities. TODO1 new homes
 
 
 #-----------------------------------------------------------------------------------

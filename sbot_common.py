@@ -6,5 +6,4 @@ import sublime_plugin
 
 def initialize():
     global settings
-    settings = None
-    sbot_common.settings.get('sel_all', True)
+    settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')

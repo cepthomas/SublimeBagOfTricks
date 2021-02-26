@@ -22,7 +22,7 @@ class SbotProject(object):
     def __init__(self, project_fn):
         self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
 
-        # Need this because ST window/view lifecycle is unreliable.
+        # Need to track this because ST window/view lifecycle is unreliable.
         self.views_inited = set()
 
         # If enabled, unpack persisted data into our internal convenience collections. Otherwise create empties.

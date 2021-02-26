@@ -9,6 +9,6 @@
     { "caption": "Execute", "command": "sbot_sidebar_exec", "args": { "paths": [] }},
     { "caption": "Exclude from Project", "command": "sbot_sidebar_exclude", "args": { "paths": [] }},
     { "caption": "-" },
-    { "caption": "Render To Html", "command": "sbot_render_to_html" },
-    { "caption": "Render Markdown", "command": "sbot_render_markdown" }
+    { "caption": "Render To Html", "command": "sbot_render_to_html", "args": { "paths": [] }},
+    { "caption": "Render Markdown", "command": "sbot_render_markdown", "args": { "paths": [] }}
 ]

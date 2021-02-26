@@ -15,7 +15,7 @@ def _do_sub(v, e, reo, sub):
     for reg in regions:
         orig = v.substr(reg)
         new = reo.sub(sub, orig)
-        if orig != new: #TODO efficient to do this strcmp every time? Profile.
+        if orig != new: #TODO1 efficient to do this strcmp every time? Profile.
             v.replace(e, reg, new)
 
 
@@ -51,7 +51,7 @@ class SbotRemoveWsCommand(sublime_plugin.TextCommand):
             reo = re.compile('([ ])[ ]+')
             sub = r'\1'
         else:
-            reo = re.compile(r'[ \t\r\n\v\f]')
+            reo = re.compile(r'[ \t\r\n\v\f]') #TODO option to keep eols
             sub = ''
         _do_sub(self.view, edit, reo, sub)
 

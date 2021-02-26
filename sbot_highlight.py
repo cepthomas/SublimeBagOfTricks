@@ -48,7 +48,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotClearHighlightCommand(sublime_plugin.TextCommand):
-    ''' Clear all marks where the cursor is. '''
+    ''' Clear all where the cursor is. '''
 
     def run(self, edit):
         # Locate specific region, crudely.
@@ -78,8 +78,8 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
-    ''' Clear all marks where the cursor is.'''
+class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
+    ''' Clear all in this file.'''
 
     def run(self, edit):
         v = self.view
@@ -91,7 +91,7 @@ class SbotClearAllHighlightsCommand(sublime_plugin.TextCommand):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             v.erase_regions(reg_name)
 
-        # Remove from internal. TODO option for in file/whole project?
+        # Remove from internal.
         if v.file_name() in sproj.highlights:
             del sproj.highlights[v.file_name()]
 
