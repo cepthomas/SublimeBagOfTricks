@@ -32,23 +32,30 @@
                         "children":
                         [
                             {
-                                "command": "edit_settings", "args": {
+                                "caption": "Settings",
+                                "command": "edit_settings",
+                                "args":
+                                {
                                     "base_file": "${packages}/SublimeBagOfTricks/SublimeBagOfTricks.sublime-settings",
                                     "default": "{\n$0\n}\n"
-                                },
-                                "caption": "Settings"
+                                }
                             },
                             {
-                                "command": "edit_settings", "args": {
+                                "caption": "Keymap",
+                                "command": "edit_settings",
+                                "args":
+                                {
                                     "base_file": "${packages}/SublimeBagOfTricks/Default (Windows).sublime-keymap",
                                     "default": "{\n$0\n}\n"
-                                },
-                                "caption": "Keymap"
+                                }
                             },
                             {
                                 "caption": "Documentation",
-                                "command": "sbot_open_site",
-                                "args": { "url": "https://github.com/cepthomas/SublimeBagOfTricks/blob/master/README.md"  }
+                                "command": "sbot_open_url",
+                                "args":
+                                {
+                                    "url": "https://github.com/cepthomas/SublimeBagOfTricks/blob/master/README.md"
+                                }
                             },
                         ]
                     }

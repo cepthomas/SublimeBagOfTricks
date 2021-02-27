@@ -204,13 +204,12 @@ Accumulated notes that will probably eventually go away.
         ....
 ```
 
-
 ### Files
 - `%executable_dir%`: C:\Program Files\Sublime Text
 - `%data_dir%`: %APPDATA%\Sublime Text 3 (C:\Users\%user%\AppData\Roaming\Sublime Text 3)
 - Nearly all of the interesting files for users live under `%data_dir%`.
 - Zipped packages (*.sublime-package) may be stored in:
-  - `%executable_dir%\Packages`: Usually just ST shipped packages.
+  - `%executable_dir%\Packages`: Usually just ST shipped packages. Includes stuff like *.sublime-syntax.
   - `%data_dir%\Installed Packages`: User packages, incl via package control.
 - Loose packages are stored in:
   - `%data_dir%`\Packages

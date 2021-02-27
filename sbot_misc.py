@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import webbrowser
 import sublime
 import sublime_plugin
 import sbot_common
@@ -33,7 +34,7 @@ class SbotSplitViewCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotOpenSiteCommand(sublime_plugin.ApplicationCommand):
+class SbotOpenUrlCommand(sublime_plugin.ApplicationCommand):
     ''' Open a web page. '''
 
     def run(self, url):
