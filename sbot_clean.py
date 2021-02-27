@@ -11,7 +11,7 @@ import sbot_misc
 #-----------------------------------------------------------------------------------
 def _do_sub(view, edit, reo, sub):
     # Generic substitution function.
-    regions = sbot_misc.get_sel_regions(view)
+    regions = sbot_common.get_sel_regions(view)
     for reg in regions:
         orig = view.substr(reg)
         new = reo.sub(sub, orig)

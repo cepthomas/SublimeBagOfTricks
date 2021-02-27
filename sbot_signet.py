@@ -118,7 +118,7 @@ def _go_to_signet(view, dir):
             for sig_fn, sig_rows in sproj.signets.items():
                 if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
                     vv = w.open_file(sig_fn)
-                    sublime.set_timeout(lambda: wait_load_file(vv, sig_rows[array_end]), 10) # already 1-based in file
+                    sublime.set_timeout(lambda: sbot_common.wait_load_file(vv, sig_rows[array_end]), 10) # already 1-based in file
                     w.focus_view(vv)
                     done = True
                     break

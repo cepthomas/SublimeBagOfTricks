@@ -51,13 +51,13 @@ class ViewEvent(sublime_plugin.ViewEventListener):
     def on_activated(self):
         ''' When focus/tab received. '''
 
-        # dump_view('ViewEventListener.on_activated', self.view)
+        # sbot_common.dump_view('ViewEventListener.on_activated', self.view)
         sbot_project.load_project_maybe(self.view)
 
     def on_deactivated(self):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. TODO-ST4 has on_pre_save_project()) '''
 
-        # dump_view('EventListener.on_deactivated', self.view)
+        # sbot_common.dump_view('EventListener.on_deactivated', self.view)
         sproj = sbot_project.get_project(self.view)
         if sproj is not None:
             # Save the project file internal to persisted.

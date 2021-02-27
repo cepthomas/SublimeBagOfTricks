@@ -63,7 +63,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             sout = subprocess.check_output([paths[0]], universal_newlines=True)
-            v = sbot_misc.create_new_view(v.window(), sout)
+            v = sbot_common.create_new_view(v.window(), sout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']

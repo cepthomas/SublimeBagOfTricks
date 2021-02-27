@@ -28,7 +28,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         serr = ''
 
         try:
-            for reg in sbot_misc.get_sel_regions(v):
+            for reg in sbot_common.get_sel_regions(v):
                 orig = v.substr(reg)
                 parsed = json.loads(orig)
                 sres.append(json.dumps(parsed, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False))
@@ -39,7 +39,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         if len(serr) > 0:
             sublime.ok_cancel_dialog(serr)
         else:
-            sbot_misc.create_new_view(v.window(), '\n'.join(sres))
+            sbot_common.create_new_view(v.window(), '\n'.join(sres))
 
     def is_visible(self):
         return self.view.settings().get('syntax').endswith('JSON.sublime-syntax')

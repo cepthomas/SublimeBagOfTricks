@@ -122,7 +122,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         ## Tokenize selection by syntax scope.
         pc = sbot_misc.SbotPerfCounter('render_html')
 
-        for region in sbot_misc.get_sel_regions(v):
+        for region in sbot_common.get_sel_regions(v):
             for line_region in v.split_by_newlines(region):
                 pc.start()
                 self.row_num += 1
@@ -281,7 +281,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
         html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(md_background, md_font_face, md_font_size))
         html.append("</style></head><body>")
 
-        for region in sbot_misc.get_sel_regions(v):
+        for region in sbot_common.get_sel_regions(v):
             html.append(v.substr(region))
 
         html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
@@ -301,7 +301,7 @@ def _output_html(view, content=[]):
     if output_type == 'clipboard':
         sublime.set_clipboard(s)
     # elif output_type == 'new_file':
-    #     v = sbot_misc.create_new_view(v.window(), s)
+    #     v = sbot_common.create_new_view(v.window(), s)
     #     v.set_syntax_file('Packages/HTML/HTML.tmLanguage')
     elif output_type == 'file' or output_type == 'show':
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'

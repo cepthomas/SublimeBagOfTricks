@@ -7,7 +7,7 @@ import sublime_plugin
 import sbot_common
 
 
-# Misc commands and utilities.
+# Misc commands.
 
 
 #-----------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class SbotSplitViewCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotOpenUrlCommand(sublime_plugin.ApplicationCommand):
+class SbotOpenUrlCommand(sublime_plugin.WindowCommand):
     ''' Open a web page. '''
 
     def run(self, url):
@@ -67,70 +67,51 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def get_sel_regions(v):
-    ''' Generic function to get selections or optionally the whole view.'''
-    regions = []    
-    if len(v.sel()[0]) > 0: # user sel
-        regions = v.sel()
-    elif sbot_common.settings.get('sel_all', True): # defaultsel?
-        regions = [sublime.Region(0, v.size())]
-    return regions
+class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
+    ''' Insert sequential numbers in first coumn. Default is to start at 1. '''
+
+    def run(self, edit, all=False):
+        v = self.view
+
+        # Iterate lines.
+        line_count = v.rowcol(v.size())[0]
+        width = len(str(line_count))
+        offset = 0
+
+        for region in sbot_common.get_sel_regions(v):
+            line_num = 1
+            offset = 0
+            for line_region in v.split_by_newlines(region):
+                s = "{:0{size}} ".format(line_num, size=width)
+                v.insert(edit, line_region.a + offset, s)
+                line_num += 1
+                # Adjust for inserts.
+                offset += width+1
 
 
 #-----------------------------------------------------------------------------------
-def create_new_view(window, text):
-    ''' Creates a temp view with text. Returns the view.'''
-    vnew = window.new_file()
-    vnew.set_scratch(True)
-    vnew.run_command('insert', {'characters': text })
-    return vnew
+class SbotShowEolCommand(sublime_plugin.TextCommand):
+    ''' Show line ends. '''
 
+    def run(self, edit, all=False):
+        v = self.view
+        w = v.window()
 
-#-----------------------------------------------------------------------------------
-def write_to_console(text):
-    ''' This is crude but works. It also adds an extra LF/CR which is some internal sublime thing.'''
-    
-    for b in text:
-        if b == r'\n':
-            sys.stdout.write('\n')
-        elif b == r'\r':
-            pass
+        if not v.get_regions("eols"):
+            eols = []
+            ind = 0
+            while 1:
+                freg = v.find('[\n\r]', ind)
+                if freg is not None and not freg.empty(): # second condition is not documented!!
+                    eols.append(freg)
+                    ind = freg.end() + 1
+                else:
+                    break
+            if eols:
+                # "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
+                v.add_regions("eols", eols, sbot_common.settings.get('eol_scope', "comment"))
         else:
-            sys.stdout.write(chr(b));
-
-
-#-----------------------------------------------------------------------------------
-def dump_view(preamble, view):
-    ''' Helper util. '''
-
-    s = []
-    s.append('view')
-    s.append(preamble)
-
-    s.append('view_id:')
-    s.append('None' if view is None else str(view.id()))
-
-    if view is not None:
-        w = view.window()
-        fn = view.file_name()
-
-        s.append('file_name:')
-        s.append('None' if fn is None else os.path.split(fn)[1])
-
-        s.append('project_file_name:')
-        s.append('None' if w is None or w.project_file_name() is None else os.path.split(w.project_file_name())[1])
-
-    logging.info(" ".join(s));
-            
-
-#-----------------------------------------------------------------------------------
-def wait_load_file(view, line):
-    ''' Open file asynchronously then position at line. '''
-    
-    if view.is_loading():
-        sublime.set_timeout(lambda: wait_load_file(view, line), 100) # maybe not forever?
-    else: # good to go
-        view.run_command("goto_line", {"line": line})
+            v.erase_regions("eols")
 
 
 #-----------------------------------------------------------------------------------
