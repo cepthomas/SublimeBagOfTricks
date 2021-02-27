@@ -131,3 +131,4 @@ dmypy.json
 # Project files
 /test/50mb.txt
 /test/25mb.txt
+/temp/sbot_log.txt

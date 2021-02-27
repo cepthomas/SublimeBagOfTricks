@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import webbrowser
 import sublime
 import sublime_plugin
 

@@ -90,7 +90,7 @@ Enhanced bookmarks:
 | eol_scope                | ST scope name for EOL marker |
 
 ## SideBar
-Commands added to the sidebar. Just the stuff I need.
+Commands added to the sidebar. Just the stuff I want.
 
 | Command                  | Description |
 |:--------                 |:-------     |
@@ -107,7 +107,7 @@ Trimming etc.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_trim                | Line end ws trim, arg:`which` should be `leading` or `trailing` or `both` |
+| sbot_trim                | Line end ws trim, arg:`how` should be `leading` or `trailing` or `both` |
 | sbot_remove_empty_lines  | Like it says, arg:`normalize`=True leaves one |
 | sbot_remove_ws           | Like it says, arg:`normalize`=True leaves one |
 

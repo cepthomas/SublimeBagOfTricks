@@ -4,7 +4,7 @@ import sublime
 import sublime_plugin
 
 
-# Holding tank for examples + leftovers.
+# Holding tank for examples, leftovers, bits and pieces.
 
 
 #-----------------------------------------------------------------------------------
@@ -12,28 +12,13 @@ class SbotFindNonAsciiCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = self.view
 
-        # TODO1 hex processor/editor
+        # TODO hex processor/editor? Can't look at view, must open file.
         # Files containing null bytes are opened as hexadecimal by default In your User or Default Settings file:
         # "enable_hexadecimal_encoding": false
         # OR
         # In your User or Default Settings file(s):
         # "preview_on_click": false
-
         # Go to File -> Reopen with Encoding and select UTF-8. This will bring back the normal text view.
-
-        # - HexViewer has:
-        #     - View any file (that exist on disk) in a hex format showing both byte and ASCII representation.
-        #     - Command to jump to a specific address.
-        #     - In place editing of bytes or ASCII chars.
-        #     - Highlight selected byte **and** ASCII code.
-        #     - Inspection panel showing different integer representation at the cursor position.
-        #     - Configurable display of byte grouping, bytes per line, endianness.
-        #     - Export hex view to a binary file.
-        #     - Get the checksum of a given file (various checksums are available).
-        #     - Generate checksum/hash from input via panel or text selection.
-        #     - Optionally auto convert binary to hex view.
-
-
 
         find = []
 
