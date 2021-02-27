@@ -140,10 +140,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         # Do popup
         html = '''
             <body>
-                <style>
-                    p {{ margin: 0em; }}
-                    {}
-                </style>
+                <style> p {{ margin: 0em; }} {} </style>
                 {}
                 {}
             </body>

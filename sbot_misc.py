@@ -66,14 +66,36 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def get_regions(v):
-    # Generic function.
+def get_sel_regions(v):
+    ''' Generic function to get selections or optionally the whole view.'''
     regions = []    
     if len(v.sel()[0]) > 0: # user sel
         regions = v.sel()
     elif sbot_common.settings.get('sel_all', True): # defaultsel?
         regions = [sublime.Region(0, v.size())]
     return regions
+
+
+#-----------------------------------------------------------------------------------
+def create_new_view(window, text):
+    ''' Creates a temp view with text. Returns the view.'''
+    vnew = window.new_file()
+    vnew.set_scratch(True)
+    vnew.run_command('insert', {'characters': text })
+    return vnew
+
+
+#-----------------------------------------------------------------------------------
+def write_to_console(text):
+    ''' This is crude but works. It also adds an extra LF/CR which is some internal sublime thing.'''
+    
+    for b in text:
+        if b == r'\n':
+            sys.stdout.write('\n')
+        elif b == r'\r':
+            pass
+        else:
+            sys.stdout.write(chr(b));
 
 
 #-----------------------------------------------------------------------------------

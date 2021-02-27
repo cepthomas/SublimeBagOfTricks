@@ -56,7 +56,7 @@ Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 | md_font_face             | For rendered markdown |
 | md_font_size             | For rendered markdown |
 | md_background            | If you need to change the markdown bg color (not done automatically from color scheme) |
-| render_output            | One of: clipboard, new_file (view), default_file (original filename + .html), default_file_open (default_file + show) |
+| render_output            | One of: `clipboard`, `file` (original fn or temp + .html), `show` |
 | render_max_file          | Max file size to render |
 | sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
 
@@ -107,9 +107,9 @@ Trimming etc.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_trim                | Line end ws trim, arg:which should be leading or trailing or both |
-| sbot_remove_empty_lines  | Like it says, arg:normalize=True leaves one |
-| sbot_remove_ws           | Like it says, arg:normalize=True leaves one |
+| sbot_trim                | Line end ws trim, arg:`which` should be `leading` or `trailing` or `both` |
+| sbot_remove_empty_lines  | Like it says, arg:`normalize`=True leaves one |
+| sbot_remove_ws           | Like it says, arg:`normalize`=True leaves one |
 
 
 ## Format

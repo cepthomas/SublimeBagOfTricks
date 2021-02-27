@@ -62,20 +62,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             sout = subprocess.check_output([paths[0]], universal_newlines=True)
-            # sout = subprocess.check_output([paths[0]]).decode("utf-8")
-            # print(sout)
-            v = self.window.new_file()
-            v.set_scratch(True)
-            v.run_command('insert', {'characters': sout })
-
-            # This is crude write to console. It also adds an extra LF/CR which is some internal sublime thing.
-            # for b in sout:
-            #     if b == r'\n':
-            #         sys.stdout.write('\n')
-            #     elif b == r'\r':
-            #         pass
-            #     else:
-            #         sys.stdout.write(chr(b));
+            v = sbot_misc.create_new_view(v.window(), sout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']

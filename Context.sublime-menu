@@ -32,6 +32,10 @@
     { "caption": "Clear Highlights", "command": "sbot_clear_highlights" },
 
     { "caption": "-" },
+    { "caption": "Render To Html", "command": "sbot_render_to_html" },
+    { "caption": "Render Markdown", "command": "sbot_render_markdown" },
+
+    { "caption": "-" },
 
     { "caption": "Format json", "command": "sbot_format_json" },
     { "caption": "Format xml", "command": "sbot_format_xml" },

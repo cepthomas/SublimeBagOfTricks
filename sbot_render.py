@@ -16,13 +16,13 @@ HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
 
 
 #-----------------------------------------------------------------------------------
-class SbotRenderToHtmlCommand(sublime_plugin.TextCommand): #TODO these should be WindowCommand!
+class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' Make a pretty. '''
 
     def run(self, edit):
         v = self.view
 
-        ## Get prefs.
+        # Get prefs.
         render_max_file = sbot_common.settings.get('render_max_file', 1)
 
         fsize = v.size() / 1024.0 / 1024.0
@@ -60,10 +60,10 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand): #TODO these should be
         
         v = self.view
         
-        # - html render msec per line:
-        #   - medium (5k dense lines) 1.248921079999997 (5000)
-        #   - small (1k sparse lines) 0.4043940577246477 (1178)
-        #   - biggish (20k dense lines = 3Mb) 1.3607864668223 (20616)
+        # html render msec per line:
+        # - medium (5k dense lines) 1.248921079999997 (5000)
+        # - small (1k sparse lines) 0.4043940577246477 (1178)
+        # - biggish (20k dense lines = 3Mb) 1.3607864668223 (20616)
 
         ## Get prefs.
         html_font_size = sbot_common.settings.get('html_font_size', 12)
@@ -120,76 +120,73 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand): #TODO these should be
         highlight_regions.sort(key=lambda v: v[0].a)
 
         ## Tokenize selection by syntax scope.
-        has_selection = len(v.sel()[0]) > 0
-        sel_reg = v.sel()[0] if has_selection else sublime.Region(0, v.size())
-
         pc = sbot_misc.SbotPerfCounter('render_html')
 
-        for line_region in v.split_by_newlines(sel_reg):
-            pc.start()
-            self.row_num += 1
+        for region in sbot_misc.get_sel_regions(v):
+            for line_region in v.split_by_newlines(region):
+                pc.start()
+                self.row_num += 1
 
-            if self.row_num % 100 == 0:
-                time.sleep(0.01)
-                v.show_popup('!!!!!')
+                if self.row_num % 100 == 0:
+                    time.sleep(0.01)
+                    v.show_popup('!!!!!')
 
-            line_styles = [] # (Region, style))
+                line_styles = [] # (Region, style))
 
-            # Start a new line.
-            current_style = None
-            # new_style = None
-            current_style_start = line_region.a # current chunk
+                # Start a new line.
+                current_style = None
+                current_style_start = line_region.a # current chunk
 
-            # Process the individual line chars.
-            point = line_region.a
+                # Process the individual line chars.
+                point = line_region.a
 
-            while point < line_region.b:
-                # Check if it's a highlight first as they take precedence.
-                if len(highlight_regions) > 0 and point >= highlight_regions[0][0].a:
+                while point < line_region.b:
+                    # Check if it's a highlight first as they take precedence.
+                    if len(highlight_regions) > 0 and point >= highlight_regions[0][0].a:
 
-                    # Start a highlight.
-                    new_style =  highlight_regions[0][1]
+                        # Start a highlight.
+                        new_style =  highlight_regions[0][1]
 
-                    # Save last maybe.
-                    if point > current_style_start:
-                        line_styles.append((sublime.Region(current_style_start, point), current_style))
-
-                    # Save highlight info.
-                    line_styles.append((highlight_regions[0][0], new_style))
-
-                    _add_style(new_style)
-
-                    # Bump ahead.
-                    point = highlight_regions[0][0].b
-                    current_style = new_style
-                    current_style_start = point
-
-                    # Remove from the list.
-                    del highlight_regions[0]
-                else:
-                    # Plain ordinary style. Did it change?
-                    new_style = _view_style_to_tuple(v.style_for_scope(v.scope_name(point)))
-
-                    if new_style != current_style:
-                        # Save last chunk maybe.
+                        # Save last maybe.
                         if point > current_style_start:
                             line_styles.append((sublime.Region(current_style_start, point), current_style))
 
-                        current_style = new_style
-                        current_style_start = point
+                        # Save highlight info.
+                        line_styles.append((highlight_regions[0][0], new_style))
 
                         _add_style(new_style)
 
-                    # Bump ahead.
-                    point += 1
+                        # Bump ahead.
+                        point = highlight_regions[0][0].b
+                        current_style = new_style
+                        current_style_start = point
 
-            # Done with this line. Save last chunk maybe.
-            if point > current_style_start:
-                line_styles.append((sublime.Region(current_style_start, point), current_style))
+                        # Remove from the list.
+                        del highlight_regions[0]
+                    else:
+                        # Plain ordinary style. Did it change?
+                        new_style = _view_style_to_tuple(v.style_for_scope(v.scope_name(point)))
 
-            # Add to master list.
-            region_styles.append(line_styles)
-            pc.stop()
+                        if new_style != current_style:
+                            # Save last chunk maybe.
+                            if point > current_style_start:
+                                line_styles.append((sublime.Region(current_style_start, point), current_style))
+
+                            current_style = new_style
+                            current_style_start = point
+
+                            _add_style(new_style)
+
+                        # Bump ahead.
+                        point += 1
+
+                # Done with this line. Save last chunk maybe.
+                if point > current_style_start:
+                    line_styles.append((sublime.Region(current_style_start, point), current_style))
+
+                # Add to master list.
+                region_styles.append(line_styles)
+                pc.stop()
 
         # Done all lines.
         logging.info('loop:' + pc.dump())
@@ -273,7 +270,8 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
-        ##### Get prefs.
+
+        # Get prefs.
         md_background = sbot_common.settings.get('md_background', 'white')
         md_font_size = sbot_common.settings.get('md_font_size', 12)
         md_font_face = sbot_common.settings.get('md_font_face', 'Arial')
@@ -283,41 +281,35 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
         html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(md_background, md_font_face, md_font_size))
         html.append("</style></head><body>")
 
-        html.append(v.substr(sublime.Region(0, v.size())))
+        for region in sbot_misc.get_sel_regions(v):
+            html.append(v.substr(region))
 
+        # TODO1 Markdeep alternative?
         html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
         html.append("</body></html>")
 
-        content = '\n'.join(html)
-
-        _output_html(v, content)
+        _output_html(v, '\n'.join(html))
 
     def is_visible(self):
-        fn = self.view.file_name()
-        vis = False if fn is None else self.view.file_name().endswith('.md')
-        return vis
+        return self.view.settings().get('syntax').endswith('Markdown.sublime-syntax')
 
 
 #-----------------------------------------------------------------------------------
 def _output_html(view, content=[]):
-    output_type = sbot_common.settings.get('render_output', 'new_file')
+    output_type = sbot_common.settings.get('render_output', 'show')
+    s = "".join(content)
 
     if output_type == 'clipboard':
-        sublime.set_clipboard("".join(content))
-
-    elif output_type == 'new_file':
-        v = sublime.active_window().new_file()
-        v.set_syntax_file('Packages/HTML/HTML.tmLanguage')
-        v.set_scratch(True)
-        v.run_command('insert', {'characters': "".join(content) })
-
-    elif output_type == 'default_file' or output_type == 'default_file_open':
-        if view.file_name() is None:
-            sublime.error_message("Can't use render_output=default_file for unnamed files")
-        else:
-            hfile = view.file_name() + '.html'
-            with open(hfile, 'w') as f:
-                f.write("".join(content))
-                if output_type == 'default_file_open':
-                    webbrowser.open_new_tab(hfile)
+        sublime.set_clipboard(s)
+    # elif output_type == 'new_file':
+    #     v = sbot_misc.create_new_view(v.window(), s)
+    #     v.set_syntax_file('Packages/HTML/HTML.tmLanguage')
+    elif output_type == 'file' or output_type == 'show':
+        basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'
+        fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', basefn)
+        print(fn)
+        with open(fn, 'w') as f:
+            f.write(s)
+        if output_type == 'show':
+            webbrowser.open_new_tab(fn)
 

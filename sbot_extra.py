@@ -68,7 +68,6 @@ class SbotFindNonAsciiCommand(sublime_plugin.TextCommand):
             print(d)
 
 
-
 #-----------------------------------------------------------------------------------
 class SbotTestCommand(sublime_plugin.TextCommand):
     ''' Just for hacking/testing. '''
@@ -230,5 +229,3 @@ class SbotExampleInputHandler(sublime_plugin.TextInputHandler):
         # Is it ok?
         # print("SbotExampleInputHandler.validate() name:{0} my_example:{1}".format(self.name(), my_example))
         return True
-
-

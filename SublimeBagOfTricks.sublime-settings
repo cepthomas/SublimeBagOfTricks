@@ -23,8 +23,8 @@
     "md_background": "OldLace",
     "md_font_face": "Calibri",
     "md_font_size": 14,
-    // One of: new_file, clipboard, default_file, default_file_open.
-    "render_output": "default_file_open",
+    // One of: clipboard, file, show.
+    "render_output": "show",
     // Max file size to render in Mb.
     "render_max_file": 1,
 

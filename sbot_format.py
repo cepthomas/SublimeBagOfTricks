@@ -1,4 +1,3 @@
-
 import os
 import sys
 import re
@@ -27,10 +26,9 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
 
         sres = []
         serr = ''
-        regions = sbot_misc.get_regions(v)
 
         try:
-            for reg in regions:
+            for reg in sbot_misc.get_sel_regions(v):
                 orig = v.substr(reg)
                 parsed = json.loads(orig)
                 sres.append(json.dumps(parsed, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False))
@@ -41,15 +39,10 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         if len(serr) > 0:
             sublime.ok_cancel_dialog(serr)
         else:
-            s = '\n'.join(sres)
-            vnew = v.window().new_file()
-            vnew.set_scratch(True)
-            vnew.insert(edit, 0, s)
+            sbot_misc.create_new_view(v.window(), '\n'.join(sres))
 
-    # def is_visible(self):
-    #     fn = self.view.file_name()
-    #     vis = True
-    #     return vis
+    def is_visible(self):
+        return self.view.settings().get('syntax').endswith('JSON.sublime-syntax')
 
 
 #-----------------------------------------------------------------------------------
@@ -66,9 +59,7 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
         v = self.view
 
     def is_visible(self):
-        # fn = self.view.file_name()
-        # vis = False if fn is None else self.view.file_name().endswith('.md')
-        return _has_lxml
+        return _has_lxml and view.settings().get('syntax').endswith('XML.sublime-syntax')
 
 
 #-----------------------------------------------------------------------------------
@@ -80,6 +71,4 @@ class SbotFormatHtmlCommand(sublime_plugin.TextCommand):
         v = self.view
 
     def is_visible(self):
-        # fn = self.view.file_name()
-        # vis = False if fn is None else self.view.file_name().endswith('.md')
-        return _has_lxml
+        return _has_lxml and self.view.settings().get('syntax').endswith('HTML.sublime-syntax')

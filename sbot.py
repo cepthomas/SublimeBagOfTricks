@@ -28,7 +28,7 @@ def plugin_loaded():
 
     # Init logging. TODO Add filemode=a|w, level, filename, 
     if sbot_common.settings.get('enable_log', False):
-        logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', '_log.txt')
+        logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'sbot_log.txt')
         print('Logfile:', logfn)
         logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
         logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO)

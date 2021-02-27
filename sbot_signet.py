@@ -8,7 +8,6 @@ import sbot_project
 
 # Defs
 SIGNET_REGION_NAME = 'signet'
-# SIGNET_ICON = 'bookmark'
 SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
 NEXT_SIG = 1
 PREV_SIG = 2

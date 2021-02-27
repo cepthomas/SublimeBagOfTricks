@@ -9,14 +9,14 @@ import sbot_misc
 
 
 #-----------------------------------------------------------------------------------
-def _do_sub(v, e, reo, sub):
+def _do_sub(view, edit, reo, sub):
     # Generic substitution function.
-    regions = sbot_misc.get_regions(v)
+    regions = sbot_misc.get_sel_regions(view)
     for reg in regions:
-        orig = v.substr(reg)
+        orig = view.substr(reg)
         new = reo.sub(sub, orig)
         if orig != new: #TODO1 efficient to do this strcmp every time? Profile.
-            v.replace(e, reg, new)
+            view.replace(edit, reg, new)
 
 
 #-----------------------------------------------------------------------------------
