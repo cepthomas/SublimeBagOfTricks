@@ -15,27 +15,27 @@ def _do_sub(view, edit, reo, sub):
     for reg in regions:
         orig = view.substr(reg)
         new = reo.sub(sub, orig)
-        if orig != new: #TODO1 efficient to do this strcmp every time? Profile.
-            view.replace(edit, reg, new)
+        view.replace(edit, reg, new)
 
 
 #-----------------------------------------------------------------------------------
 class SbotTrimCommand(sublime_plugin.TextCommand):
-    def run(self, edit, which):
-        sub = ''
-        if which == 'leading':
+    def run(self, edit, how):
+        if how == 'leading':
             reo = re.compile('^[ \t]+', re.MULTILINE)
-        elif which == 'trailing':
+            sub = ''
+        elif how == 'trailing':
             reo = re.compile('[\t ]+$', re.MULTILINE)
+            sub = ''
         else: # both
             reo = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
+            sub = ''
         _do_sub(self.view, edit, reo, sub)
-
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
-    def run(self, edit, normalize):
-        if normalize:
+    def run(self, edit, how):
+        if how == 'normalize':
             reo = re.compile(r'(?:\s*)(\r?\n)(?:\s*)(?:\r?\n+)', re.MULTILINE)
             sub = r'\1\1'
         else:
@@ -46,12 +46,15 @@ class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveWsCommand(sublime_plugin.TextCommand):
-    def run(self, edit, normalize):
-        if normalize:
+    def run(self, edit, how):
+        if how == 'normalize':
             reo = re.compile('([ ])[ ]+')
             sub = r'\1'
+        elif how == 'keep_eol':
+            reo = re.compile(r'[ \t\v\f]')
+            sub = ''
         else:
-            reo = re.compile(r'[ \t\r\n\v\f]') #TODO option to keep eols
+            reo = re.compile(r'[ \t\r\n\v\f]')
             sub = ''
         _do_sub(self.view, edit, reo, sub)
 
