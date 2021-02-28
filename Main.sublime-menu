@@ -72,9 +72,7 @@
         [
             { "command": "open_file", "caption": "Notes", "args": {"file": "${packages}/SublimeBagOfTricks/notes.txt"} },
             
-    { "caption": "XXX: Get Input", "command": "sbot_example_input" },
-
-            // { "command": "sbot_example_input_print" },
+            { "command": "sbot_example_input" },
             // { "command": "arithmetic" },
             // { "command": "sbot_example_user_input" },
 

@@ -205,7 +205,10 @@ class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
     def placeholder(self):
         return "placeholder - optional"
 
-    def description(self, sdef):
+    def name(self):
+        return "my_value"
+
+    def description(self, args):
         return "description - optional"
 
     def initial_text(self):
@@ -222,14 +225,14 @@ class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
 
 #-----------------------------------------------------------------------------------
 class SbotExampleInputCommand(sublime_plugin.TextCommand):
-    def run(self, edit, sbot_example_argument): #TODO seems to require sbot_example_ prefix for some reason
-        print('argument:', sbot_example_argument)
+    def run(self, edit, my_value): # Has to be called exactly my_value - another convention.
+        print('argument:', my_value)
         # for i in range(len(self.view.sel())):
         #     sel = self.view.sel()[i]
         #     data = self.view.substr(sel)
         #     # print("*** sel:{0} data:{1}".format(sel, data))
         #     # replace selected text.
-        #     self.view.replace(edit, sel, sbot_example_argument)
+        #     self.view.replace(edit, sel, my_value)
 
     def input(self, args):
         if "text" not in args:
