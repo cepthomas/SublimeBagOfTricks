@@ -68,7 +68,7 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
-    ''' Insert sequential numbers in first coumn. Default is to start at 1. '''
+    ''' Insert sequential numbers in first column. Default is to start at 1. '''
 
     def run(self, edit, all=False):
         v = self.view

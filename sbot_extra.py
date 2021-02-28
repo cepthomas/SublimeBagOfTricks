@@ -95,28 +95,31 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         #     propertyValue = pval1 if v.settings().get(pname, pval1) != pval1 else pval2
         #     v.settings().set(pname, propertyValue)
 
+        print('11111111111111')
+        c = sys.stdin.read(1)
+        print('========', c)
+        print('22222222222222')
+        
+        # sys.stderr.write("started\n")
+        # i = 4
+        # import pdb ; pdb.set_trace()
+        # # import spdb ; spdb.start()
+        # z = 5
+        
+        # winpdb will be launched, if not yet launched from Plugin Debugger. Each later call of this function sets a breakpoint.
+        # If winpdb (started from Plugin Debugger) has been terminated in between, it will be restarted.
+        # spdb.setbreak()
+        # sets a breakpoint. You need to have to attached debug client for using this.
+        # Note: If you start winpdb manually, use sublime as password for finding scripts on localhost.
+        
+        # Test your installation
+        # Run "Plugin Debugger: run debug_example (opens Debugger)" from command palette.
+        # Your sublime text will freeze for few seconds and then will open a winpdb window ready for debugging DebugExampleCommand.
 
-#-----------------------------------------------------------------------------------
-class SbotExampleUserInputCommand(sublime_plugin.TextCommand):
-    ''' Command: Get input from user. sbot_example_user_input
-    When a command with arguments is called without them, but it defines an input() method, Sublime will call
-    the input() method to see if there is an input handler that can be used to gather the arguments instead.
-    Every input handler represents an argument to the command, and once the entire chain of them is finished, 
-    Sublime re-invokes the command with the arguments that it gathered.
-    '''
-
-    def run(self, edit, my_example):
-        # print("!!!StptUserInputCommand.run() name:{0} my_example:{1}".format(self.name(), my_example)) # self.name is "sbot_example_user_input"
-        for i in range(len(self.view.sel())):
-            sel = self.view.sel()[i]
-            data = self.view.substr(sel)
-            # print("*** sel:{0} data:{1}".format(sel, data))
-            # replace selected text.
-            self.view.replace(edit, sel, my_example)
-
-    def input(self, args):
-        # print("!!!StptUserInputCommand.input() " + str(args))
-        return SbotExampleInputHandler(self.view)
+        # Module rpdb2 havily hooks into python interpreter, so if you really want to quit the debug session, you have to restart your sublime text.
+        # Once Winpdb has opened, you should keep it open, because it will inform you on any uncaught exception. If you 
+        # close winpdb, your sublime simply freezes on an uncaught exception (because it breaks on that exception), but you are 
+        # not informed on this because of missing frontend.
 
 
 #-----------------------------------------------------------------------------------
@@ -183,8 +186,18 @@ class SbotExampleMenuCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotExampleInputHandler(sublime_plugin.TextInputHandler):
-    ''' Generic user input handler. '''
+class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
+    ''' Command: Get input from user. sbot_example_user_input
+    When a command with arguments is called without them, but it defines an input() method, Sublime will call
+    the input() method to see if there is an input handler that can be used to gather the arguments instead.
+    Every input handler represents an argument to the command, and once the entire chain of them is finished, 
+    Sublime re-invokes the command with the arguments that it gathered.
+
+    https://forum.sublimetext.com/t/simple-examples-for-textinputhandler/48422/13
+    you also need to add the command to the command palette by adding an entry to a sublime-commands file;
+    Something you may have missed is that only commands that appear in the command palette support using 
+    input handlers because the handlers display input in the command palette itself as a part of its operation.
+    '''
 
     def __init__(self, view):
         self.view = view
@@ -193,24 +206,31 @@ class SbotExampleInputHandler(sublime_plugin.TextInputHandler):
         return "placeholder - optional"
 
     def description(self, sdef):
-        return "description for SbotExampleInputHandler"
+        return "description - optional"
 
     def initial_text(self):
-        # Check if something selected.
-        if len(self.view.sel()) > 0:
-            if(self.view.sel()[0].size() == 0):
-                return "default initial contents"
-            else:
-                return self.view.substr(self.view.sel()[0])
-        else:
-            return "wtf?"
+        # # Check if something selected.
+        # if len(self.view.sel()) > 0:
+        #     if(self.view.sel()[0].size() == 0):
+        #         return "initial_text"
+        #     else:
+        #         return self.view.substr(self.view.sel()[0])
+        # else:
+        #     return "wtf?"
+        return 'initial_text'
 
-    def preview(self, my_example):
-        # Optional peek at current value.
-        # print("SbotExampleInputHandler.preview() name:{0} my_example:{1}".format(self.name(), my_example))
-        return my_example
 
-    def validate(self, my_example):
-        # Is it ok?
-        # print("SbotExampleInputHandler.validate() name:{0} my_example:{1}".format(self.name(), my_example))
-        return True
+#-----------------------------------------------------------------------------------
+class SbotExampleInputCommand(sublime_plugin.TextCommand):
+    def run(self, edit, sbot_example_argument): #TODO seems to require sbot_example_ prefix for some reason
+        print('argument:', sbot_example_argument)
+        # for i in range(len(self.view.sel())):
+        #     sel = self.view.sel()[i]
+        #     data = self.view.substr(sel)
+        #     # print("*** sel:{0} data:{1}".format(sel, data))
+        #     # replace selected text.
+        #     self.view.replace(edit, sel, sbot_example_argument)
+
+    def input(self, args):
+        if "text" not in args:
+            return SbotExampleArgumentInputHandler(self.view)

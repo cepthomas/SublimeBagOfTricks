@@ -82,8 +82,9 @@ Enhanced bookmarks:
 ## Miscellany
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_split_view          | Toggles simple horizontal split screen, like e.g. Word |
+| sbot_split_view          | Toggles simple horizontal split screen, like e.g. `MS Word` |
 | sbot_show_eol            | Toggles showing EOLs |
+| sbot_insert_line_indexes | Insert sequential numbers in first column |
 
 | Setting                  | Description |
 |:--------                 |:-------     |
