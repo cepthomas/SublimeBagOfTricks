@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import sublime
 import sublime_plugin
 
@@ -57,9 +58,8 @@ class SbotFindNonAsciiCommand(sublime_plugin.TextCommand):
 class SbotTestCommand(sublime_plugin.TextCommand):
     ''' Just for hacking/testing. '''
 
-    def run(self, edit, all=False):
-        v = self.view
-        w = self.view.window()
+    def run(self, edit, cmd=None):
+        pass
         
         # for sheet in w.sheets():
         #     print('sheet:', sheet)
@@ -95,32 +95,6 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         #     propertyValue = pval1 if v.settings().get(pname, pval1) != pval1 else pval2
         #     v.settings().set(pname, propertyValue)
 
-        print('11111111111111')
-        c = sys.stdin.read(1)
-        print('========', c)
-        print('22222222222222')
-        
-        # sys.stderr.write("started\n")
-        # i = 4
-        # import pdb ; pdb.set_trace()
-        # # import spdb ; spdb.start()
-        # z = 5
-        
-        # winpdb will be launched, if not yet launched from Plugin Debugger. Each later call of this function sets a breakpoint.
-        # If winpdb (started from Plugin Debugger) has been terminated in between, it will be restarted.
-        # spdb.setbreak()
-        # sets a breakpoint. You need to have to attached debug client for using this.
-        # Note: If you start winpdb manually, use sublime as password for finding scripts on localhost.
-        
-        # Test your installation
-        # Run "Plugin Debugger: run debug_example (opens Debugger)" from command palette.
-        # Your sublime text will freeze for few seconds and then will open a winpdb window ready for debugging DebugExampleCommand.
-
-        # Module rpdb2 havily hooks into python interpreter, so if you really want to quit the debug session, you have to restart your sublime text.
-        # Once Winpdb has opened, you should keep it open, because it will inform you on any uncaught exception. If you 
-        # close winpdb, your sublime simply freezes on an uncaught exception (because it breaks on that exception), but you are 
-        # not informed on this because of missing frontend.
-
 
 #-----------------------------------------------------------------------------------
 class SbotExampleGetNumberCommand(sublime_plugin.WindowCommand):
@@ -154,15 +128,12 @@ class SbotExampleListSelectCommand(sublime_plugin.TextCommand):
     ''' Command: Select from list. sbot_example_list_select '''
 
     def run(self, edit, cmd=None):
-        # print("ListSelect! {0} {1}".format(self.name(), edit))
         self.panel_items = ["Duck", "Cat", "Banana"]
-        # self.window.show_quick_panel(self.panel_items, self.on_done_panel)
         self.view.window().show_quick_panel(self.panel_items, self.on_done_panel)
 
     def on_done_panel(self, choice):
         if choice >= 0:
             print("You picked {0}".format(self.panel_items[choice]))
-            os.startfile(ddir + r"\test1.txt")
 
 
 #-----------------------------------------------------------------------------------
@@ -193,8 +164,8 @@ class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
     Every input handler represents an argument to the command, and once the entire chain of them is finished, 
     Sublime re-invokes the command with the arguments that it gathered.
 
-    https://forum.sublimetext.com/t/simple-examples-for-textinputhandler/48422/13
-    you also need to add the command to the command palette by adding an entry to a sublime-commands file;
+    This >>>>>> https://forum.sublimetext.com/t/simple-examples-for-textinputhandler/48422/13
+    You also need to add the command to the command palette by adding an entry to a sublime-commands file;
     Something you may have missed is that only commands that appear in the command palette support using 
     input handlers because the handlers display input in the command palette itself as a part of its operation.
     '''

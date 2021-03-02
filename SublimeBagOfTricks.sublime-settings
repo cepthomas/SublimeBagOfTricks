@@ -6,6 +6,7 @@
     "enable_persistence": true,
     // Scopes for marking text with highlights.
     "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
+    // "highlight_scopes": [ "region.redish", "region.orangish", "region.yellowish", "region.greenish", "region.cyanish", "region.bluish", "region.purplish", "region.pinkish" ],
     // Scope for coloring eols.
     "eol_scope": "constant.character.escape",
     // Option for selection defaults. If true and no user selection, assumes the whole document (like ST).

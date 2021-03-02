@@ -74,8 +74,6 @@
             
             { "command": "sbot_example_input" },
             // { "command": "arithmetic" },
-            // { "command": "sbot_example_user_input" },
-
             { "command": "sbot_example_menu", "caption": "Menu" },
             { "command": "sbot_example_list_select", "caption": "List Select" },
             {

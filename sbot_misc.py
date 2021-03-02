@@ -60,7 +60,6 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 else:
                     break
             if eols:
-                # "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
                 v.add_regions("eols", eols, sbot_common.settings.get('eol_scope', "comment"))
         else:
             v.erase_regions("eols")
