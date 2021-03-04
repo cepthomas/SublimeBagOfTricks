@@ -129,8 +129,8 @@ Leftovers that will eventually be deleted or subsumed.
 | Command                  | Description |
 |:--------                 |:-------     |
 | sbot_example_menu        | Menu |
-| sbot_example_get_number  | User input |
-| sbot_example_user_input  | User input |
+| sbot_example_get_number  | User text input |
+| sbot_example_input       | User text input |
 | sbot_example_list_select | User list sel |
 | sbot_example_msg_box     | User message |
 
@@ -221,7 +221,7 @@ Accumulated notes that will probably eventually go away.
 - To remove items from default menus: In `<user>\AppData\Roaming\Sublime Text 3\Packages`, create a new folder that’s named exactly like the package you want to overwrite. For Sublime Core, this is `Default`. In this folder, create a new `.sublime-menu` file. Either add only your own stuff, or copy the default content and edit it.
 - Style:
   - Themes (`*.sublime-theme`) basically decorate the core UI elements like side-pane, tabs, menus etc.
-  - Color-schemes are responsible for the syntax-highlighting e.g. `Visual Studio Bold.tmTheme`.
+  - Color schemes are responsible for the syntax-highlighting e.g. `Visual Studio Bold.tmTheme` or `abc.sublime-color-scheme`.
 
 
 ### Menus

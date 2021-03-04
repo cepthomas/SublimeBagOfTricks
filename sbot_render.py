@@ -9,7 +9,7 @@ from html import escape
 import sublime
 import sublime_plugin
 import sbot_common
-import sbot_misc
+import sbot_misc_commands
 
 
 HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
@@ -120,7 +120,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         highlight_regions.sort(key=lambda v: v[0].a)
 
         ## Tokenize selection by syntax scope.
-        pc = sbot_misc.SbotPerfCounter('render_html')
+        pc = sbot_common.SbotPerfCounter('render_html')
 
         for region in sbot_common.get_sel_regions(v):
             for line_region in v.split_by_newlines(region):

@@ -9,7 +9,7 @@ import sublime
 import sublime_plugin
 import sbot_common
 import sbot_project
-import sbot_misc
+import sbot_misc_commands
 import sbot_render
 import sbot_highlight
 import sbot_sidebar

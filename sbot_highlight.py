@@ -99,9 +99,11 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 class SbotShowScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
+    #TODO let user add more.
 
     def run(self, edit):
         v = self.view
+
         style_text = []
         content = []
         scopes = [
@@ -109,7 +111,14 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
             'entity.name.section', 'entity.name.tag', 'entity.other', 'invalid', 'invalid.deprecated', 'invalid.illegal',
             'keyword', 'keyword.control', 'keyword.declaration', 'keyword.operator', 'markup', 'punctuation', 'source',
             'storage.modifier', 'storage.type', 'string', 'support', 'text', 'variable', 'variable.function',
-            'variable.language', 'variable.parameter']
+            'variable.language', 'variable.parameter',
+            'region.redish', 'region.orangish', 'region.yellowish', 'region.greenish', 'region.cyanish', 
+            'region.bluish', 'region.purplish', 'region.pinkish'
+            ]
+
+        # scopes = set()
+        # for i in range(v.size()):
+        #     scopes.add(v.scope_name(i))
 
         for scope in scopes:
             style = v.style_for_scope(scope)

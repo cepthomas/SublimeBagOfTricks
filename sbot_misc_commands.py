@@ -16,9 +16,8 @@ class SbotSplitViewCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         w = self.window
-        lo = w.layout()
 
-        if(len(lo['rows']) > 2):
+        if(len(w.layout()['rows']) > 2):
             # Remove split.
             w.run_command("focus_group", { "group": 1 } )
             w.run_command("close_file")
@@ -111,34 +110,3 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 v.add_regions("eols", eols, sbot_common.settings.get('eol_scope', "comment"))
         else:
             v.erase_regions("eols")
-
-
-#-----------------------------------------------------------------------------------
-class SbotPerfCounter(object):
-    ''' Container for perf counter. All times in msec. '''
-
-    def __init__(self, id):
-        self.id = id
-        self.vals = []
-        self.start_time = 0
-
-    def start(self):
-        self.start_time = time.perf_counter() * 1000.0
-
-    def stop(self):
-        if self.start_time != 0:
-            self.vals.append(time.perf_counter() * 1000.0 - self.start_time)
-            self.start_time = 0
-
-    def dump(self):
-        avg = sum(self.vals) / len(self.vals)
-        s = self.id + ': '
-        if len(self.vals) > 0:
-            s += str(avg)
-            s += ' ({})'.format(len(self.vals))
-        else:
-            s += 'No data'
-        return s
-
-    def clear(self):
-        self.vals = []

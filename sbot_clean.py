@@ -4,7 +4,7 @@ import re
 import sublime
 import sublime_plugin
 import sbot_common
-import sbot_misc
+import sbot_misc_commands
 
 
 

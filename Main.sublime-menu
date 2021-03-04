@@ -1,5 +1,5 @@
 [
-    ////// Add some "bookmark" commands.
+    // Add some "bookmark" commands.
     {
         "id": "goto",
         "children":
@@ -18,7 +18,7 @@
         ]
     },
 
-    ////// Add to existing Preferences menu for package-settings.
+    // Add to existing Preferences menu for package-settings.
     {
         "id": "preferences",
         "children":
@@ -64,7 +64,7 @@
         ]
     },
 
-    ////// New top level menu. For some reason this needs to be after the preceding sections.
+    // New top level menu. For some reason this needs to be after the preceding sections.
     {
         "caption": "Extra",
         "id": "sbot_extra",

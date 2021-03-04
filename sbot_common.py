@@ -1,4 +1,5 @@
 import os
+import time
 import sublime
 import sublime_plugin
 
@@ -13,6 +14,7 @@ def initialize():
 #-----------------------------------------------------------------------------------
 def get_sel_regions(v):
     ''' Generic function to get selections or optionally the whole view.'''
+
     regions = []    
     if len(v.sel()[0]) > 0: # user sel
         regions = v.sel()
@@ -24,6 +26,7 @@ def get_sel_regions(v):
 #-----------------------------------------------------------------------------------
 def create_new_view(window, text):
     ''' Creates a temp view with text. Returns the view.'''
+
     vnew = window.new_file()
     vnew.set_scratch(True)
     vnew.run_command('insert', {'characters': text })
@@ -33,6 +36,7 @@ def create_new_view(window, text):
 #-----------------------------------------------------------------------------------
 def write_to_console(text):
     ''' This is crude but works. Sublime also adds an extra eol when writing to the console. '''
+    
     for b in text:
         if b == r'\n':
             sys.stdout.write('\n')
@@ -74,3 +78,34 @@ def wait_load_file(view, line):
         sublime.set_timeout(lambda: wait_load_file(view, line), 100) # maybe not forever?
     else: # good to go
         view.run_command("goto_line", {"line": line})
+
+
+#-----------------------------------------------------------------------------------
+class SbotPerfCounter(object):
+    ''' Container for perf counter. All times in msec. '''
+
+    def __init__(self, id):
+        self.id = id
+        self.vals = []
+        self.start_time = 0.0
+
+    def start(self):
+        self.start_time = time.perf_counter() * 1000.0
+
+    def stop(self):
+        if self.start_time != 0:
+            self.vals.append(time.perf_counter() * 1000.0 - self.start_time)
+            self.start_time = 0.0
+
+    def dump(self):
+        avg = sum(self.vals) / len(self.vals)
+        s = self.id + ': '
+        if len(self.vals) > 0:
+            s += str(avg)
+            s += ' ({})'.format(len(self.vals))
+        else:
+            s += 'No data'
+        return s
+
+    def clear(self):
+        self.vals = []
