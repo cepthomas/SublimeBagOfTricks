@@ -9,6 +9,7 @@ import sublime_plugin
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarCopyNameCommand(sublime_plugin.WindowCommand):
+    ''' Get file name. '''
 
     def run(self, paths):
         names = (os.path.split(path)[1] for path in paths)
@@ -17,6 +18,7 @@ class SbotSidebarCopyNameCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarCopyPathCommand(sublime_plugin.WindowCommand):
+    ''' Get file path. '''
 
     def run(self, paths):
         sublime.set_clipboard('\n'.join(paths))
@@ -24,6 +26,7 @@ class SbotSidebarCopyPathCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
+    ''' Open win term here. '''
 
     def run(self, paths):
         if len(paths) > 0:
@@ -33,6 +36,7 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarFolderCommand(sublime_plugin.WindowCommand):
+    ''' Open current folder. '''
 
     def run(self, paths):
         if len(paths) > 0:
@@ -46,6 +50,7 @@ class SbotSidebarFolderCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
+    ''' Run tree command to clipboard. '''
 
     def run(self, paths):
         if len(paths) > 0:
@@ -59,6 +64,7 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
+    ''' Simple executioner for exes/cmds without args. '''
 
     def run(self, paths):
         if len(paths) > 0:
@@ -72,6 +78,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
+    ''' Remove from project. '''
 
     def __init__(self, window):
         self.fn = window.project_file_name()
@@ -132,6 +139,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarOpenBrowserCommand(sublime_plugin.WindowCommand):
+    ''' Simple exec for html files. '''
 
     def run(self, paths):
         webbrowser.open_new_tab(paths[0])

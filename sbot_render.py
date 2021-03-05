@@ -9,7 +9,6 @@ from html import escape
 import sublime
 import sublime_plugin
 import sbot_common
-import sbot_misc_commands
 
 
 HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
