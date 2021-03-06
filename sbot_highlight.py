@@ -10,6 +10,71 @@ import sbot_project
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 MAX_HIGHLIGHTS = 6
 
+# # Like project file format.
+# _highlights = {}
+
+# # Maps view id to current filename.
+# _view_map = {}
+
+# sbot-project file:
+# {
+#     "highlights": {
+#         "file5.o": {
+#             "token2": {
+#                 "scope": "scope_yyy", 
+#                 "whole_word": false
+#             }, 
+#             "token3": {
+#                 "scope": "scope_zzz", 
+#                 "whole_word": true
+#             }, 
+#             "token1": {
+#                 "scope": "scope_xxx", 
+#                 "whole_word": true
+#             }
+#         }, 
+#     }, 
+# }
+
+
+# #-----------------------------------------------------------------------------------
+# def init_highlights(winid, highlights):
+#     _highlights = highlights
+
+#     # for tok in tokens:
+#     #     _highlight_view(view, tok['token'], tok['whole_word'], tok['scope'])
+
+
+
+
+# #-----------------------------------------------------------------------------------
+# class HighlightEvent(sublime_plugin.EventListener):
+#     ''' Listener for events of interest. '''
+
+#     def on_pre_close(self, view):
+#         ''' Called when a view is about to be closed. The view will still be in the window at this point. '''
+#         print('||| hl-on_pre_close', view.file_name(), view.id(), view.window().id())
+#         # if view.file_name() is not None:
+
+#     def on_new(self, view):
+#         ''' Called when a new file is created.'''
+#         print('||| hl-on_new', view.file_name(), view.id(), view.window().id())
+#         # add to collection with fake fn = __sbot__view__123.fake
+
+#     def on_load(self, view):
+#         '''  Called when the file is finished loading.'''
+#         print('||| hl-on_load', view.file_name(), view.id(), view.window().id())
+
+#     def on_pre_save(self, view):
+#         ''' Called before a view has been saved. '''
+#         print('||| hl-on_pre_save', view.file_name(), view.id(), view.window().id())
+
+#     def on_post_save(self, view):
+#         ''' Called after a view has been saved. '''
+#         print('||| hl-on_post_save', view.file_name(), view.id(), view.window().id())
+
+
+
 
 #-----------------------------------------------------------------------------------
 class SbotHighlightTextCommand(sublime_plugin.TextCommand):
@@ -41,7 +106,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
         # Add to internal.
         sproj = sbot_project.get_project(v)
-        if v.file_name() not in sproj.highlights:
+        if v.file_name() is not None and v.file_name() not in sproj.highlights:
             sproj.highlights[v.file_name()] = []
         sproj.highlights[v.file_name()].append( { "token": token, "whole_word": whole_word, "scope": scope } )
 
@@ -144,7 +209,6 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         html1 = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<style  type="text/css">\np {\nmargin: 0em;\nfont-family: Consolas;\nfont-size: 1.0em;\nbackground-color: white;\n}\n'
         html2 = '</style>\n</head>\n<body>\n'
         html3 = '</body>\n</html>\n'
-        # Could also: sublime.set_clipboard(html1 + '\n'.join(style_text) + html2 + '\n'.join(content) + html3)
 
         # Do popup
         html = '''
@@ -156,6 +220,8 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         '''.format('\n'.join(style_text), '\n'.join(content), html3)
 
         v.show_popup(html, max_width=512)
+
+        # Could also: sublime.set_clipboard(html1 + '\n'.join(style_text) + html2 + '\n'.join(content) + html3)
 
 
 #-----------------------------------------------------------------------------------
