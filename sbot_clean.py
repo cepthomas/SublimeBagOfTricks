@@ -32,6 +32,7 @@ class SbotTrimCommand(sublime_plugin.TextCommand):
             sub = ''
         _do_sub(self.view, edit, reo, sub)
 
+
 #-----------------------------------------------------------------------------------
 class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
     def run(self, edit, how):
