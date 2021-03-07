@@ -111,13 +111,27 @@ class SbotPerfCounter(object):
         self.vals = []
 
 
+
 #-----------------------------------------------------------------------------------
-def trace(*objects):
+def trace(*args):
     # 'Hey {name}, there is a 0x{errno:x} error!'.format(name=name, errno=errno)
     # f-string   f'Five plus ten is {a + b} and not {2 * (a + b)}.'
 
-    # print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
-    print(*objects, sep=', ')
+
+    # print(*args, sep=' ', end='\n', file=sys.stdout, flush=False)
+
+    # print('!!!', *args)
+    # print('!!!', sublime.packages_path(), _trace_file)
+
+    s = ', '.join(map(str, args))
+
+    print(s)
+    # and/or TODO config - fn, w/a, print/log, ...
+    _trace_file = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
+    with open(_trace_file, "a+") as f:
+        f.write(s + '\n')    
+
+    # print(*objects, sep=', ')
     # or append to file TODO
     # logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'sbot_log.txt')
     # print('Logfile:', logfn)

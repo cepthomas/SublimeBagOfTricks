@@ -161,7 +161,7 @@ Accumulated notes that will probably eventually go away.
 |       ...
 |       
 +---Lib
-|   \---python3.3  ???  empty
+|   \---python3.3 (empty)
 |
 +---Local
 |       License.sublime_license
@@ -181,7 +181,7 @@ Accumulated notes that will probably eventually go away.
         |   Package Control.merged-ca-bundle
         |   Package Control.sublime-settings
         |   Package Control.user-ca-bundle
-        |   Preferences.sublime-settings (!!!)
+        |   Preferences.sublime-settings
         |   StyleToken.sublime-settings
         |   XML.sublime-settings
         |   

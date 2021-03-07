@@ -42,7 +42,8 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
             sbot_common.create_new_view(v.window(), '\n'.join(sres))
 
     def is_visible(self):
-        return self.view.settings().get('syntax').endswith('JSON.sublime-syntax')
+        # return self.view.settings().get('syntax').endswith('JSON.sublime-syntax')
+        return True
 
 
 #-----------------------------------------------------------------------------------

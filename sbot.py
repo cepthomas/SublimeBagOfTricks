@@ -33,11 +33,11 @@ import sbot_extra
 def plugin_loaded():
     ''' Initialize module global stuff. This fires only once for all instances of sublime. '''
 
-    sbot_common.trace('Hello! I am python', sys.version)
-
     sbot_common.initialize()
 
-    sbot_common.trace('^^^ plugin_loaded', sublime.active_window().id())
+    sbot_common.trace('===================== Starting', sys.version)
+
+    sbot_common.trace('plugin_loaded', sublime.active_window().id())
 
 
 #-----------------------------------------------------------------------------------
@@ -56,36 +56,40 @@ class Event(sublime_plugin.EventListener):
 
     def on_pre_close(self, view):
         ''' Called when a view is about to be closed. The view will still be in the window at this point. '''
-        sbot_common.trace('^^^ on_pre_close', view.file_name(), view.id(), view.window().id())
+        sbot_common.trace('on_pre_close', view.file_name(), view.id(), view.window().id(), view.window().project_file_name(), 'end')
+        # if view.file_name() is not None:
+
+
+    def on_close(self, view):
+        ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
+        sbot_common.trace('on_close', view.file_name(), view.id(), 'view.window is None', 'ng view.window().project_file_name()', 'end')
         # if view.file_name() is not None:
 
 
     def on_new(self, view):
         ''' Called when a new file is created.'''
-        sbot_common.trace('^^^ on_new', view.file_name(), view.id(), view.window().id())
+        sbot_common.trace('on_new', view.file_name(), view.id(), view.window().id())
 
 
     def on_load(self, view):
         '''  Called when the file is finished loading.'''
-        sbot_common.trace('^^^ on_load', view.file_name(), view.id(), view.window().id())
+        sbot_common.trace('on_load', view.file_name(), view.id(), view.window().id())
+
+
+    def on_pre_save(self, view):
+        '''  Called just before a view is saved.'''
+        sbot_common.trace('on_pre_save', view.file_name(), view.id(), view.window().id())
 
 
     def on_activated(self, view):
-        ''' When focus/tab received. '''
-        sbot_common.trace('^^^ on_activated',view.file_name(), view.id(),view.window().id())
-        sbot_common.trace('$$$ on_activated', view.file_name(), view.id(), view.window().id())
-        # sbot_common.dump_view('ViewEventListener.on_activated',view)
+        ''' When focus/tab received. This is the only reliable event - on_load() doesn't get called when showing previously opened files. '''
+        sbot_common.trace('on_activated', view.file_name(), view.id(),view.window().id(), view.window().project_file_name())
         sbot_project.load_project_maybe(view)
-        # # Open the st project.
-        # self.fn = project_fn.replace('.sublime-project', SBOT_PROJECT_EXT)
-        # # Need to track this because ST window/view lifecycle is unreliable.
-        # self.views_inited = set()
 
 
-    def on_deactivated(self, view):
-        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. TODO-ST4 has on_pre_save_project()) '''
-        sbot_common.trace('^^^ on_deactivated',view.id(),view.window().id())
-        # sbot_common.dump_view('EventListener.on_deactivated',view)
+    def on_deactivated(self, view): # use on_close() TODO?
+        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. TODO-ST4 has on_pre_save_project(). '''
+        sbot_common.trace('on_deactivated',view.id(),view.window().id())
         sproj = sbot_project.get_project(view)
         if sproj is not None:
             # Save the project file internal to persisted.
@@ -97,36 +101,6 @@ class Event(sublime_plugin.EventListener):
         
         pos = view.sel()[0].begin()
         view.set_status("position", 'Pos {}'.format(pos))
-
-
-# #-----------------------------------------------------------------------------------
-# class ViewEvent(sublime_plugin.ViewEventListener):
-#     ''' Listener for events of interest. '''
-
-#     def on_activated(self):
-#         ''' When focus/tab received. '''
-
-#         sbot_common.trace('^^^ on_activated', self.view.file_name() , self.view.id(), self.view.window().id())
-
-
-#         # sbot_common.dump_view('ViewEventListener.on_activated', self.view)
-#         sbot_project.load_project_maybe(self.view)
-
-#     def on_deactivated(self):
-#         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. TODO-ST4 has on_pre_save_project()) '''
-#         sbot_common.trace('^^^ on_deactivated', self.view.id(), self.view.window().id())
-
-#         # sbot_common.dump_view('EventListener.on_deactivated', self.view)
-#         sproj = sbot_project.get_project(self.view)
-#         if sproj is not None:
-#             # Save the project file internal to persisted.
-#             sproj.save()
-
-#     def on_selection_modified(self):
-#         ''' Show the abs position in the status bar for debugging. '''
-        
-#         pos = self.view.sel()[0].begin()
-#         self.view.set_status("position", 'Pos {}'.format(pos))
 
 
 #-----------------------------------------------------------------------------------
