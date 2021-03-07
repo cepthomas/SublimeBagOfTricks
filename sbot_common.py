@@ -67,7 +67,7 @@ def dump_view(preamble, view):
         s.append('project_file_name:')
         s.append('None' if w is None or w.project_file_name() is None else os.path.split(w.project_file_name())[1])
 
-    logging.info(" ".join(s));
+    trace(" ".join(s));
             
 
 #-----------------------------------------------------------------------------------
@@ -109,3 +109,20 @@ class SbotPerfCounter(object):
 
     def clear(self):
         self.vals = []
+
+
+#-----------------------------------------------------------------------------------
+def trace(*objects):
+    # 'Hey {name}, there is a 0x{errno:x} error!'.format(name=name, errno=errno)
+    # f-string   f'Five plus ten is {a + b} and not {2 * (a + b)}.'
+
+    # print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
+    print(*objects, sep=', ')
+    # or append to file TODO
+    # logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'sbot_log.txt')
+    # print('Logfile:', logfn)
+    # logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
+    # logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO)
+    # logging.info("=============================== log start ===============================");
+
+    # pass

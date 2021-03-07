@@ -53,25 +53,25 @@ MAX_HIGHLIGHTS = 6
 
 #     def on_pre_close(self, view):
 #         ''' Called when a view is about to be closed. The view will still be in the window at this point. '''
-#         print('||| hl-on_pre_close', view.file_name(), view.id(), view.window().id())
+#         sbot_common.trace('||| hl-on_pre_close', view.file_name(), view.id(), view.window().id())
 #         # if view.file_name() is not None:
 
 #     def on_new(self, view):
 #         ''' Called when a new file is created.'''
-#         print('||| hl-on_new', view.file_name(), view.id(), view.window().id())
+#         sbot_common.trace('||| hl-on_new', view.file_name(), view.id(), view.window().id())
 #         # add to collection with fake fn = __sbot__view__123.fake
 
 #     def on_load(self, view):
 #         '''  Called when the file is finished loading.'''
-#         print('||| hl-on_load', view.file_name(), view.id(), view.window().id())
+#         sbot_common.trace('||| hl-on_load', view.file_name(), view.id(), view.window().id())
 
 #     def on_pre_save(self, view):
 #         ''' Called before a view has been saved. '''
-#         print('||| hl-on_pre_save', view.file_name(), view.id(), view.window().id())
+#         sbot_common.trace('||| hl-on_pre_save', view.file_name(), view.id(), view.window().id())
 
 #     def on_post_save(self, view):
 #         ''' Called after a view has been saved. '''
-#         print('||| hl-on_post_save', view.file_name(), view.id(), view.window().id())
+#         sbot_common.trace('||| hl-on_post_save', view.file_name(), view.id(), view.window().id())
 
 
 
@@ -187,7 +187,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
 
         for scope in scopes:
             style = v.style_for_scope(scope)
-            # print(scope, style)
+            # sbot_common.trace(scope, style)
             props = '{{ color:{}; '.format(style['foreground'])
             props2 = 'fg:{} '.format(style['foreground'])
             if 'background' in style:

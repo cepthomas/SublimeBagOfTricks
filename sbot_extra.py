@@ -49,9 +49,9 @@ class SbotFindNonAsciiCommand(sublime_plugin.TextCommand):
                 col += 1
 
                 
-        print('----------- find non-ascii ---------------\n')
+        sbot_common.trace('----------- find non-ascii ---------------\n')
         for d in find:
-            print(d)
+            sbot_common.trace(d)
 
 
 #-----------------------------------------------------------------------------------
@@ -62,14 +62,14 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         pass
         
         # for sheet in w.sheets():
-        #     print('sheet:', sheet)
+        #     sbot_common.trace('sheet:', sheet)
         # for view in w.views(): # These are in order L -> R.
-        #     print('active view:', w.get_view_index(view), view.file_name()) # (group, index)
+        #     sbot_common.trace('active view:', w.get_view_index(view), view.file_name()) # (group, index)
         # get_project(v).dump() # These are not ordered like file.
 
         # # Phantom phun
         # image = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'test', 'mark1.bmp')
-        # print(image)
+        # sbot_common.trace(image)
         # html = '<body><p>Hello!</p><img src="file://' + image + '" width="90" height="145"></body>'
         # self.phantset = sublime.PhantomSet(v, "test")
         # phant = sublime.Phantom(v.sel()[0], html, sublime.LAYOUT_BLOCK)
@@ -78,7 +78,7 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         # self.phantset.update(phants)
 
         # global global_thing
-        # print(global_thing)
+        # sbot_common.trace(global_thing)
         # global_thing['item' + str(len(global_thing) + 5)] = 1234
         # v.show_popup(str(global_thing))
 
@@ -119,7 +119,7 @@ class SbotExampleMsgBoxCommand(sublime_plugin.TextCommand):
     ''' Command: Simple message box. sbot_example_msg_box '''
 
     def run(self, edit, cmd=None):
-        # print("MsgBox! {0} {1}".format(self.name(), edit))
+        # sbot_common.trace("MsgBox! {0} {1}".format(self.name(), edit))
         sublime.ok_cancel_dialog("Hi there from StptMsgBoxCommand")
 
 
@@ -133,7 +133,7 @@ class SbotExampleListSelectCommand(sublime_plugin.TextCommand):
 
     def on_done_panel(self, choice):
         if choice >= 0:
-            print("You picked {0}".format(self.panel_items[choice]))
+            sbot_common.trace("You picked {0}".format(self.panel_items[choice]))
 
 
 #-----------------------------------------------------------------------------------
@@ -197,11 +197,11 @@ class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
 #-----------------------------------------------------------------------------------
 class SbotExampleInputCommand(sublime_plugin.TextCommand):
     def run(self, edit, my_value): # Has to be called exactly my_value - another convention.
-        print('argument:', my_value)
+        sbot_common.trace('argument:', my_value)
         # for i in range(len(self.view.sel())):
         #     sel = self.view.sel()[i]
         #     data = self.view.substr(sel)
-        #     # print("*** sel:{0} data:{1}".format(sel, data))
+        #     # sbot_common.trace("*** sel:{0} data:{1}".format(sel, data))
         #     # replace selected text.
         #     self.view.replace(edit, sel, my_value)
 

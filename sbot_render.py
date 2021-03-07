@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-import logging
 import math
 import textwrap
 import webbrowser
@@ -188,12 +187,12 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 pc.stop()
 
         # Done all lines.
-        logging.info('loop:' + pc.dump())
+        sbot_common.trace('loop:', pc.dump())
         # return
 
         ## Create css.
         style_text = ""
-        # print('all_styles', all_styles)
+        # sbot_common.trace('all_styles', all_styles)
         for style, id in all_styles.items():
             props = '{{ color:{}; '.format(style[0])
             if style[1] is not None:
@@ -305,7 +304,7 @@ def _output_html(view, content=[]):
     elif output_type == 'file' or output_type == 'show':
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'
         fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', basefn)
-        print(fn)
+        sbot_common.trace(fn)
         with open(fn, 'w') as f:
             f.write(s)
         if output_type == 'show':

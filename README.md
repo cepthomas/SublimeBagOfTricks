@@ -15,7 +15,6 @@ Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 
 | Setting                  | Description |
 |:--------                 |:-------     |
-| enable_log               | Turn on diagnostics - default is false |
 | enable_persistence       | Save/load signet/highlight persistence - default is true |
 
 

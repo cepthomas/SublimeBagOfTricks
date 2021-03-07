@@ -1,7 +1,5 @@
 {
     ///// General settings /////
-    // Turn on for diagnostics.
-    "enable_log": false,
     // Turn on to use sbot project files for signet and highlight persistence.
     "enable_persistence": true,
     // Scopes for marking text with highlights.

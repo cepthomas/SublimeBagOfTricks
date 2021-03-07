@@ -114,7 +114,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
             if found:
                 self.window.set_project_data(pdata)
             else:
-                logging.info('not found:' + paths[0])
+                sbot_common.trace('not found:', paths[0])
 
     def is_visible(self, paths):
         # Disallow project folders - they should use builtin remove_folder.

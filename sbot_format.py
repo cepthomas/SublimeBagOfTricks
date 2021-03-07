@@ -13,7 +13,7 @@ try:
     import lxml
     _has_lxml = True
 except Exception as e:
-    # print(e)
+    # sbot_common.trace(e)
     _has_lxml = False
 
 
