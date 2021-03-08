@@ -20,7 +20,50 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
         v = self.view
         # Get current row.
         sel_row, _ = v.rowcol(v.sel()[0].a)
-        _toggle_signet(v, _get_signet_rows(v), sel_row)
+
+
+        # _toggle_signet(v, _get_signet_rows(v), sel_row)
+
+        rows = _get_signet_rows(v)
+
+    ####################
+    # def _toggle_signet(view, rows, sel_row=-1):
+
+        if sel_row != -1:
+            # Is there one currently at the selected row?
+            existing = sel_row in rows
+            if existing:
+                rows.remove(sel_row)
+            else:
+                rows.append(sel_row)
+
+        # Update collection.
+        sproj = sbot_project.get_project(v)
+        found = False
+        if sproj is not None:
+            for sig in sproj.signets:
+                fn = sig['filename']
+                # rows = sig['rows']
+                if fn == v.file_name():
+                    if len(rows) > 0:
+                        sif['rows'] = rows
+                    elif v.file_name() in sproj.signets:
+                        sproj.signets.remove(sig)
+        # # Update internal.
+        # sproj = sbot_project.get_project(view)
+        # if sproj is not None:
+        #     if len(rows) > 0:
+        #         sproj.signets[view.file_name()] = rows
+        #     elif view.file_name() in sproj.signets:
+        #         del sproj.signets[view.file_name()]
+
+        # Update visual signets, brutally. This is the ST way.
+        regions = []
+        for r in rows:
+            pt = v.text_point(r, 0) # 0-based
+            regions.append(sublime.Region(pt, pt))
+        v.add_regions(SIGNET_REGION_NAME, regions, sbot_common.settings.get('signet_scope', 'comment'), SIGNET_ICON)
+
 
 
 #-----------------------------------------------------------------------------------
@@ -115,10 +158,13 @@ def _go_to_signet(view, dir):
         sig_files = []
         sproj = sbot_project.get_project(v)
         if sproj is not None:
-            for sig_fn, sig_rows in sproj.signets.items():
-                if w.find_open_file(sig_fn) is None and os.path.exists(sig_fn) and len(sig_rows) > 0:
-                    vv = w.open_file(sig_fn)
-                    sublime.set_timeout(lambda: sbot_common.wait_load_file(vv, sig_rows[array_end]), 10) # already 1-based in file
+            # for sig_fn, sig_rows in sproj.signets.items():
+            for sig in sproj.signets:
+                fn = sig['filename']
+                rows = sig['rows']
+                if w.find_open_file(fn) is None and os.path.exists(fn) and len(rows) > 0:
+                    vv = w.open_file(fn)
+                    sublime.set_timeout(lambda: sbot_common.wait_load_file(vv, rows[array_end]), 10) # already 1-based in file
                     w.focus_view(vv)
                     done = True
                     break
@@ -149,28 +195,3 @@ def _get_signet_rows(view):
     sig_rows.sort()
     return sig_rows
 
-
-#-----------------------------------------------------------------------------------
-def _toggle_signet(view, rows, sel_row=-1):
-    if sel_row != -1:
-        # Is there one currently at the selected row?
-        existing = sel_row in rows
-        if existing:
-            rows.remove(sel_row)
-        else:
-            rows.append(sel_row)
-
-    # Update internal.
-    sproj = sbot_project.get_project(view)
-    if sproj is not None:
-        if len(rows) > 0:
-            sproj.signets[view.file_name()] = rows
-        elif view.file_name() in sproj.signets:
-            del sproj.signets[view.file_name()]
-
-    # Update visual signets, brutally. This is the ST way.
-    regions = []
-    for r in rows:
-        pt = view.text_point(r, 0) # 0-based
-        regions.append(sublime.Region(pt, pt))
-    view.add_regions(SIGNET_REGION_NAME, regions, sbot_common.settings.get('signet_scope', 'comment'), SIGNET_ICON)

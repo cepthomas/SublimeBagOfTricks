@@ -26,8 +26,10 @@ class SbotProject(object):
         self.views_inited = set()
 
         # If enabled, unpack persisted data into our internal convenience collections. Otherwise create empties.
-        self.signets = {} # k:filename v:[rows]
-        self.highlights = {} # k:filename v:[tokens] where: tokens={"token": "abc", "whole_word": true, "scope": "comment"}
+        self.signets = [] # { k:filename v:[rows] }
+        self.highlights = [] # { k:filename v:[tokens] where: tokens={"token": "abc", "whole_word": true, "scope": "comment"} }
+        # self.signets = {} # k:filename v:[rows]
+        # self.highlights = {} # k:filename v:[tokens] where: tokens={"token": "abc", "whole_word": true, "scope": "comment"}
 
         if sbot_common.settings.get('enable_persistence', True):
             try:
@@ -35,14 +37,16 @@ class SbotProject(object):
                     values = json.load(fp)
 
                     if 'signets' in values:
-                        for sig in values['signets']:
-                            if os.path.exists(sig['filename']): # sanity check
-                                self.signets[sig['filename']] = sig['rows']
+                        self.signets = values['signets']
+                        # for sig in values['signets']:
+                        #     if os.path.exists(sig['filename']): # sanity check
+                        #         self.signets[sig['filename']] = sig['rows']
 
                     if 'highlights' in values:
-                        for hl in values['highlights']:
-                            if os.path.exists(hl['filename']): # sanity check
-                                self.highlights[hl['filename']] = hl['tokens']
+                        self.highlights = values['highlights']
+                        # for hl in values['highlights']:
+                        #     if os.path.exists(hl['filename']): # sanity check
+                        #         self.highlights[hl['filename']] = hl['tokens']
 
             except FileNotFoundError as e:
                 # Assumes new file.
@@ -60,17 +64,19 @@ class SbotProject(object):
                 values = {}
 
                 # Persist our internal convenience collections as json.
-                for filename, rows in self.signets.items():
-                    if len(rows) > 0:
-                        if filename is not None and os.path.exists(filename): # sanity check
-                            sigs.append({'filename': filename, 'rows': rows})
-                    values['signets'] = sigs
+                values['signets'] = self.signets
+                # for filename, rows in self.signets.items():
+                #     if len(rows) > 0:
+                #         if filename is not None and os.path.exists(filename): # sanity check
+                #             sigs.append({'filename': filename, 'rows': rows})
+                #     values['signets'] = sigs
 
-                for filename, tokens in self.highlights.items():
-                    if len(tokens) > 0:
-                        if filename is not None and os.path.exists(filename): # sanity check
-                            hls.append({'filename': filename, 'tokens': tokens})
-                    values['highlights'] = hls
+                values['highlights'] = self.highlights
+                # for filename, tokens in self.highlights.items():
+                #     if len(tokens) > 0:
+                #         if filename is not None and os.path.exists(filename): # sanity check
+                #             hls.append({'filename': filename, 'tokens': tokens})
+                #     values['highlights'] = hls
 
                 with open(self.fn, 'w') as fp:
                     json.dump(values, fp, indent=4)
@@ -112,8 +118,19 @@ def load_project_maybe(v):
     # If this is the first time through and project has signets and/or highlights for this file, set them all.
     if sproj is not None and v.id() not in sproj.views_inited:
         sproj.views_inited.add(v.id())
-        sbot_signet.init_signets(v, sproj.signets.get(v.file_name(), []))
-        sbot_highlight.init_highlights(v,  sproj.highlights.get(v.file_name(), []))
+
+
+        for hl in sproj.signets:
+            if hl['filename'] == v.file_name():
+                sbot_signet.init_signets(v,  hl['rows'])
+                break
+        # sbot_signet.init_signets(v, sproj.signets.get(v.file_name(), []))
+
+        for hl in sproj.highlights:
+            if hl['filename'] == v.file_name():
+                sbot_highlight.init_highlights(v,  hl['tokens'])
+                break
+        # sbot_highlight.init_highlights(v,  sproj.highlights.get(v.file_name(), []))
 
 
 #-----------------------------------------------------------------------------------

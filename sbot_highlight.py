@@ -16,25 +16,6 @@ MAX_HIGHLIGHTS = 6
 # # Maps view id to current filename.
 # _view_map = {}
 
-# sbot-project file:
-# {
-#     "highlights": {
-#         "file5.o": {
-#             "token2": {
-#                 "scope": "scope_yyy", 
-#                 "whole_word": false
-#             }, 
-#             "token3": {
-#                 "scope": "scope_zzz", 
-#                 "whole_word": true
-#             }, 
-#             "token1": {
-#                 "scope": "scope_xxx", 
-#                 "whole_word": true
-#             }
-#         }, 
-#     }, 
-# }
 
 
 # #-----------------------------------------------------------------------------------
@@ -102,13 +83,38 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
         scope = highlight_scopes[hl_index]
 
-        _highlight_view(v, token, whole_word, scope)
-
-        # Add to internal.
         sproj = sbot_project.get_project(v)
-        if v.file_name() is not None and v.file_name() not in sproj.highlights:
-            sproj.highlights[v.file_name()] = []
-        sproj.highlights[v.file_name()].append( { "token": token, "whole_word": whole_word, "scope": scope } )
+
+        # Add or replace in collection.
+        fn = v.file_name()
+        found = False
+        for hl in sproj.highlights:
+            if fn == hl['filename']:
+                for tok in hl['tokens']:
+                    if tok == token:
+                        tok['whole_word'] = whole_word
+                        tok['scope'] = scope
+                        found = True
+
+                if not found:                      
+                    hl['tokens'].append( { "token": token, "whole_word": whole_word, "scope": scope } )
+                    found = True
+                break
+        if not found:
+            hl = { 'filename': fn, 'tokens': [] }
+            hl['tokens'].append( { "token": token, "whole_word": whole_word, "scope": scope } )
+            sproj.highlights.append(hl)
+            found = True
+        # # Add to internal.
+        # sproj = sbot_project.get_project(v)
+        # if v.file_name() is not None and v.file_name() not in sproj.highlights:
+        #     sproj.highlights[v.file_name()] = []
+        # sproj.highlights[v.file_name()].append( { "token": token, "whole_word": whole_word, "scope": scope } )
+
+        if found:
+            _highlight_view(v, token, whole_word, scope)
+        else:
+            sbot_common.trace('ERR not found')
 
 
 #-----------------------------------------------------------------------------------
@@ -133,12 +139,23 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
                     highlight_scope = highlight_scopes[i]
                     v.erase_regions(reg_name)
 
-                    # Remove from internal.
-                    if v.file_name() in sproj.highlights:
-                        for i in range(len(sproj.highlights[v.file_name()])):
-                            if sproj.highlights[v.file_name()][i]['scope'] == highlight_scope:
-                                del sproj.highlights[v.file_name()][i]
-                                break;
+                    # # Remove from internal.
+                    # if v.file_name() in sproj.highlights:
+                    #     for i in range(len(sproj.highlights[v.file_name()])):
+                    #         if sproj.highlights[v.file_name()][i]['scope'] == highlight_scope:
+                    #             del sproj.highlights[v.file_name()][i]
+                    #             break;
+
+
+                    # Remove from collection.
+                    for hl in sproj.highlights:
+                        fn = v.file_name()
+                        if fn == hl['filename']:
+                            for i in range(len(hl['tokens'])):
+                                if hl['tokens'][i]['scope'] == highlight_scope:
+                                    del hl['tokens'][i]
+                                    break;
+
                     break;
 
 
@@ -156,7 +173,7 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             v.erase_regions(reg_name)
 
-        # Remove from internal.
+        # Remove from collection.
         if v.file_name() in sproj.highlights:
             del sproj.highlights[v.file_name()]
 

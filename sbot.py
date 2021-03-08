@@ -94,6 +94,8 @@ class Event(sublime_plugin.EventListener):
         if sproj is not None:
             # Save the project file internal to persisted.
             sproj.save()
+        else:
+            sbot_common.trace('!!! Fail')
 
 
     def on_selection_modified(self, view):
