@@ -25,21 +25,20 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         v = self.view
 
         sres = []
-        serr = ''
 
         try:
             for reg in sbot_common.get_sel_regions(v):
-                orig = v.substr(reg)
-                parsed = json.loads(orig)
-                sres.append(json.dumps(parsed, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False))
+                s = v.substr(reg)
+                print(s)
+                s = json.loads(s)
+                s = json.dumps(s, indent=4) #, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+                sres.append(s)
         except Exception as e:
             has_err = True
-            serr = 'Parse error: {}'.format(e.args)
+            sres = ['Parse error: {}'.format(e.args)]
 
-        if len(serr) > 0:
-            sublime.ok_cancel_dialog(serr)
-        else:
-            sbot_common.create_new_view(v.window(), '\n'.join(sres))
+        vnew = sbot_common.create_new_view(v.window(), '\n'.join(sres))
+        vnew.set_syntax_file('Packages/JavaScript/JSON.sublime-syntax')
 
     def is_visible(self):
         # return self.view.settings().get('syntax').endswith('JSON.sublime-syntax')

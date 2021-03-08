@@ -29,7 +29,7 @@ def create_new_view(window, text):
 
     vnew = window.new_file()
     vnew.set_scratch(True)
-    vnew.run_command('insert', {'characters': text })
+    vnew.run_command('append', {'characters': text }) # insert has some odd behavior - indentation
     return vnew
 
 
@@ -81,6 +81,25 @@ def wait_load_file(view, line):
 
 
 #-----------------------------------------------------------------------------------
+def trace(*args, cat=None):
+    if cat == None:
+        s = ', '.join(map(str, args))
+    else:
+        s = cat + ' ' + ', '.join(map(str, args))
+
+    print(s)
+    # and/or TODO config - fn, w/a, print/log, ...
+    _trace_file = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
+    with open(_trace_file, "a+") as f:
+        f.write(s + '\n')    
+
+
+#-----------------------------------------------------------------------------------
+def error(*args):
+    trace(*args, cat='!!!')
+
+
+#-----------------------------------------------------------------------------------
 class SbotPerfCounter(object):
     ''' Container for perf counter. All times in msec. '''
 
@@ -110,33 +129,3 @@ class SbotPerfCounter(object):
     def clear(self):
         self.vals = []
 
-
-
-#-----------------------------------------------------------------------------------
-def trace(*args):
-    # 'Hey {name}, there is a 0x{errno:x} error!'.format(name=name, errno=errno)
-    # f-string   f'Five plus ten is {a + b} and not {2 * (a + b)}.'
-
-
-    # print(*args, sep=' ', end='\n', file=sys.stdout, flush=False)
-
-    # print('!!!', *args)
-    # print('!!!', sublime.packages_path(), _trace_file)
-
-    s = ', '.join(map(str, args))
-
-    print(s)
-    # and/or TODO config - fn, w/a, print/log, ...
-    _trace_file = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
-    with open(_trace_file, "a+") as f:
-        f.write(s + '\n')    
-
-    # print(*objects, sep=', ')
-    # or append to file TODO
-    # logfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'sbot_log.txt')
-    # print('Logfile:', logfn)
-    # logformat = "%(asctime)s %(levelname)8s <%(name)s> %(message)s"
-    # logging.basicConfig(filename=logfn, filemode='w', format=logformat, level=logging.INFO)
-    # logging.info("=============================== log start ===============================");
-
-    # pass

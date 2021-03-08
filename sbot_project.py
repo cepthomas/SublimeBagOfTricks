@@ -25,9 +25,9 @@ class SbotProject(object):
         # Need to track this because ST window/view lifecycle is unreliable.
         self.views_inited = set()
 
-        # If enabled, unpack persisted data into our internal convenience collections. Otherwise create empties.
         self.signets = [] # { k:filename v:[rows] }
         self.highlights = [] # { k:filename v:[tokens] where: tokens={"token": "abc", "whole_word": true, "scope": "comment"} }
+        # If enabled, unpack persisted data into our internal convenience collections. Otherwise create empties.
         # self.signets = {} # k:filename v:[rows]
         # self.highlights = {} # k:filename v:[tokens] where: tokens={"token": "abc", "whole_word": true, "scope": "comment"}
 
@@ -52,9 +52,9 @@ class SbotProject(object):
                 # Assumes new file.
                 sublime.status_message('Creating new sbot project file')
 
-            except:
-                s = 'bad thing!' + traceback.format_exc()
-                sublime.error_message(s)
+            # except:
+            #     s = 'bad thing!' + traceback.format_exc()
+            #     sublime.error_message(s)
 
     def save(self):
         if sbot_common.settings.get('enable_persistence', True):
@@ -82,8 +82,9 @@ class SbotProject(object):
                     json.dump(values, fp, indent=4)
 
             except:
-                s = 'bad thing!' + traceback.format_exc()
-                sublime.error_message(s)
+                # s = 'bad thing!' + traceback.format_exc()
+                # sublime.error_message(s)
+                raise
 
 
 #-----------------------------------------------------------------------------------

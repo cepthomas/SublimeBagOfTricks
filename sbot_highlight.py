@@ -10,50 +10,6 @@ import sbot_project
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 MAX_HIGHLIGHTS = 6
 
-# # Like project file format.
-# _highlights = {}
-
-# # Maps view id to current filename.
-# _view_map = {}
-
-
-
-# #-----------------------------------------------------------------------------------
-# def init_highlights(winid, highlights):
-#     _highlights = highlights
-
-#     # for tok in tokens:
-#     #     _highlight_view(view, tok['token'], tok['whole_word'], tok['scope'])
-
-
-
-
-# #-----------------------------------------------------------------------------------
-# class HighlightEvent(sublime_plugin.EventListener):
-#     ''' Listener for events of interest. '''
-
-#     def on_pre_close(self, view):
-#         ''' Called when a view is about to be closed. The view will still be in the window at this point. '''
-#         sbot_common.trace('||| hl-on_pre_close', view.file_name(), view.id(), view.window().id())
-#         # if view.file_name() is not None:
-
-#     def on_new(self, view):
-#         ''' Called when a new file is created.'''
-#         sbot_common.trace('||| hl-on_new', view.file_name(), view.id(), view.window().id())
-#         # add to collection with fake fn = __sbot__view__123.fake
-
-#     def on_load(self, view):
-#         '''  Called when the file is finished loading.'''
-#         sbot_common.trace('||| hl-on_load', view.file_name(), view.id(), view.window().id())
-
-#     def on_pre_save(self, view):
-#         ''' Called before a view has been saved. '''
-#         sbot_common.trace('||| hl-on_pre_save', view.file_name(), view.id(), view.window().id())
-
-#     def on_post_save(self, view):
-#         ''' Called after a view has been saved. '''
-#         sbot_common.trace('||| hl-on_post_save', view.file_name(), view.id(), view.window().id())
-
 
 
 
@@ -83,7 +39,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
         scope = highlight_scopes[hl_index]
 
-        sproj = sbot_project.get_project(v)
+        sproj = sbot_project.get_project(v) ### 
 
         # Add or replace in collection.
         fn = v.file_name()
@@ -258,3 +214,50 @@ def _highlight_view(view, token, whole_word, scope):
     highlight_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
     if len(highlight_regions) > 0:
         view.add_regions(HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)
+
+
+
+# # Like project file format.
+# _highlights = {}
+
+# # Maps view id to current filename.
+# _view_map = {}
+
+
+
+# #-----------------------------------------------------------------------------------
+# def init_highlights(winid, highlights):
+#     _highlights = highlights
+
+#     # for tok in tokens:
+#     #     _highlight_view(view, tok['token'], tok['whole_word'], tok['scope'])
+
+
+
+
+# #-----------------------------------------------------------------------------------
+# class HighlightEvent(sublime_plugin.EventListener):
+#     ''' Listener for events of interest. '''
+
+#     def on_pre_close(self, view):
+#         ''' Called when a view is about to be closed. The view will still be in the window at this point. '''
+#         sbot_common.trace('||| hl-on_pre_close', view.file_name(), view.id(), view.window().id())
+#         # if view.file_name() is not None:
+
+#     def on_new(self, view):
+#         ''' Called when a new file is created.'''
+#         sbot_common.trace('||| hl-on_new', view.file_name(), view.id(), view.window().id())
+#         # add to collection with fake fn = __sbot__view__123.fake
+
+#     def on_load(self, view):
+#         '''  Called when the file is finished loading.'''
+#         sbot_common.trace('||| hl-on_load', view.file_name(), view.id(), view.window().id())
+
+#     def on_pre_save(self, view):
+#         ''' Called before a view has been saved. '''
+#         sbot_common.trace('||| hl-on_pre_save', view.file_name(), view.id(), view.window().id())
+
+#     def on_post_save(self, view):
+#         ''' Called after a view has been saved. '''
+#         sbot_common.trace('||| hl-on_post_save', view.file_name(), view.id(), view.window().id())
+

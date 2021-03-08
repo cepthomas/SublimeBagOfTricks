@@ -44,7 +44,7 @@ def plugin_loaded():
 def plugin_unloaded():
     sbot_common.trace("plugin_unloaded()")
 
-    # just in case...
+    # just in case... TODO I think it's too late for this.
     sbot_project.save_all()
 
 
@@ -95,7 +95,7 @@ class Event(sublime_plugin.EventListener):
             # Save the project file internal to persisted.
             sproj.save()
         else:
-            sbot_common.trace('!!! Fail')
+            sbot_common.error('!!! on_deactivated')
 
 
     def on_selection_modified(self, view):
