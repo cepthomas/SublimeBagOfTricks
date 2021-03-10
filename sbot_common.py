@@ -3,22 +3,33 @@ import time
 import sublime
 import sublime_plugin
 
+# print('^^^^^ Load sbot_common')
+
+# The settings.
+_settings = {}
+
 
 #-----------------------------------------------------------------------------------
-def initialize():
-    ''' Vars shared across project.'''
-    global settings
-    settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
+def plugin_loaded():
+    ''' Initialize module global stuff. '''
+    trace('plugin_loaded sbot_common')
+    global _settings
+    _settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings') #TODO doesn't reload on change.
+
+
+#-----------------------------------------------------------------------------------
+def plugin_unloaded():
+    ''' Clean up module global stuff. '''
+    trace('plugin_unloaded sbot_common')
 
 
 #-----------------------------------------------------------------------------------
 def get_sel_regions(v):
     ''' Generic function to get selections or optionally the whole view.'''
-
     regions = []    
     if len(v.sel()[0]) > 0: # user sel
         regions = v.sel()
-    elif settings.get('sel_all', True):
+    elif _settings.get('sel_all', True):
         regions = [sublime.Region(0, v.size())]
     return regions
 
@@ -26,7 +37,6 @@ def get_sel_regions(v):
 #-----------------------------------------------------------------------------------
 def create_new_view(window, text):
     ''' Creates a temp view with text. Returns the view.'''
-
     vnew = window.new_file()
     vnew.set_scratch(True)
     vnew.run_command('append', {'characters': text }) # insert has some odd behavior - indentation
@@ -36,7 +46,6 @@ def create_new_view(window, text):
 #-----------------------------------------------------------------------------------
 def write_to_console(text):
     ''' This is crude but works. Sublime also adds an extra eol when writing to the console. '''
-    
     for b in text:
         if b == r'\n':
             sys.stdout.write('\n')
@@ -49,7 +58,6 @@ def write_to_console(text):
 #-----------------------------------------------------------------------------------
 def dump_view(preamble, view):
     ''' Helper util. '''
-
     s = []
     s.append('view')
     s.append(preamble)
@@ -73,7 +81,6 @@ def dump_view(preamble, view):
 #-----------------------------------------------------------------------------------
 def wait_load_file(view, line):
     ''' Open file asynchronously then position at line. '''
-    
     if view.is_loading():
         sublime.set_timeout(lambda: wait_load_file(view, line), 100) # maybe not forever?
     else: # good to go
@@ -82,20 +89,22 @@ def wait_load_file(view, line):
 
 #-----------------------------------------------------------------------------------
 def trace(*args, cat=None):
+    ''' Debugging. '''
     if cat == None:
         s = ', '.join(map(str, args))
     else:
         s = cat + ' ' + ', '.join(map(str, args))
 
     print(s)
-    # and/or TODO config - fn, w/a, print/log, ...
+    # and/or TODO print | file | off , size, w/a?
     _trace_file = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
-    with open(_trace_file, "a+") as f:
+    with open(_trace_file, "w+") as f:
         f.write(s + '\n')    
 
 
 #-----------------------------------------------------------------------------------
 def error(*args):
+    ''' Debugging. '''
     trace(*args, cat='!!!')
 
 

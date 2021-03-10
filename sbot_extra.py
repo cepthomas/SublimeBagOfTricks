@@ -1,9 +1,11 @@
 import os
 import sys
 import time
+import json
 import sublime
 import sublime_plugin
 
+# print('^^^^^ Load sbot_extra')
 
 # Holding tank for examples, leftovers, bits and pieces.
 
@@ -47,9 +49,7 @@ class SbotFindNonAsciiCommand(sublime_plugin.TextCommand):
             else:
                 # Valid.
                 col += 1
-
                 
-        sbot_common.trace('----------- find non-ascii ---------------\n')
         for d in find:
             sbot_common.trace(d)
 
@@ -94,6 +94,19 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         # if pname:
         #     propertyValue = pval1 if v.settings().get(pname, pval1) != pval1 else pval2
         #     v.settings().set(pname, propertyValue)
+
+
+        # with open(r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\test\new_proj.json', 'r') as fp:
+        #     o = json.load(fp)
+        #     sigs = o['signets']
+        #     hls = o['highlights']
+        #     for k, v in sigs.items():
+        #         sbot_common.trace(k, v)
+        #     for k, v in hls.items():
+        #         sbot_common.trace(k, v)
+
+        # with open(r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\junk.txt', 'w') as fp:
+        #     json.dump(sbot_proj, fp, indent=4)
 
 
 #-----------------------------------------------------------------------------------

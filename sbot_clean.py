@@ -4,8 +4,20 @@ import re
 import sublime
 import sublime_plugin
 import sbot_common
-import sbot_misc_commands
 
+# print('^^^^^ Load sbot_clean')
+
+
+#-----------------------------------------------------------------------------------
+def plugin_loaded():
+    ''' Initialize module global stuff. '''
+    sbot_common.trace('plugin_loaded sbot_clean')
+
+
+#-----------------------------------------------------------------------------------
+def plugin_unloaded():
+    ''' Clean up module global stuff. '''
+    sbot_common.trace('plugin_unloaded sbot_clean')
 
 
 #-----------------------------------------------------------------------------------

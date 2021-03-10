@@ -7,7 +7,26 @@ import sublime_plugin
 import sbot_common
 
 
+# print('^^^^^ Load sbot_misc_commands')
+
 # Misc commands.
+
+# The settings.
+_settings = {}
+
+
+#-----------------------------------------------------------------------------------
+def plugin_loaded():
+    ''' Initialize module global stuff. '''
+    sbot_common.trace('plugin_loaded sbot_misc_commands')
+    global _settings
+    _settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
+
+
+#-----------------------------------------------------------------------------------
+def plugin_unloaded():
+    ''' Clean up module global stuff. '''
+    sbot_common.trace('plugin_unloaded sbot_misc_commands')
 
 
 #-----------------------------------------------------------------------------------
@@ -59,7 +78,7 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 else:
                     break
             if eols:
-                v.add_regions("eols", eols, sbot_common.settings.get('eol_scope', "comment"))
+                v.add_regions("eols", eols, _settings.get('eol_scope', "comment"))
         else:
             v.erase_regions("eols")
 
@@ -107,6 +126,6 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                     break
             if eols:
                 # "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
-                v.add_regions("eols", eols, sbot_common.settings.get('eol_scope', "comment"))
+                v.add_regions("eols", eols, _settings.get('eol_scope', "comment"))
         else:
             v.erase_regions("eols")

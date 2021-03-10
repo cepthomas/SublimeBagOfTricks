@@ -1,30 +1,192 @@
 import os
 import sys
 import re
+import json
 import sublime
 import sublime_plugin
 import sbot_common
-import sbot_project
+
+# print('^^^^^ Load sbot_highlight')
 
 
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 MAX_HIGHLIGHTS = 6
 
+# The current highlight collections. Key is window id which corresponds to a project.
+_hls = {}
+
+# Need to track these because ST window/view lifecycle is unreliable.
+_views_inited = set()
+
+# The settings.
+_settings = {}
+
+#-----------------------------------------------------------------------------------
+def plugin_loaded():
+    ''' Initialize module global stuff. '''
+    sbot_common.trace('plugin_loaded sbot_highlight')
+    global _settings
+    _settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
 
 
+#-----------------------------------------------------------------------------------
+def plugin_unloaded():
+    ''' Clean up module global stuff. '''
+    sbot_common.trace('plugin_unloaded sbot_highlight')
+
+
+#-----------------------------------------------------------------------------------
+def _highlight_view(view, token, whole_word, scope):
+    ''' Colorize one token. '''
+    escaped = re.escape(token)
+    if whole_word and escaped[0].isalnum():
+        escaped = r'\b%s\b' % escaped
+
+    highlight_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
+    if len(highlight_regions) > 0:
+        view.add_regions(HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)
+
+
+#-----------------------------------------------------------------------------------
+def _get_collection_values(view):
+    ''' General helper to get the data values from collection. Initializes for new files. '''
+    global _hls
+
+    vals = {} # Default
+    winid = view.window().id()
+    fn = view.file_name()
+    if winid in _hls:
+        if fn not in _hls[winid]:
+            # Add a new one.
+            _hls[winid][fn] = {}
+        vals = _hls[winid][fn]
+    else:
+        pass # TODO error
+
+    return vals
+
+
+#-----------------------------------------------------------------------------------
+class HighlightEvent(sublime_plugin.EventListener):
+    ''' Listener for events of interest. '''
+
+    def on_activated(self, view):
+        ''' When focus/tab received. This is the only reliable event - on_load() doesn't get called when showing previously opened files. '''
+        global _views_inited
+        vid = view.id()
+        winid = view.window().id()
+        fn = view.file_name()
+        
+        sbot_common.trace('HighlightEvent.on_activated', fn, vid, winid, _views_inited)
+
+        # Lazy init.
+        if fn is not None: # TODO Sometimes this happens...
+            if vid not in _views_inited:
+                _views_inited.add(vid)
+
+                # Init the view.
+                for token, tparams in _hls.get(fn, {}).items():
+                    _highlight_view(view, token, tparams['whole_word'], tparams['scope'])
+
+
+    def on_close(self, view):
+        ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
+        sbot_common.trace('HighlightEvent.on_close', view.file_name(), view.id(), 'view.window is None', 'ng view.window().project_file_name()', 'end')
+        # if view.file_name() is not None:
+
+
+    def on_load(self, view):
+        ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
+        sbot_common.trace('HighlightEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
+        # if view.file_name() is not None:
+
+
+    def on_activated(self, view):
+        ''' When focus/tab received. This is the only reliable event - on_load() doesn't get called when showing previously opened files. '''
+        winid = view.window().id()
+        sbot_common.trace('HighlightEvent.on_activated', view.file_name(), view.id(), winid, view.window().project_file_name())
+
+        if winid not in _hls:
+            _open_hls(winid, view.window().project_file_name())
+        else:
+            pass # TODO error?
+
+
+    def on_deactivated(self, view): # use on_close() TODO?
+        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. TODO-ST4 has on_pre_save_project(). '''
+        winid = view.window().id()
+        sbot_common.trace('HighlightEvent.on_deactivated', view.id(), winid)
+
+        if winid in _hls:
+            _save_hls(winid, view.window().project_file_name())
+        else:
+            pass # TODO error?
+
+
+
+#-----------------------------------------------------------------------------------
+def _save_hls(winid, stp_fn):
+    ''' General project saver. '''
+    ok = True
+    return ok #TODO
+
+    if _settings.get('enable_persistence', True):
+        fn = stp_fn.replace('.sublime-project', '.sbot_hls')
+        
+        try:
+            with open(fn, 'w') as fp:
+                json.dump(_hls[winid], fp, indent=4)
+
+        except Exception as e:
+            sres = 'Save sbot-project error: {}'.format(e.args)
+            sublime.error_message(sres)
+            ok = False
+
+    return ok
+
+
+#-----------------------------------------------------------------------------------
+def _open_hls(winid, stp_fn):
+    ''' General project opener. '''
+    global _hls
+    ok = True
+
+    if _settings.get('enable_persistence', True):
+        fn = stp_fn.replace('.sublime-project', '.sbot_hls')
+
+        try:
+            with open(fn, 'r') as fp:
+                values = json.load(fp)
+                _hls[winid] = values
+
+        except FileNotFoundError as e:
+            # Assumes new file.
+            sublime.status_message('Creating new sbot project file')
+            _hls[winid] = { 'highlights': {}, 'signets': {} }
+
+        except Exception as e:
+            sres = 'Open sbot-project error: {}'.format(e.args)
+            sublime.error_message(sres)
+            ok = False
+
+    # if ok:
+    #     sbot_global.init_highlights(winid, _hls[winid]['highlights'])
+    #     # sbot_highlight.init_highlights(winid, _hls[winid]['highlights'])
+    #     sbot_signet.init_signets(winid, _hls[winid]['signets'])
+
+    return ok
 
 #-----------------------------------------------------------------------------------
 class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     ''' Highlight specific words using scopes. Parts borrowed from StyleToken.
     Persistence supported via sbot-project container.
-
     Note: Regions added by v.add_regions() can not set the foreground color. The scope color is used
     for the region background color. Also they are not available via extract_scope().
     '''
-
     def run(self, edit, hl_index):
         v = self.view
-        highlight_scopes = sbot_common.settings.get('highlight_scopes')
+        highlight_scopes = _settings.get('highlight_scopes')
+
 
         # Get whole word or specific span.
         region = v.sel()[0]
@@ -38,39 +200,11 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
         hl_index = min(hl_index, num_highlights)
 
         scope = highlight_scopes[hl_index]
-
-        sproj = sbot_project.get_project(v) ### 
+        tokens = _get_collection_values(v)
 
         # Add or replace in collection.
-        fn = v.file_name()
-        found = False
-        for hl in sproj.highlights:
-            if fn == hl['filename']:
-                for tok in hl['tokens']:
-                    if tok == token:
-                        tok['whole_word'] = whole_word
-                        tok['scope'] = scope
-                        found = True
-
-                if not found:                      
-                    hl['tokens'].append( { "token": token, "whole_word": whole_word, "scope": scope } )
-                    found = True
-                break
-        if not found:
-            hl = { 'filename': fn, 'tokens': [] }
-            hl['tokens'].append( { "token": token, "whole_word": whole_word, "scope": scope } )
-            sproj.highlights.append(hl)
-            found = True
-        # # Add to internal.
-        # sproj = sbot_project.get_project(v)
-        # if v.file_name() is not None and v.file_name() not in sproj.highlights:
-        #     sproj.highlights[v.file_name()] = []
-        # sproj.highlights[v.file_name()].append( { "token": token, "whole_word": whole_word, "scope": scope } )
-
-        if found:
-            _highlight_view(v, token, whole_word, scope)
-        else:
-            sbot_common.trace('ERR not found')
+        tokens[token] = { "scope": scope, "whole_word": whole_word }
+        _highlight_view(v, token, whole_word, scope)
 
 
 #-----------------------------------------------------------------------------------
@@ -78,16 +212,21 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
     ''' Clear all where the cursor is. '''
 
     def run(self, edit):
+        global _hls
+
         # Locate specific region, crudely.
         v = self.view
-        sproj = sbot_project.get_project(v)
-        highlight_scopes = sbot_common.settings.get('highlight_scopes')
+
+        tokens = _get_collection_values(v)
+
+        highlight_scopes = _settings.get('highlight_scopes')
         num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
         point = v.sel()[0].a
 
         highlight_scope = ''
 
+        # Clean displayed colors.
         for i in range(num_highlights):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             for region in v.get_regions(reg_name):
@@ -95,7 +234,7 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
                     highlight_scope = highlight_scopes[i]
                     v.erase_regions(reg_name)
 
-                    # # Remove from internal.
+                    # # Remove from internal. old
                     # if v.file_name() in sproj.highlights:
                     #     for i in range(len(sproj.highlights[v.file_name()])):
                     #         if sproj.highlights[v.file_name()][i]['scope'] == highlight_scope:
@@ -103,14 +242,14 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
                     #             break;
 
 
-                    # Remove from collection.
-                    for hl in sproj.highlights:
-                        fn = v.file_name()
-                        if fn == hl['filename']:
-                            for i in range(len(hl['tokens'])):
-                                if hl['tokens'][i]['scope'] == highlight_scope:
-                                    del hl['tokens'][i]
-                                    break;
+                    # Remove from collection. TODO fix
+                    # for hl in sproj.highlights:
+                    #     fn = v.file_name()
+                    #     if fn == hl['filename']:
+                    #         for i in range(len(hl['tokens'])):
+                    #             if hl['tokens'][i]['scope'] == highlight_scope:
+                    #                 del hl['tokens'][i]
+                    #                 break;
 
                     break;
 
@@ -120,9 +259,12 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
     ''' Clear all in this file.'''
 
     def run(self, edit):
+        global _hls
+
         v = self.view
-        sproj = sbot_project.get_project(v)
-        highlight_scopes = sbot_common.settings.get('highlight_scopes')
+
+        # Clean displayed colors.
+        highlight_scopes = _settings.get('highlight_scopes')
         num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
         for i in range(num_highlights):
@@ -130,8 +272,9 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
             v.erase_regions(reg_name)
 
         # Remove from collection.
-        if v.file_name() in sproj.highlights:
-            del sproj.highlights[v.file_name()]
+        winid = self.view.window().id()
+        fn = self.view.file_name()
+        del _hls[winid][fn]
 
 
 #-----------------------------------------------------------------------------------
@@ -195,69 +338,4 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         v.show_popup(html, max_width=512)
 
         # Could also: sublime.set_clipboard(html1 + '\n'.join(style_text) + html2 + '\n'.join(content) + html3)
-
-
-#-----------------------------------------------------------------------------------
-def init_highlights(view, tokens):
-
-    for tok in tokens:
-        _highlight_view(view, tok['token'], tok['whole_word'], tok['scope'])
-
-
-#-----------------------------------------------------------------------------------
-def _highlight_view(view, token, whole_word, scope):
-
-    escaped = re.escape(token)
-    if whole_word and escaped[0].isalnum():
-        escaped = r'\b%s\b' % escaped
-
-    highlight_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
-    if len(highlight_regions) > 0:
-        view.add_regions(HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)
-
-
-
-# # Like project file format.
-# _highlights = {}
-
-# # Maps view id to current filename.
-# _view_map = {}
-
-
-
-# #-----------------------------------------------------------------------------------
-# def init_highlights(winid, highlights):
-#     _highlights = highlights
-
-#     # for tok in tokens:
-#     #     _highlight_view(view, tok['token'], tok['whole_word'], tok['scope'])
-
-
-
-
-# #-----------------------------------------------------------------------------------
-# class HighlightEvent(sublime_plugin.EventListener):
-#     ''' Listener for events of interest. '''
-
-#     def on_pre_close(self, view):
-#         ''' Called when a view is about to be closed. The view will still be in the window at this point. '''
-#         sbot_common.trace('||| hl-on_pre_close', view.file_name(), view.id(), view.window().id())
-#         # if view.file_name() is not None:
-
-#     def on_new(self, view):
-#         ''' Called when a new file is created.'''
-#         sbot_common.trace('||| hl-on_new', view.file_name(), view.id(), view.window().id())
-#         # add to collection with fake fn = __sbot__view__123.fake
-
-#     def on_load(self, view):
-#         '''  Called when the file is finished loading.'''
-#         sbot_common.trace('||| hl-on_load', view.file_name(), view.id(), view.window().id())
-
-#     def on_pre_save(self, view):
-#         ''' Called before a view has been saved. '''
-#         sbot_common.trace('||| hl-on_pre_save', view.file_name(), view.id(), view.window().id())
-
-#     def on_post_save(self, view):
-#         ''' Called after a view has been saved. '''
-#         sbot_common.trace('||| hl-on_post_save', view.file_name(), view.id(), view.window().id())
 

@@ -5,16 +5,30 @@ import json
 import sublime
 import sublime_plugin
 import sbot_common
-import sbot_misc_commands
 
+
+# print('^^^^^ Load sbot_format')
 
 _has_lxml = False # TODO-ST4
+
 try:
     import lxml
     _has_lxml = True
 except Exception as e:
     # sbot_common.trace(e)
     _has_lxml = False
+
+
+#-----------------------------------------------------------------------------------
+def plugin_loaded():
+    ''' Initialize module global stuff. '''
+    sbot_common.trace('plugin_loaded sbot_format')
+
+
+#-----------------------------------------------------------------------------------
+def plugin_unloaded():
+    ''' Clean up module global stuff. '''
+    sbot_common.trace('plugin_unloaded sbot_format')
 
 
 #-----------------------------------------------------------------------------------
@@ -29,13 +43,12 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         try:
             for reg in sbot_common.get_sel_regions(v):
                 s = v.substr(reg)
-                print(s)
                 s = json.loads(s)
                 s = json.dumps(s, indent=4) #, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
                 sres.append(s)
         except Exception as e:
             has_err = True
-            sres = ['Parse error: {}'.format(e.args)]
+            sres.append('Parse error: {}'.format(e.args))
 
         vnew = sbot_common.create_new_view(v.window(), '\n'.join(sres))
         vnew.set_syntax_file('Packages/JavaScript/JSON.sublime-syntax')
