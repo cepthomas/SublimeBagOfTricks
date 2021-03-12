@@ -20,7 +20,7 @@ def plugin_loaded():
     ''' Initialize module global stuff. '''
     sbot_common.trace('plugin_loaded sbot_misc_commands')
     global _settings
-    _settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
+    _settings = sublime.load_settings(sbot_common.SETTINGS_FN)
 
 
 #-----------------------------------------------------------------------------------

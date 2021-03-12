@@ -12,7 +12,7 @@ import sbot_common
 
 # print('^^^^^ Load sbot_render')
 
-HIGHLIGHT_REGION_NAME = 'highlight_%s' # TODO Duplicated from sbot_highlight. My bad.
+HIGHLIGHT_REGION_NAME = 'highlight_%s' # TODO2 Duplicated from sbot_highlight. My bad.
 
 # The settings.
 _settings = {}
@@ -22,7 +22,7 @@ def plugin_loaded():
     ''' Initialize module global stuff. '''
     sbot_common.trace('plugin_loaded sbot_render')
     global _settings
-    _settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings')
+    _settings = sublime.load_settings(sbot_common.SETTINGS_FN)
 
 
 #-----------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         fsize = v.size() / 1024.0 / 1024.0
         if fsize > render_max_file:
-            sublime.message_dialog('File too large to render. If you really want to, change your SublimeBagOfTricks.sublime-settings')
+            sublime.message_dialog('File too large to render. If you really want to, change your settings')
         else:
             self._do_work()
             # Actually would like to run in a thread but takes 10x time, probably the GIL.

@@ -8,13 +8,16 @@ import sublime_plugin
 # The settings.
 _settings = {}
 
+# Definitions.
+SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
+
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
     trace('plugin_loaded sbot_common')
     global _settings
-    _settings = sublime.load_settings('SublimeBagOfTricks.sublime-settings') #TODO doesn't reload on change.
+    _settings = sublime.load_settings(SETTINGS_FN) #TODO2 doesn't reload on change.
 
 
 #-----------------------------------------------------------------------------------
@@ -95,10 +98,10 @@ def trace(*args, cat=None):
     else:
         s = cat + ' ' + ', '.join(map(str, args))
 
-    print(s)
-    # and/or TODO print | file | off , size, w/a?
-    _trace_file = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
-    with open(_trace_file, "w+") as f:
+#    print(s)
+    # and/or TODO1 print | file | off , max_size, w/a? Also shouldn't have to do fn every time...
+    tfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
+    with open(tfn, "a+") as f:
         f.write(s + '\n')    
 
 

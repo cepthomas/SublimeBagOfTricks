@@ -22,16 +22,29 @@ def plugin_loaded():
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
     sbot_common.trace("plugin_unloaded()")
-    # just in case... TODO I think it's too late for this.
-    # sbot_project.save_all()
 
 
 #-----------------------------------------------------------------------------------
 class SbotEvent(sublime_plugin.EventListener):
     ''' Listener for events of interest. '''
 
+    def on_load(self, view):
+        sbot_common.trace('SbotEvent.on_load', view.file_name(), view.id())
+        # for v in view.window().views():
+        #     sbot_common.trace('   view:', v.file_name(), v.id())
+
+    def on_activated(self, view):
+        sbot_common.trace('SbotEvent.on_activated', view.file_name(), view.id())
+
+    def on_deactivated(self, view):
+        sbot_common.trace('SbotEvent.on_deactivated', view.file_name(), view.id())
+
+    def on_close(self, view):
+        sbot_common.trace('SbotEvent.on_close', view.file_name(), view.id())
+
+
     def on_selection_modified(self, view):
-        ''' Show the abs position in the status bar for debugging. '''
+        ''' Show the abs position in the status bar. '''
         pos = view.sel()[0].begin()
         view.set_status("position", 'Pos {}'.format(pos))
 

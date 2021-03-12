@@ -15,7 +15,7 @@ class SbotFindNonAsciiCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = self.view
 
-        # TODO hex processor/editor? Can't look at view, must open file.
+        # TODOF hex processor/editor? Can't look at view, must open file.
         # Files containing null bytes are opened as hexadecimal by default In your User or Default Settings file:
         # "enable_hexadecimal_encoding": false
         # OR
