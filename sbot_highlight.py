@@ -22,6 +22,7 @@ _views_inited = set()
 # The settings.
 _settings = {}
 
+
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
@@ -123,7 +124,7 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         global _hls
 
-        # Locate specific region, crudely. TODO this is clumsy.
+        # Locate specific region, crudely. TODO-X this is clumsy.
         v = self.view
 
         tokens = _get_persist_tokens(v, False)

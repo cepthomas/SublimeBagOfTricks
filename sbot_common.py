@@ -29,12 +29,12 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 def ensure_init():
-    ''' Call this before accessing global stuff. TODO Kinda ugly kludge - fix. '''
+    ''' Call this before accessing global stuff. TODO-X Kinda ugly kludge - fix. See README.md for info. '''
     global _settings
     global _trace_fn
 
     if _settings == None:
-        _settings = sublime.load_settings(SETTINGS_FN) #TODO doesn't reload on change?
+        _settings = sublime.load_settings(SETTINGS_FN) #TODO-X doesn't reload on change?
         _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
 
 
@@ -49,7 +49,7 @@ def trace(*args, cat=None):
     else:
         s = cat + ' ' + ' | '.join(map(str, args))
 
-    # print(s) TODO option or cat
+    # print(s) TODO-X option or cat
     with open(_trace_fn, "a+") as f:
         f.write(s + '\n')    
 
@@ -64,7 +64,7 @@ def error(*args):
     ''' Debugging. '''
     trace(*args, cat='ERR')
     print(*args)
-    # TODO and/or: sublime.error_message(' '.join(map(str, args)))
+    # TODO-X and/or: sublime.error_message(' '.join(map(str, args)))
 
 
 #-----------------------------------------------------------------------------------
