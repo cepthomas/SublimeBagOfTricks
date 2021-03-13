@@ -176,8 +176,8 @@ def _save_sigs(winid, stp_fn):
                         del _sigs[winid][fn]
 
                 # Now save.
-                #with open(fn, 'w') as fp:
-                #    json.dump(_sigs[winid], fp, indent=4)
+                with open(fn, 'w') as fp:
+                    json.dump(_sigs[winid], fp, indent=4)
 
         except Exception as e:
             sres = 'Save signets error: {}'.format(e.args)

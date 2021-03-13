@@ -243,7 +243,7 @@ def _save_hls(winid, stp_fn):
     ''' General project saver. '''
     ok = True
 
-    if _settings.get('enable_persistence', True):
+    if _settings.get('enable_persistence', True) and stp_fn is not None:
         stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
         
         try:
@@ -256,8 +256,10 @@ def _save_hls(winid, stp_fn):
                         del _hls[winid][fn]
 
                 # Now save.
-                #with open(stp_fn, 'w') as fp:
-                #    json.dump(_hls[winid], fp, indent=4)
+                with open(stp_fn, 'w') as fp:
+                    json.dump(_hls[winid], fp, indent=4)
+                #with open(stp_fn + 'xxx.json', 'w') as fp:
+                #   json.dump(_hls[winid], fp, indent=4)
 
         except Exception as e:
             sres = 'Save highlights error: {}'.format(e.args)
@@ -273,7 +275,7 @@ def _open_hls(winid, stp_fn):
     global _hls
     ok = True
 
-    if _settings.get('enable_persistence', True):
+    if _settings.get('enable_persistence', True) and stp_fn is not None:
         stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
 
         try:
