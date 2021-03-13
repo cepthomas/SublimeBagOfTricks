@@ -256,8 +256,8 @@ def _save_hls(winid, stp_fn):
                         del _hls[winid][fn]
 
                 # Now save.
-                with open(stp_fn, 'w') as fp:
-                    json.dump(_hls[winid], fp, indent=4)
+                #with open(stp_fn, 'w') as fp:
+                #    json.dump(_hls[winid], fp, indent=4)
 
         except Exception as e:
             sres = 'Save highlights error: {}'.format(e.args)
