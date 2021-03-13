@@ -129,7 +129,4 @@ dmypy.json
 .pyre/
 
 # Project files
-/test/50mb.txt
-/test/25mb.txt
-/temp/sbot_log.txt
-/temp/trace.txt
+/temp/
