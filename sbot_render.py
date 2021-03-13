@@ -11,7 +11,7 @@ import sbot_common
 
 # print('Load sbot_render')
 
-HIGHLIGHT_REGION_NAME = 'highlight_%s' # TODO2 Duplicated from sbot_highlight. My bad.
+HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
 
 # The settings.
 _settings = {}

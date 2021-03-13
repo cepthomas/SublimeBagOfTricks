@@ -3,7 +3,7 @@ import time
 import sublime
 import sublime_plugin
 
-print('Load sbot_common')
+# print('Load sbot_common')
 
 # Definitions.
 SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
@@ -19,11 +19,6 @@ _trace_fn = None
 def plugin_loaded():
     ''' Initialize module global stuff. '''
     trace('plugin_loaded sbot_common')
-    # global _settings
-    # _settings = sublime.load_settings(SETTINGS_FN) #TODO2 doesn't reload on change.
-
-    # print('^^^101', _settings.get("html_font_face"), id(_settings))
-
 
 
 #-----------------------------------------------------------------------------------
@@ -34,12 +29,12 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 def ensure_init():
-    ''' Call these before accessing global stuff. TODO2 Ugly kludge - fix. '''
+    ''' Call this before accessing global stuff. TODO Kinda ugly kludge - fix. '''
     global _settings
     global _trace_fn
 
     if _settings == None:
-        _settings = sublime.load_settings(SETTINGS_FN) #TODO2 doesn't reload on change.
+        _settings = sublime.load_settings(SETTINGS_FN) #TODO doesn't reload on change?
         _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
 
 
@@ -54,19 +49,22 @@ def trace(*args, cat=None):
     else:
         s = cat + ' ' + ' | '.join(map(str, args))
 
-#    print(s)
-    # and/or TODO1 print | file | off , max_size, w/a? Also shouldn't have to do fn every time...
+    # print(s) TODO option or cat
     with open(_trace_fn, "a+") as f:
         f.write(s + '\n')    
 
-    # print('^^^102', _settings.get("html_font_face"), id(_settings))
+    # Check for file size limit.
+    if os.path.getsize(_trace_fn) > 100000:
+        os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
+        os.remove(_trace_fn)
+
 
 #-----------------------------------------------------------------------------------
 def error(*args):
     ''' Debugging. '''
     trace(*args, cat='ERR')
-    # sublime.error_message(' '.join(map(str, args)))
     print(*args)
+    # TODO and/or: sublime.error_message(' '.join(map(str, args)))
 
 
 #-----------------------------------------------------------------------------------

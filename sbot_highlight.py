@@ -38,7 +38,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class HighlightEvent(sublime_plugin.EventListener):
-    ''' Listener for events of interest. TODOST4 review these lifecycles.'''
+    ''' Listener for events of interest. TODO-ST4 review these lifecycles.'''
 
     def on_activated(self, view):
         ''' When focus/tab received. This is the only reliable init event - on_load() doesn't get called when showing previously opened files. '''
@@ -123,7 +123,7 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         global _hls
 
-        # Locate specific region, crudely. TODO2 this is clumsy.
+        # Locate specific region, crudely. TODO this is clumsy.
         v = self.view
 
         tokens = _get_persist_tokens(v, False)
@@ -178,7 +178,7 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 class SbotShowScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
-    #TODOF let user add more.
+    #TODO-F let user add more.
 
     def run(self, edit):
         v = self.view
