@@ -5,7 +5,7 @@ import json
 import sublime
 import sublime_plugin
 
-# print('^^^^^ Load sbot_extra')
+# print('Load sbot_extra')
 
 # Holding tank for examples, leftovers, bits and pieces.
 

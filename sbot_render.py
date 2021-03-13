@@ -8,9 +8,8 @@ from html import escape
 import sublime
 import sublime_plugin
 import sbot_common
-# import sbot_global
 
-# print('^^^^^ Load sbot_render')
+# print('Load sbot_render')
 
 HIGHLIGHT_REGION_NAME = 'highlight_%s' # TODO2 Duplicated from sbot_highlight. My bad.
 
@@ -39,7 +38,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         v = self.view
 
         # Get prefs.
-        render_max_file = _settings.get('render_max_file', 1)
+        render_max_file = _settings.get('render_max_file')
 
         fsize = v.size() / 1024.0 / 1024.0
         if fsize > render_max_file:
@@ -80,11 +79,11 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         # - biggish (20k dense lines = 3Mb) 1.3607864668223 (20616)
 
         ## Get prefs.
-        html_font_size = _settings.get('html_font_size', 12)
-        html_font_face = _settings.get('html_font_face', 'Arial')
-        html_background = _settings.get('html_background', 'white')
-        html_line_numbers = _settings.get('html_line_numbers', True)
-        html_background = _settings.get('html_background', 'white')
+        html_font_size = _settings.get('html_font_size')
+        html_font_face = _settings.get('html_font_face')
+        html_background = _settings.get('html_background')
+        html_line_numbers = _settings.get('html_line_numbers')
+        html_background = _settings.get('html_background')
 
         # Use tuples for everything as they can be hashable keys.
         # my_style = (foreground, background, bold, italic)
@@ -285,9 +284,9 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
         v = self.view
 
         # Get prefs.
-        md_background = _settings.get('md_background', 'white')
-        md_font_size = _settings.get('md_font_size', 12)
-        md_font_face = _settings.get('md_font_face', 'Arial')
+        md_background = _settings.get('md_background')
+        md_font_size = _settings.get('md_font_size')
+        md_font_face = _settings.get('md_font_face')
 
         html = []
         html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
@@ -308,7 +307,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 def _output_html(view, content=[]):
-    output_type = _settings.get('render_output', 'show')
+    output_type = _settings.get('render_output')
     s = "".join(content)
 
     if output_type == 'clipboard':

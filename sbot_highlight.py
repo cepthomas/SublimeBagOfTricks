@@ -6,11 +6,11 @@ import sublime
 import sublime_plugin
 import sbot_common
 
-# print('^^^^^ Load sbot_highlight')
+# print('Load sbot_highlight')
 
 # Definitions.
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
-HIGHLIGHT_FILE_EXT = '.sbot_hls'
+HIGHLIGHT_FILE_EXT = '.sbot-hls'
 MAX_HIGHLIGHTS = 6
 
 # The current highlight collections. Key is window id which corresponds to a project.
@@ -38,7 +38,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class HighlightEvent(sublime_plugin.EventListener):
-    ''' Listener for events of interest. '''
+    ''' Listener for events of interest. TODOST4 review these lifecycles.'''
 
     def on_activated(self, view):
         ''' When focus/tab received. This is the only reliable init event - on_load() doesn't get called when showing previously opened files. '''
@@ -62,19 +62,18 @@ class HighlightEvent(sublime_plugin.EventListener):
                 # Init the view with any persisted values.
                 tokens = _get_persist_tokens(view, False)
                 if tokens is not None:
-                    # print('200', tokens)
                     for token, tparams in tokens.items():
                         _highlight_view(view, token, tparams['whole_word'], tparams['scope'])
 
 
     def on_load(self, view):
-        ''' Called when . '''
+        ''' Called when file loaded. Doesn't work when starting up! Maybe ST4 improved? '''
         sbot_common.trace('HighlightEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
         # if view.file_name() is not None:
 
 
-    def on_deactivated(self, view): # use on_close() TODO1?
-        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. TODOST4 has on_pre_save_project(). '''
+    def on_deactivated(self, view):
+        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
         winid = view.window().id()
         sbot_common.trace('HighlightEvent.on_deactivated', view.id(), winid)
 
@@ -245,15 +244,23 @@ def _save_hls(winid, stp_fn):
     ok = True
 
     if _settings.get('enable_persistence', True):
-        fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
+        stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
         
         try:
-            # TODO1 remove invalid files and any empty values.
-            with open(fn, 'w') as fp:
-                json.dump(_hls[winid], fp, indent=4)
+            # Remove invalid files and any empty values.
+            if winid in _hls:
+                for fn, tokens in _hls[winid].items():
+                    if not os.path.exists(fn):
+                        del _hls[winid][fn]
+                    elif len(_hls[winid][fn]) == 0:
+                        del _hls[winid][fn]
+
+                # Now save.
+                with open(stp_fn, 'w') as fp:
+                    json.dump(_hls[winid], fp, indent=4)
 
         except Exception as e:
-            sres = 'Save sbot-hls error: {}'.format(e.args)
+            sres = 'Save highlights error: {}'.format(e.args)
             sublime.error_message(sres)
             ok = False
 
@@ -267,20 +274,20 @@ def _open_hls(winid, stp_fn):
     ok = True
 
     if _settings.get('enable_persistence', True):
-        fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
+        stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
 
         try:
-            with open(fn, 'r') as fp:
+            with open(stp_fn, 'r') as fp:
                 values = json.load(fp)
                 _hls[winid] = values
 
         except FileNotFoundError as e:
             # Assumes new file.
-            sublime.status_message('Creating new sbot_hls file')
+            sublime.status_message('Creating new highlights file')
             _hls[winid] = { }
 
         except Exception as e:
-            sres = 'Open sbot_hls error: {}'.format(e.args)
+            sres = 'Open highlights error: {}'.format(e.args)
             sublime.error_message(sres)
             ok = False
 
@@ -296,7 +303,6 @@ def _highlight_view(view, token, whole_word, scope):
 
     highlight_regions = view.find_all(escaped) if whole_word else view.find_all(token, sublime.LITERAL)
     if len(highlight_regions) > 0:
-        # print('999', HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)
         view.add_regions(HIGHLIGHT_REGION_NAME % scope, highlight_regions, scope)
 
 

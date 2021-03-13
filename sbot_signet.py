@@ -5,13 +5,13 @@ import sublime
 import sublime_plugin
 import sbot_common
 
-# print('^^^^^ Load sbot_signet')
+# print('Load sbot_signet')
 
 
 # Definitions.
 SIGNET_REGION_NAME = 'signet'
 SIGNET_ICON = 'Packages/Theme - Default/common/label.png'
-SIGNET_FILE_EXT = '.sbot_sigs'
+SIGNET_FILE_EXT = '.sbot-sigs'
 NEXT_SIG = 1
 PREV_SIG = 2
 
@@ -41,7 +41,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class SignetEvent(sublime_plugin.EventListener):
-    ''' Listener for events of interest. '''
+    ''' Listener for events of interest. TODOST4 review these lifecycles.'''
 
     def on_activated(self, view):
         ''' When focus/tab received. This is the only reliable event - on_load() doesn't get called when showing previously opened files. '''
@@ -65,23 +65,22 @@ class SignetEvent(sublime_plugin.EventListener):
                 # Init the view with any persisted values.
                 rows = _get_persist_rows(view, False)
                 if rows is not None:
-                    # print('200', rows)
                     # Update visual signets, brutally. This is the ST way.
                     regions = []
                     for r in rows:
                         pt = view.text_point(r-1, 0) # ST is 0-based
                         regions.append(sublime.Region(pt, pt))
-                    view.add_regions(SIGNET_REGION_NAME, regions, _settings.get('signet_scope', 'comment'), SIGNET_ICON)
+                    view.add_regions(SIGNET_REGION_NAME, regions, _settings.get('signet_scope'), SIGNET_ICON)
 
 
     def on_load(self, view):
-        ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
+        ''' Called when file loaded. Doesn't work when starting up! Maybe ST4 improved? '''
         sbot_common.trace('SignetEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
         # if view.file_name() is not None:
 
 
-    def on_deactivated(self, view): # use on_close() TODO1?
-        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. TODOST4 has on_pre_save_project(). '''
+    def on_deactivated(self, view):
+        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
         winid = view.window().id()
         sbot_common.trace('SignetEvent.on_deactivated', view.id(), winid)
 
@@ -117,14 +116,14 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
         crows = _get_persist_rows(v, True)
         crows.clear()
         for r in drows:
-            crows.append(r+1)
+            crows.append(r + 1)
 
         # Update visual signets, brutally. This is the ST way.
         regions = []
         for r in drows:
             pt = v.text_point(r, 0) # 0-based
             regions.append(sublime.Region(pt, pt))
-        v.add_regions(SIGNET_REGION_NAME, regions, _settings.get('signet_scope', 'comment'), SIGNET_ICON)
+        v.add_regions(SIGNET_REGION_NAME, regions, _settings.get('signet_scope'), SIGNET_ICON)
 
 
 #-----------------------------------------------------------------------------------
@@ -162,18 +161,27 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 def _save_sigs(winid, stp_fn):
     ''' General project saver. '''
     ok = True
-
-    if _settings.get('enable_persistence', True):
+    return
+    
+    if _settings.get('enable_persistence') and stp_fn is not None:
         fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
         
         try:
-            # TODO1 remove invalid files and any empty values.
-            with open(fn, 'w') as fp:
-                json.dump(_sigs[winid], fp, indent=4)
+            # Remove invalid files and any empty values.
+            if winid in _sigs:
+                for fn, tokens in _sigs[winid].items():
+                    if not os.path.exists(fn):
+                        del _sigs[winid][fn]
+                    elif len(_sigs[winid][fn]) == 0:
+                        del _sigs[winid][fn]
+
+                # Now save.
+                with open(fn, 'w') as fp:
+                    json.dump(_sigs[winid], fp, indent=4)
 
         except Exception as e:
-            sres = 'Save sbot_sigs error: {}'.format(e.args)
-            sublime.error_message(sres)
+            sres = 'Save signets error: {}'.format(e.args)
+            sbot_common.error(sres)
             ok = False
 
     return ok
@@ -186,7 +194,7 @@ def _open_sigs(winid, stp_fn):
 
     ok = True
 
-    if _settings.get('enable_persistence', True):
+    if _settings.get('enable_persistence') and stp_fn is not None:
         fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
 
         try:
@@ -196,12 +204,12 @@ def _open_sigs(winid, stp_fn):
 
         except FileNotFoundError as e:
             # Assumes new file.
-            sublime.status_message('Creating new sbot_sigs file')
+            sublime.status_message('Creating new signets file')
             _sigs[winid] = { }
 
         except Exception as e:
-            sres = 'Open sbot_sigs error: {}'.format(e.args)
-            sublime.error_message(sres)
+            sres = 'Open signets error: {}'.format(e.args)
+            sbot_common.error(sres)
             ok = False
 
     return ok
@@ -212,7 +220,7 @@ def _go_to_signet(view, dir):
     ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
     v = view
     w = view.window()
-    signet_nav_files = _settings.get('signet_nav_files', True)
+    signet_nav_files = _settings.get('signet_nav_files')
 
     signet_nav_files
     done = False

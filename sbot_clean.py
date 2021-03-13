@@ -5,7 +5,7 @@ import sublime
 import sublime_plugin
 import sbot_common
 
-# print('^^^^^ Load sbot_clean')
+# print('Load sbot_clean')
 
 
 #-----------------------------------------------------------------------------------

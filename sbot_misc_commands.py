@@ -7,7 +7,7 @@ import sublime_plugin
 import sbot_common
 
 
-# print('^^^^^ Load sbot_misc_commands')
+# print('Load sbot_misc_commands')
 
 # Misc commands.
 
@@ -78,7 +78,7 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 else:
                     break
             if eols:
-                v.add_regions("eols", eols, _settings.get('eol_scope', "comment"))
+                v.add_regions("eols", eols, _settings.get('eol_scope'))
         else:
             v.erase_regions("eols")
 
@@ -126,6 +126,6 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                     break
             if eols:
                 # "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
-                v.add_regions("eols", eols, _settings.get('eol_scope', "comment"))
+                v.add_regions("eols", eols, _settings.get('eol_scope'))
         else:
             v.erase_regions("eols")

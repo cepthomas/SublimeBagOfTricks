@@ -3,21 +3,27 @@ import time
 import sublime
 import sublime_plugin
 
-# print('^^^^^ Load sbot_common')
-
-# The settings.
-_settings = {}
+print('Load sbot_common')
 
 # Definitions.
 SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
+
+# The settings.
+_settings = None
+
+# Debug.
+_trace_fn = None
 
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
     trace('plugin_loaded sbot_common')
-    global _settings
-    _settings = sublime.load_settings(SETTINGS_FN) #TODO2 doesn't reload on change.
+    # global _settings
+    # _settings = sublime.load_settings(SETTINGS_FN) #TODO2 doesn't reload on change.
+
+    # print('^^^101', _settings.get("html_font_face"), id(_settings))
+
 
 
 #-----------------------------------------------------------------------------------
@@ -27,12 +33,51 @@ def plugin_unloaded():
 
 
 #-----------------------------------------------------------------------------------
+def ensure_init():
+    ''' Call these before accessing global stuff. TODO2 Ugly kludge - fix. '''
+    global _settings
+    global _trace_fn
+
+    if _settings == None:
+        _settings = sublime.load_settings(SETTINGS_FN) #TODO2 doesn't reload on change.
+        _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
+
+
+#-----------------------------------------------------------------------------------
+def trace(*args, cat=None):
+    ''' Debugging. '''
+    global _trace_fn
+    ensure_init()
+
+    if cat == None:
+        s = ' | '.join(map(str, args))
+    else:
+        s = cat + ' ' + ' | '.join(map(str, args))
+
+#    print(s)
+    # and/or TODO1 print | file | off , max_size, w/a? Also shouldn't have to do fn every time...
+    with open(_trace_fn, "a+") as f:
+        f.write(s + '\n')    
+
+    # print('^^^102', _settings.get("html_font_face"), id(_settings))
+
+#-----------------------------------------------------------------------------------
+def error(*args):
+    ''' Debugging. '''
+    trace(*args, cat='ERR')
+    # sublime.error_message(' '.join(map(str, args)))
+    print(*args)
+
+
+#-----------------------------------------------------------------------------------
 def get_sel_regions(v):
     ''' Generic function to get selections or optionally the whole view.'''
+    ensure_init()
+
     regions = []    
     if len(v.sel()[0]) > 0: # user sel
         regions = v.sel()
-    elif _settings.get('sel_all', True):
+    elif _settings.get('sel_all'):
         regions = [sublime.Region(0, v.size())]
     return regions
 
@@ -88,27 +133,6 @@ def wait_load_file(view, line):
         sublime.set_timeout(lambda: wait_load_file(view, line), 100) # maybe not forever?
     else: # good to go
         view.run_command("goto_line", {"line": line})
-
-
-#-----------------------------------------------------------------------------------
-def trace(*args, cat=None):
-    ''' Debugging. '''
-    if cat == None:
-        s = ', '.join(map(str, args))
-    else:
-        s = cat + ' ' + ', '.join(map(str, args))
-
-#    print(s)
-    # and/or TODO1 print | file | off , max_size, w/a? Also shouldn't have to do fn every time...
-    tfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
-    with open(tfn, "a+") as f:
-        f.write(s + '\n')    
-
-
-#-----------------------------------------------------------------------------------
-def error(*args):
-    ''' Debugging. '''
-    trace(*args, cat='!!!')
 
 
 #-----------------------------------------------------------------------------------

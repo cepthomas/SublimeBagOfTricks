@@ -7,7 +7,7 @@ import sublime_plugin
 import sbot_common
 
 
-# print('^^^^^ Load sbot_sidebar')
+# print('Load sbot_sidebar')
 
 
 #-----------------------------------------------------------------------------------

@@ -135,7 +135,7 @@ Leftovers that will eventually be deleted or subsumed.
 
 # Notes
 
-Accumulated notes that will probably eventually go away.
+Accumulated notes that will probably eventually go away. A lot is snipped from the docs or found online.
 
 ## This Project
 - In general `line` refers to editor lines and is 1-based. `row` refers to buffer contents as an array and is 0-based.
@@ -144,24 +144,32 @@ Accumulated notes that will probably eventually go away.
   - `visual` is the way ST API handles elements.
   - `internal` is the plugin format.
 - Commands can't end with `<underscore numeral>` e.g. `my_cmd_1` should be `stpt_cmd1`.
-- There is magic naming for Commands and InputHandlers to support mapping to the menu and key maps. e.g. a command like `big_brown_dog` is mapped to a handler named 'BigBrownDogCommand()'.
-- `package-metadata.json` is used for package management so remove it while developing/debugging plugins because PackageControl will delete the entire package.
+- There is magic naming for Commands and InputHandlers to support mapping to the menu and key maps. e.g. a command like `big_brown_dog`
+  is mapped to a handler named 'BigBrownDogCommand()'.
+- `package-metadata.json` is used for package management so remove it while developing/debugging plugins because PackageControl
+  will delete the entire package.
 - There's lots of good plugin examples in `Packages\Default`.
 - If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
-
+- To avoid the import issue described below, each plugin file has no dependency on other files except sbot_common. This results in sbot_common
+  being reloaded so some kludge is implemented to ensure global initialization. Maybe this is improved in ST4...
 
 ## Sublime
 
 ### General
 - Read the [API](https://www.sublimetext.com/docs/api_reference.html).
-- I learned the hard way that ST doesn't handle python modules/packages as you expect. It may load modules multiple times, making the standard way
-  of handling globals difficult if not impossible. [Details}(https://forum.sublimetext.com/t/accessing-settings-from-within-a-multi-module-st-package/46128/5).
-- EventListeners are instantiated exactly once (on plugin load time), as are ApplicationCommands. WindowCommands are instantiated for each window and TextCommands for each view, or even every time a command is run???
+- I learned the hard way that ST doesn't handle python modules/packages as you expect. It may load modules multiple times, making the
+  standard way of handling globals difficult if not impossible.
+  [Details}(https://forum.sublimetext.com/t/accessing-settings-from-within-a-multi-module-st-package/46128/5).
+- EventListeners are instantiated exactly once (on plugin load time), as are ApplicationCommands. WindowCommands are instantiated for
+  each window and TextCommands for each view, or even every time a command is run???
 - There is one global context and all plugins share the same process.
-- For the specific case of Sublime plugins, when your plugin modules are loaded by sublime it invokes the dir function on the loaded module to find all of the symbols it contains and ignores everything that’s not a subclass of one of the special plugin classes (i.e. ApplicationCommand, WindowCommand, TextCommand, EventListener and ViewEventListener).
-- These are in sublime_plugin module.
-If you are going to interact with the current view, use TextCommand, otherwise use WindowCommand. I have yet to see a use case for ApplicationCommand, but I guess if you need to interact with all windows.
-- sublime_plugin.EventListener Class: Note that many of these events are triggered by the buffer underlying the view, and thus the method is only called once, with the first view as the parameter.
+- For the specific case of Sublime plugins, when your plugin modules are loaded by sublime it invokes the dir function on the loaded module
+  to find all of the symbols it contains and ignores everything that’s not a subclass of one of the special plugin classes
+  (i.e. ApplicationCommand, WindowCommand, TextCommand, EventListener and ViewEventListener).
+- These are in sublime_plugin module: If you are going to interact with the current view, use TextCommand, otherwise use
+  WindowCommand. Unknown use for ApplicationCommand.
+- sublime_plugin.EventListener Class: Note that many of these events are triggered by the buffer underlying the view, and thus the
+  method is only called once, with the first view as the parameter.
 
 
 ### Directories
@@ -226,19 +234,29 @@ If you are going to interact with the current view, use TextCommand, otherwise u
 - Loose packages are stored in:
   - `%data_dir%\Packages`
 - Any loose files in `%data_dir%\Packages\%name%` will override files stored in the `%name%.sublime-package file`.
-- There are two special packages: `Default` and `User`. Default is always ordered first, User is always ordered last, and others are ordered alphabetically. Package ordering comes into effect when merging files between packages, for example `Main.sublime-menu`. Any package may contain a file called `Main.sublime-menu`, however this won't override the main menu, instead the files will be merged according to the order of the packages.
-- To create a new package, simply create a new directory under `%data_dir%\Installed Packages`. You can access this directory from the `Preferences > Browse Packages` menu.
+- There are two special packages: `Default` and `User`. Default is always ordered first, User is always ordered last, and others are
+  ordered alphabetically. Package ordering comes into effect when merging files between packages, for example `Main.sublime-menu`.
+  Any package may contain a file called `Main.sublime-menu`, however this won't override the main menu, instead the files will be merged
+  according to the order of the packages.
+- To create a new package, simply create a new directory under `%data_dir%\Installed Packages`. You can access this directory from
+  the `Preferences > Browse Packages` menu.
 - To override a file in an existing package, just create a file with the same name under the `Packages\%name%` directory.
-- To remove items from default menus: In `<user>\AppData\Roaming\Sublime Text 3\Packages`, create a new folder that’s named exactly like the package you want to overwrite. For Sublime Core, this is `Default`. In this folder, create a new `.sublime-menu` file. Either add only your own stuff, or copy the default content and edit it.
+- To remove items from default menus: In `<user>\AppData\Roaming\Sublime Text 3\Packages`, create a new folder that’s named exactly like
+  the package you want to overwrite. For Sublime Core, this is `Default`. In this folder, create a new `.sublime-menu` file. Either
+  add only your own stuff, or copy the default content and edit it.
 - Style:
   - Themes (`*.sublime-theme`) basically decorate the core UI elements like side-pane, tabs, menus etc.
   - Color schemes are responsible for the syntax-highlighting e.g. `Visual Studio Bold.tmTheme` or `abc.sublime-color-scheme`.
 - Menu filess
   - `Main.sublime-menu`: Primary menu for the application
   - `Side Bar Mount Point.sublime-menu`: Context menu for top-level folders in the side bar
-  - `Side Bar.sublime-menu`: Context menu for files and folders in the side bar. Has "magic" args for passing file and folder names to commands.Entries with an arg "files": [] will be enabled for files and will pass file names to the command via the arg files. Entries with an arg "dirs": [] will be enabled for folders and will pass file names to the command via the arg dirs. Entries with an arg "paths": [] will be enabled for files and folders and will pass file and folder names to the command via the arg paths.
+  - `Side Bar.sublime-menu`: Context menu for files and folders in the side bar. Has "magic" args for passing file and folder names to commands.
+  Entries with an arg "files": [] will be enabled for files and will pass file names to the command via the arg files.
+  Entries with an arg "dirs": [] will be enabled for folders and will pass file names to the command via the arg dirs.
+  Entries with an arg "paths": [] will be enabled for files and folders and will pass file and folder names to the command via the arg paths.
   - `Tab Context.sublime-menu`: Context menu for file tabs
   - `Context.sublime-menu`: Context menu for text areas
   - `Find in Files.sublime-menu`: Menu shown when clicking the ... button in Find in Files panel
-  - `Widget Context.sublime-menu`: Context menu for text inputs in various panels. Technically this file name can be changed via the "context_menu" setting inside of `Widget.sublime-settings`.
+  - `Widget Context.sublime-menu`: Context menu for text inputs in various panels. Technically this file name can be changed via
+  the "context_menu" setting inside of `Widget.sublime-settings`.
 
