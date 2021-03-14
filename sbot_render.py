@@ -13,15 +13,12 @@ import sbot_common
 
 HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
 
-# The settings.
-_settings = {}
+
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
     sbot_common.trace('plugin_loaded sbot_render')
-    global _settings
-    _settings = sublime.load_settings(sbot_common.SETTINGS_FN)
 
 
 #-----------------------------------------------------------------------------------
@@ -38,7 +35,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         v = self.view
 
         # Get prefs.
-        render_max_file = _settings.get('render_max_file')
+        self.settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+
+        render_max_file = self.settings.get('render_max_file')
 
         fsize = v.size() / 1024.0 / 1024.0
         if fsize > render_max_file:
@@ -79,11 +78,11 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         # - biggish (20k dense lines = 3Mb) 1.3607864668223 (20616)
 
         ## Get prefs.
-        html_font_size = _settings.get('html_font_size')
-        html_font_face = _settings.get('html_font_face')
-        html_background = _settings.get('html_background')
-        html_line_numbers = _settings.get('html_line_numbers')
-        html_background = _settings.get('html_background')
+        html_font_size = self.settings.get('html_font_size')
+        html_font_face = self.settings.get('html_font_face')
+        html_background = self.settings.get('html_background')
+        html_line_numbers = self.settings.get('html_line_numbers')
+        html_background = self.settings.get('html_background')
 
         # Use tuples for everything as they can be hashable keys.
         # my_style = (foreground, background, bold, italic)
@@ -114,7 +113,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         sublime.set_timeout(self._update_status, 100)
         
         ## If there are highlights, collect them.
-        highlight_scopes = _settings.get('highlight_scopes')
+        highlight_scopes = self.settings.get('highlight_scopes')
         for i in range(len(highlight_scopes)):
             # Get the style and invert for highlights.
             scope = highlight_scopes[i]
@@ -284,9 +283,10 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
         v = self.view
 
         # Get prefs.
-        md_background = _settings.get('md_background')
-        md_font_size = _settings.get('md_font_size')
-        md_font_face = _settings.get('md_font_face')
+        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        md_background = settings.get('md_background')
+        md_font_size = settings.get('md_font_size')
+        md_font_face = settings.get('md_font_face')
 
         html = []
         html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
@@ -307,7 +307,10 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 def _output_html(view, content=[]):
-    output_type = _settings.get('render_output')
+    ''' Common html file formatter. '''
+
+    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+    output_type = settings.get('render_output')
     s = "".join(content)
 
     if output_type == 'clipboard':

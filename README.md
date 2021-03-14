@@ -6,10 +6,10 @@ No support as yet for PackageControl.
 
 Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 
-
 ![logo](felix.jpg)
 
-# Features
+
+# Commands and Settings
 
 ## General
 
@@ -17,6 +17,7 @@ Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 |:--------                 |:-------     |
 | enable_persistence       | Save/load signet/highlight persistence - default is true |
 
+Note that the files used to persist highlights and signets are located next to the .sublime-project file.
 
 ## Colorizing
 - Word colorizing similar to [StyleToken](https://github.com/vcharnahrebel/style-token).
@@ -59,6 +60,7 @@ Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 | render_max_file          | Max file size to render |
 | sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
 
+
 ## Signets (bookmarks)
 Enhanced bookmarks:
 - Persists to sbot project file.
@@ -78,6 +80,7 @@ Enhanced bookmarks:
 | signet_scope             | ST scope name for gutter icon color |
 | signet_nav_files         | Next/prev traverses all files otherwise just open one |
 
+
 ## Miscellany
 | Command                  | Description |
 |:--------                 |:-------     |
@@ -88,6 +91,7 @@ Enhanced bookmarks:
 | Setting                  | Description |
 |:--------                 |:-------     |
 | eol_scope                | ST scope name for EOL marker |
+
 
 ## SideBar
 Commands added to the sidebar. Just the stuff I want.
@@ -101,6 +105,7 @@ Commands added to the sidebar. Just the stuff I want.
 | sbot_sb_open_browser     | Open html file in your browser |
 | sbot_sb_tree             | Run tree cmd to clipboard |
 | sbot_sidebar_exclude     | Hide selected file/dir in project |
+
 
 ## Cleaning
 Trimming etc.

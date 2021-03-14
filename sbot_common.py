@@ -8,9 +8,6 @@ import sublime_plugin
 # Definitions.
 SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
 
-# The settings.
-_settings = None
-
 # Debug.
 _trace_fn = None
 
@@ -28,28 +25,19 @@ def plugin_unloaded():
 
 
 #-----------------------------------------------------------------------------------
-def ensure_init():
-    ''' Call this before accessing global stuff. TODO-X Kinda ugly kludge - fix. See README.md for info. '''
-    global _settings
-    global _trace_fn
-
-    if _settings == None:
-        _settings = sublime.load_settings(SETTINGS_FN) #TODO-X doesn't reload on change?
-        _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
-
-
-#-----------------------------------------------------------------------------------
 def trace(*args, cat=None):
     ''' Debugging. '''
     global _trace_fn
-    ensure_init()
+    if _trace_fn == None:
+        _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
 
     if cat == None:
         s = ' | '.join(map(str, args))
     else:
         s = cat + ' ' + ' | '.join(map(str, args))
 
-    # print(s) TODO-X option or cat
+    # TODO-F option for print(s)
+
     with open(_trace_fn, "a+") as f:
         f.write(s + '\n')    
 
@@ -62,9 +50,9 @@ def trace(*args, cat=None):
 #-----------------------------------------------------------------------------------
 def error(*args):
     ''' Debugging. '''
-    trace(*args, cat='ERR')
+    trace(*args, cat='ERROR!!!')
     print(*args)
-    # TODO-X and/or: sublime.error_message(' '.join(map(str, args)))
+    # TODO-F option for sublime.error_message(' '.join(map(str, args)))
 
 
 #-----------------------------------------------------------------------------------
@@ -75,8 +63,10 @@ def get_sel_regions(v):
     regions = []    
     if len(v.sel()[0]) > 0: # user sel
         regions = v.sel()
-    elif _settings.get('sel_all'):
-        regions = [sublime.Region(0, v.size())]
+    else:
+        settings = sublime.load_settings(SETTINGS_FN)
+        if settings.get('sel_all'):
+            regions = [sublime.Region(0, v.size())]
     return regions
 
 

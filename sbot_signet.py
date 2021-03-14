@@ -21,16 +21,12 @@ _sigs = {}
 # Need to track these because ST window/view lifecycle is unreliable.
 _views_inited = set()
 
-# The settings.
-_settings = {}
 
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
     sbot_common.trace('plugin_loaded sbot_signet')
-    global _settings
-    _settings = sublime.load_settings(sbot_common.SETTINGS_FN)
 
 
 #-----------------------------------------------------------------------------------
@@ -70,7 +66,8 @@ class SignetEvent(sublime_plugin.EventListener):
                     for r in rows:
                         pt = view.text_point(r-1, 0) # ST is 0-based
                         regions.append(sublime.Region(pt, pt))
-                    view.add_regions(SIGNET_REGION_NAME, regions, _settings.get('signet_scope'), SIGNET_ICON)
+                    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+                    view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
 
 
     def on_load(self, view):
@@ -123,7 +120,9 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
         for r in drows:
             pt = v.text_point(r, 0) # 0-based
             regions.append(sublime.Region(pt, pt))
-        v.add_regions(SIGNET_REGION_NAME, regions, _settings.get('signet_scope'), SIGNET_ICON)
+
+        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        v.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
 
 
 #-----------------------------------------------------------------------------------
@@ -163,7 +162,9 @@ def _save_sigs(winid, stp_fn):
     ok = True
     return
     
-    if _settings.get('enable_persistence') and stp_fn is not None:
+    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+
+    if settings.get('enable_persistence') and stp_fn is not None:
         fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
         
         try:
@@ -193,8 +194,9 @@ def _open_sigs(winid, stp_fn):
     global _sigs
 
     ok = True
+    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
 
-    if _settings.get('enable_persistence') and stp_fn is not None:
+    if settings.get('enable_persistence') and stp_fn is not None:
         fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
 
         try:
@@ -220,7 +222,10 @@ def _go_to_signet(view, dir):
     ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
     v = view
     w = view.window()
-    signet_nav_files = _settings.get('signet_nav_files')
+
+    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+
+    signet_nav_files = settings.get('signet_nav_files')
 
     signet_nav_files
     done = False

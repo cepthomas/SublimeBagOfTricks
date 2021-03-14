@@ -11,16 +11,11 @@ import sbot_common
 
 # Misc commands.
 
-# The settings.
-_settings = {}
-
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
     sbot_common.trace('plugin_loaded sbot_misc_commands')
-    global _settings
-    _settings = sublime.load_settings(sbot_common.SETTINGS_FN)
 
 
 #-----------------------------------------------------------------------------------
@@ -78,7 +73,9 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 else:
                     break
             if eols:
-                v.add_regions("eols", eols, _settings.get('eol_scope'))
+                global settings
+                settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+                v.add_regions("eols", eols, settings.get('eol_scope'))
         else:
             v.erase_regions("eols")
 
@@ -104,28 +101,3 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
                 line_num += 1
                 # Adjust for inserts.
                 offset += width+1
-
-
-#-----------------------------------------------------------------------------------
-class SbotShowEolCommand(sublime_plugin.TextCommand):
-    ''' Show line ends. '''
-
-    def run(self, edit, all=False):
-        v = self.view
-        w = v.window()
-
-        if not v.get_regions("eols"):
-            eols = []
-            ind = 0
-            while 1:
-                freg = v.find('[\n\r]', ind)
-                if freg is not None and not freg.empty(): # second condition is not documented!!
-                    eols.append(freg)
-                    ind = freg.end() + 1
-                else:
-                    break
-            if eols:
-                # "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
-                v.add_regions("eols", eols, _settings.get('eol_scope'))
-        else:
-            v.erase_regions("eols")

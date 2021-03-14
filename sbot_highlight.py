@@ -19,16 +19,11 @@ _hls = {}
 # Need to track these because ST window/view lifecycle is unreliable.
 _views_inited = set()
 
-# The settings.
-_settings = {}
-
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
     sbot_common.trace('plugin_loaded sbot_highlight')
-    global _settings
-    _settings = sublime.load_settings(sbot_common.SETTINGS_FN)
 
 
 #-----------------------------------------------------------------------------------
@@ -96,7 +91,8 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     '''
     def run(self, edit, hl_index):
         v = self.view
-        highlight_scopes = _settings.get('highlight_scopes')
+        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        highlight_scopes = settings.get('highlight_scopes')
 
         # Get whole word or specific span.
         region = v.sel()[0]
@@ -122,34 +118,24 @@ class SbotClearHighlightCommand(sublime_plugin.TextCommand):
     ''' Clear all where the cursor is. '''
 
     def run(self, edit):
-        global _hls
-
-        # Locate specific region, crudely. TODO-X this is clumsy.
         v = self.view
 
         tokens = _get_persist_tokens(v, False)
 
         if tokens is not None:
-            highlight_scopes = _settings.get('highlight_scopes')
+            settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+            highlight_scopes = settings.get('highlight_scopes')
             num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
-
-            point = v.sel()[0].a
-            highlight_scope = ''
 
             # Clean displayed colors.
             for i in range(num_highlights):
                 reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
-                for region in v.get_regions(reg_name):
-                    if region.contains(point):
-                        highlight_scope = highlight_scopes[i]
-                        v.erase_regions(reg_name)
+                v.erase_regions(reg_name)
 
-                        # Remove from collection.
-                        for token, tparams in tokens.items():
-                            if highlight_scope == tparams['scope']:
-                                del tokens[token]
-                                break;
-
+                # Remove from collection.
+                for token, tparams in tokens.items():
+                    if highlight_scope == tparams['scope']:
+                        del tokens[token]
                         break;
 
 
@@ -163,7 +149,8 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
         v = self.view
 
         # Clean displayed colors.
-        highlight_scopes = _settings.get('highlight_scopes')
+        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        highlight_scopes = settings.get('highlight_scopes')
         num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
         for i in range(num_highlights):
@@ -244,7 +231,9 @@ def _save_hls(winid, stp_fn):
     ''' General project saver. '''
     ok = True
 
-    if _settings.get('enable_persistence', True) and stp_fn is not None:
+    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+
+    if settings.get('enable_persistence') and stp_fn is not None:
         stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
         
         try:
@@ -276,7 +265,9 @@ def _open_hls(winid, stp_fn):
     global _hls
     ok = True
 
-    if _settings.get('enable_persistence', True) and stp_fn is not None:
+    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+
+    if settings.get('enable_persistence') and stp_fn is not None:
         stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
 
         try:
