@@ -11,7 +11,7 @@ import sbot_common
 # Definitions.
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 HIGHLIGHT_FILE_EXT = '.sbot-hls'
-MAX_HIGHLIGHTS = 6
+
 
 # The current highlight collections. Key is window id which corresponds to a project.
 _hls = {}
@@ -102,9 +102,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
             region = v.word(region)
         token = v.substr(region)
 
-        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
-        hl_index = min(hl_index, num_highlights)
-
+        hl_index %= len(highlight_scopes)
         scope = highlight_scopes[hl_index]
         tokens = _get_persist_tokens(v, True)
 
@@ -125,9 +123,8 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
         # Clean displayed colors.
         settings = sublime.load_settings(sbot_common.SETTINGS_FN)
         highlight_scopes = settings.get('highlight_scopes')
-        num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
 
-        for i in range(num_highlights):
+        for i in range(len(highlight_scopes)):
             reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
             v.erase_regions(reg_name)
 
@@ -140,7 +137,6 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 class SbotShowScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
-    #TODO-F let user add more from settings.
 
     def run(self, edit):
         v = self.view
