@@ -34,6 +34,8 @@ Note that the files used to persist highlights and signets are located next to t
 | Setting                  | Description |
 |:--------                 |:-------     |
 | highlight_scopes         | List of scopes for marking text |
+| highlight_scopes_to_show | Scope list for sbot_show_scopes command |
+| highlight_eol_scope      | Scope for coloring eols |
 
 
 ## Render To Html
@@ -87,10 +89,6 @@ Enhanced bookmarks:
 | sbot_split_view          | Toggles simple horizontal split screen, like e.g. `MS Word` |
 | sbot_show_eol            | Toggles showing EOLs |
 | sbot_insert_line_indexes | Insert sequential numbers in first column |
-
-| Setting                  | Description |
-|:--------                 |:-------     |
-| eol_scope                | ST scope name for EOL marker |
 
 
 ## SideBar

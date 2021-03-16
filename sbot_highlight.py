@@ -144,18 +144,11 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
+        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        scopes = settings.get('highlight_scopes_to_show')
 
         style_text = []
         content = []
-        scopes = [
-            'comment', 'constant', 'constant.character.escape', 'constant.language', 'constant.numeric', 'entity.name',
-            'entity.name.section', 'entity.name.tag', 'entity.other', 'invalid', 'invalid.deprecated', 'invalid.illegal',
-            'keyword', 'keyword.control', 'keyword.declaration', 'keyword.operator', 'markup', 'punctuation', 'source',
-            'storage.modifier', 'storage.type', 'string', 'support', 'text', 'variable', 'variable.function',
-            'variable.language', 'variable.parameter',
-            'region.redish', 'region.orangish', 'region.yellowish', 'region.greenish', 'region.cyanish', 
-            'region.bluish', 'region.purplish', 'region.pinkish'
-            ]
 
         # scopes = set()
         # for i in range(v.size()):

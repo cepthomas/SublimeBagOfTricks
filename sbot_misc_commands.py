@@ -73,9 +73,8 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 else:
                     break
             if eols:
-                global settings
                 settings = sublime.load_settings(sbot_common.SETTINGS_FN)
-                v.add_regions("eols", eols, settings.get('eol_scope'))
+                v.add_regions("eols", eols, settings.get('highlight_eol_scope'))
         else:
             v.erase_regions("eols")
 
