@@ -2,48 +2,13 @@ import os
 import sys
 import time
 import json
+import re
 import sublime
 import sublime_plugin
 
 # print('Load sbot_extra')
 
 # Holding tank for examples, leftovers, bits and pieces.
-
-
-#-----------------------------------------------------------------------------------
-class SbotFindNonAsciiCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        v = self.view
-
-        find = []
-
-        reg = sublime.Region(0, v.size())
-        s = v.substr(reg)
-
-        row = 1
-        col = 1
-
-        for c in s:
-            if c == '\n':
-                # Valid.
-                row += 1
-                col = 1
-            elif c == '\r':
-                # Valid.
-                col = 1
-            elif c == '\t':
-                # Valid.
-                col += 1
-            elif c < ' ' or c > '~': # 32  SPACE  126  ~
-                # Invalid.
-                find.append('row:{} col:{} char:{}'.format(row, col, int(c)))
-                col += 1
-            else:
-                # Valid.
-                col += 1
-                
-        for d in find:
-            sbot_common.trace(d)
 
 
 #-----------------------------------------------------------------------------------
@@ -97,8 +62,38 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         #     for k, v in hls.items():
         #         sbot_common.trace(k, v)
 
-        # with open(r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\junk.txt', 'w') as fp:
-        #     json.dump(sbot_proj, fp, indent=4)
+
+
+        # https://sublime-text-unofficial-documentation.readthedocs.io/en/latest/reference/key_bindings.html
+
+        # Structure of a Context
+        # key - Name of the context whose value you want to query.
+        # operator - Type of test to perform against key’s value. Defaults to equal.
+        # operand - The result returned by key is tested against this value.
+        # match_all - Requires the test to succeed for all selections. Defaults to false.
+
+
+        try:
+            with open(r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\default-keymap.json', 'r') as fp:
+                # print(fp.read())
+                # s = fp.read()
+                kmap = json.load(fp)
+
+                for entry in kmap:
+                    # print(entry)
+                    keys = ' '.join(entry['keys'])
+                    cmd = entry['command']
+
+                    args = list(entry.get('args', []))
+                    s = '{}, {}, {}'.format(cmd, keys, ','.join(args))
+
+                    # args = entry.get('args', '')  # {"panel": "incremental_find", "reverse": true}  or  {'cells': [[0, 0, 1, 1]], 'cols': [0.0, 1.0], 'rows': [0.0, 1.0]}
+                    # context = entry.get('context', '') # [ {key': 'last_command', 'operator': 'equal', ''operand': 'insert_best_completion'} ]
+                    # s = '{}, {}, {}, {}'.format(cmd, keys, args, context)
+
+                    print(s)
+        except Exception as e:
+            print('exception', e)
 
 
 #-----------------------------------------------------------------------------------

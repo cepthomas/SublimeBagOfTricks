@@ -39,16 +39,25 @@
     { "caption": "Format xml", "command": "sbot_format_xml" },
     { "caption": "Format html", "command": "sbot_format_html" },
 
+    { "caption": "-" },
+
     { "caption": "Trim Leading WS", "command": "sbot_trim", "args" : {"how" : "leading"}  },
     { "caption": "Trim Trailing WS", "command": "sbot_trim", "args" : {"how" : "trailing"}  },
     { "caption": "Trim Both Ends WS", "command": "sbot_trim", "args" : {"how" : "both"}  },
     
+    { "caption": "-" },
+
     { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "all" } },
     { "caption": "Collapse Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "normalize" } },
+
+    { "caption": "-" },
 
     { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : { "how" : "all" } },
     { "caption": "Remove WS Except EOL", "command": "sbot_remove_ws", "args" : { "how" : "keep_eol" } },
     { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : { "how" : "normalize" } },
+
+    { "caption": "-" },
+    { "caption": "Remove Lines With Selections", "command": "sbot_remove_sel_lines" },
 
     { "caption": "-" },
     { "caption": "Insert Line Indexes", "command": "sbot_insert_line_indexes" },

@@ -83,14 +83,6 @@ Enhanced bookmarks:
 | signet_nav_files         | Next/prev traverses all files otherwise just open one |
 
 
-## Miscellany
-| Command                  | Description |
-|:--------                 |:-------     |
-| sbot_split_view          | Toggles simple horizontal split screen, like e.g. `MS Word` |
-| sbot_show_eol            | Toggles showing EOLs |
-| sbot_insert_line_indexes | Insert sequential numbers in first column |
-
-
 ## SideBar
 Commands added to the sidebar. Just the stuff I want.
 
@@ -123,6 +115,14 @@ Prettify json. xml, html later when ST4.
 | sbot_format_json         | Format json content and show in new view |
 | sbot_format_xml          | Format xml content and show in new view |
 | sbot_format_html         | Format html content and show in new view |
+
+
+## Miscellany
+| Command                  | Description |
+|:--------                 |:-------     |
+| sbot_split_view          | Toggles simple horizontal split screen, like e.g. `MS Word` |
+| sbot_show_eol            | Toggles showing EOLs |
+| sbot_insert_line_indexes | Insert sequential numbers in first column |
 
 
 ## Examples

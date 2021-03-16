@@ -37,7 +37,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class SignetEvent(sublime_plugin.EventListener):
-    ''' Listener for events of interest. TODO-ST4 review these lifecycles.'''
+    ''' Listener for events of interest. '''
 
     def on_activated(self, view):
         ''' When focus/tab received. This is the only reliable event - on_load() doesn't get called when showing previously opened files. '''

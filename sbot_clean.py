@@ -23,11 +23,11 @@ def plugin_unloaded():
 #-----------------------------------------------------------------------------------
 def _do_sub(view, edit, reo, sub):
     # Generic substitution function.
-    regions = sbot_common.get_sel_regions(view)
-    for reg in regions:
-        orig = view.substr(reg)
+    sels = sbot_common.get_sel_regions(view)
+    for sel in sels:
+        orig = view.substr(sel)
         new = reo.sub(sub, orig)
-        view.replace(edit, reg, new)
+        view.replace(edit, sel, new)
 
 
 #-----------------------------------------------------------------------------------
