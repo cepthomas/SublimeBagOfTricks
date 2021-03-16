@@ -25,13 +25,11 @@
             { "caption": "HL 5", "command": "sbot_highlight_text", "args" : {"hl_index" : 4} },
             { "caption": "HL 6", "command": "sbot_highlight_text", "args" : {"hl_index" : 5} },
             { "caption": "-" },
-            { "caption": "Clear Highlight", "command": "sbot_clear_highlight" },
+            { "caption": "Clear Highlights", "command": "sbot_clear_highlights" },
             { "caption": "Show Scopes", "command": "sbot_show_scopes" },
         ]
     },
-    { "caption": "Clear Highlights", "command": "sbot_clear_highlights" },
 
-    { "caption": "-" },
     { "caption": "Render To Html", "command": "sbot_render_to_html" },
     { "caption": "Render Markdown", "command": "sbot_render_markdown" },
 

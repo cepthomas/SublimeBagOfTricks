@@ -47,7 +47,7 @@ class HighlightEvent(sublime_plugin.EventListener):
 
         # Lazy init.
         if fn is not None: # Sometimes this happens...
-            # Is the persisted file read yet?
+            # Is the persist file read yet?
             if winid not in _hls:
                 _open_hls(winid, view.window().project_file_name())
 
@@ -55,7 +55,7 @@ class HighlightEvent(sublime_plugin.EventListener):
             if vid not in _views_inited:
                 _views_inited.add(vid)
 
-                # Init the view with any persisted values.
+                # Init the view with any persist values.
                 tokens = _get_persist_tokens(view, False)
                 if tokens is not None:
                     for token, tparams in tokens.items():
@@ -114,32 +114,6 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotClearHighlightCommand(sublime_plugin.TextCommand):
-    ''' Clear all where the cursor is. '''
-
-    def run(self, edit):
-        v = self.view
-
-        tokens = _get_persist_tokens(v, False)
-
-        if tokens is not None:
-            settings = sublime.load_settings(sbot_common.SETTINGS_FN)
-            highlight_scopes = settings.get('highlight_scopes')
-            num_highlights = min(len(highlight_scopes), MAX_HIGHLIGHTS)
-
-            # Clean displayed colors.
-            for i in range(num_highlights):
-                reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
-                v.erase_regions(reg_name)
-
-                # Remove from collection.
-                for token, tparams in tokens.items():
-                    if highlight_scope == tparams['scope']:
-                        del tokens[token]
-                        break;
-
-
-#-----------------------------------------------------------------------------------
 class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
     ''' Clear all in this file.'''
 
@@ -166,7 +140,7 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 class SbotShowScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
-    #TODO-F let user add more.
+    #TODO-F let user add more from settings.
 
     def run(self, edit):
         v = self.view
@@ -304,7 +278,6 @@ def _highlight_view(view, token, whole_word, scope):
 def _get_persist_tokens(view, init_empty):
     ''' General helper to get the data values from collection. If init_empty and there are none, add a default value. '''
     global _hls
-
     vals = None # Default
     winid = view.window().id()
     fn = view.file_name()

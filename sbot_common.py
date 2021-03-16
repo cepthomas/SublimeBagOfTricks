@@ -36,7 +36,7 @@ def trace(*args, cat=None):
     else:
         s = cat + ' ' + ' | '.join(map(str, args))
 
-    # TODO-F option for print(s)
+    # print(s)
 
     with open(_trace_fn, "a+") as f:
         f.write(s + '\n')    
@@ -51,14 +51,13 @@ def trace(*args, cat=None):
 def error(*args):
     ''' Debugging. '''
     trace(*args, cat='ERROR!!!')
-    print(*args)
-    # TODO-F option for sublime.error_message(' '.join(map(str, args)))
+
+    # sublime.error_message(' '.join(map(str, args)))
 
 
 #-----------------------------------------------------------------------------------
 def get_sel_regions(v):
     ''' Generic function to get selections or optionally the whole view.'''
-    ensure_init()
 
     regions = []    
     if len(v.sel()[0]) > 0: # user sel
