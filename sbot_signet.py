@@ -50,7 +50,7 @@ class SignetEvent(sublime_plugin.EventListener):
 
         # Lazy init.
         if fn is not None: # Sometimes this happens...
-            # Is the persisted file read yet?
+            # Is the persist file read yet?
             if winid not in _sigs:
                 _open_sigs(winid, view.window().project_file_name())
 
@@ -58,7 +58,7 @@ class SignetEvent(sublime_plugin.EventListener):
             if vid not in _views_inited:
                 _views_inited.add(vid)
 
-                # Init the view with any persisted values.
+                # Init the view with any persist values.
                 rows = _get_persist_rows(view, False)
                 if rows is not None:
                     # Update visual signets, brutally. This is the ST way.
