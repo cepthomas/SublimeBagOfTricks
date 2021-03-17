@@ -4,6 +4,7 @@ import json
 import time
 import traceback
 import threading
+import datetime
 import sublime
 import sublime_plugin
 import sbot_common
@@ -16,7 +17,8 @@ import sbot_common
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. This fires only once for all instances of sublime. '''
-    sbot_common.trace('===================== Starting', sys.version)
+    sbot_common.trace('===================== Starting {} ======================='.format(datetime.datetime.now()))
+    sbot_common.trace('Using python', sys.version)
 
 
 #-----------------------------------------------------------------------------------
@@ -48,7 +50,3 @@ class SbotEvent(sublime_plugin.EventListener):
         pos = view.sel()[0].begin()
         view.set_status("position", 'Pos {}'.format(pos))
 
-
-#-----------------------------------------------------------------------------------
-if __name__ == '__main__':
-    sbot_common.trace("Hello from __main__")

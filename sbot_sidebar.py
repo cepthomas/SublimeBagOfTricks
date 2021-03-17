@@ -24,7 +24,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarCopyNameCommand(sublime_plugin.WindowCommand):
-    ''' Get file name. '''
+    ''' Get file name to clipboard. '''
 
     def run(self, paths):
         names = (os.path.split(path)[1] for path in paths)
@@ -33,7 +33,7 @@ class SbotSidebarCopyNameCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarCopyPathCommand(sublime_plugin.WindowCommand):
-    ''' Get file path. '''
+    ''' Get file path to clipboard. '''
 
     def run(self, paths):
         sublime.set_clipboard('\n'.join(paths))
@@ -46,7 +46,8 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            subprocess.call(['wt', '-d', dir])
+            cmd = 'wt -d "{}"'.format(dir)
+            subprocess.call(cmd, shell=True)
 
 
 #-----------------------------------------------------------------------------------
@@ -56,7 +57,8 @@ class SbotSidebarFolderCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            subprocess.call(['explorer', dir], shell=True)
+            cmd = 'explorer "{}"'.format(dir)
+            subprocess.call(cmd, shell=True)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.isdir(paths[0])
@@ -70,7 +72,9 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            subprocess.call(['tree', dir, '/a', '/f', '|', 'clip'])#, shell=True)
+            cmd = 'tree "{}" /a /f | clip'.format(dir)
+            subprocess.call(cmd, shell=True)
+            # subprocess.call(['tree', dir, '/a', '/f', '|', 'clip'])#, shell=True)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.isdir(paths[0])
@@ -84,7 +88,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             sout = subprocess.check_output([paths[0]], universal_newlines=True)
-            v = sbot_common.create_new_view(v.window(), sout)
+            v = sbot_common.create_new_view(self.window, sout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']
