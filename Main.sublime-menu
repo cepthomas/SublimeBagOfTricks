@@ -81,7 +81,6 @@
                 "id": "sbot_example_dropdown",
                 "children":
                 [
-                    { "command": "sbot_example_msg_box", "caption": "Message Box" },
                     { "command": "sbot_example_get_number", "caption": "Get Number" },
                 ]
             }

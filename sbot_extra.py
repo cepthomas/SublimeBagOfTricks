@@ -180,15 +180,6 @@ class SbotExampleGetNumberCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotExampleMsgBoxCommand(sublime_plugin.TextCommand):
-    ''' Command: Simple message box. sbot_example_msg_box '''
-
-    def run(self, edit, cmd=None):
-        # sbot_common.trace("MsgBox! {0} {1}".format(self.name(), edit))
-        sublime.ok_cancel_dialog("Hi there from StptMsgBoxCommand")
-
-
-#-----------------------------------------------------------------------------------
 class SbotExampleListSelectCommand(sublime_plugin.TextCommand):
     ''' Command: Select from list. sbot_example_list_select '''
 
