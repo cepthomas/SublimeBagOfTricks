@@ -11,12 +11,12 @@ import sbot_common
 
 _has_lxml = False
 
-try:
-    import lxml
-    _has_lxml = True
-except Exception as e:
-    # sbot_common.trace(e)
-    _has_lxml = False
+#try:
+#    import lxml
+#    _has_lxml = True
+#except Exception as e:
+#    # sbot_common.trace(e)
+#    _has_lxml = False
 
 
 #-----------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
         v = self.view
 
     def is_visible(self):
-        return _has_lxml and view.settings().get('syntax').endswith('XML.sublime-syntax')
+        return _has_lxml and self.view.settings().get('syntax').endswith('XML.sublime-syntax')
 
 
 #-----------------------------------------------------------------------------------

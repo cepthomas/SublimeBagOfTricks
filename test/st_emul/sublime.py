@@ -79,18 +79,22 @@ LAYOUT_INLINE = 0
 LAYOUT_BELOW = 1
 LAYOUT_BLOCK = 2
 
-###########################################################################
-###########################################################################
-###########################################################################
+######################################################### my added ###################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
 
 def etrace(*args):
     s = ' | '.join(map(str, args))
     print('EMUL', s)
 
 
-###########################################################################
-###########################################################################
-###########################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
 
 def version():
     return 'sublime_api.version()'
@@ -158,7 +162,7 @@ def ok_cancel_dialog(msg, ok_title=""):
 
 
 def run_command(cmd, args=None):
-    etrace('run_command', cmd, msg)
+    etrace('run_command', cmd, args)
 #     sublime_api.run_command(cmd, args)
 
 
@@ -171,7 +175,8 @@ def run_command(cmd, args=None):
 #     return sublime_api.get_clipboard(size_limit)
 
 
-# def set_clipboard(text):
+def set_clipboard(text):
+    pass
 #     return sublime_api.set_clipboard(text)
 
 
@@ -242,21 +247,24 @@ def run_command(cmd, args=None):
 #     return sublime_api.expand_variables(val, variables)
 
 
-# def load_settings(base_name):
-#     settings_id = sublime_api.load_settings(base_name)
-#     return Settings(settings_id)
-
+def load_settings(base_name):
+    #settings_id = sublime_api.load_settings(base_name)
+    #return Settings(settings_id)
+    settings = Settings(1234)
+    settings.set('TODO-T', 'all-these')
+    return settings
 
 # def save_settings(base_name):
 #     sublime_api.save_settings(base_name)
 
 
-# def set_timeout(f, timeout_ms=0):
-#     """
-#     Schedules a function to be called in the future. Sublime Text will block
-#     while the function is running
-#     """
-#     sublime_api.set_timeout(f, timeout_ms)
+def set_timeout(f, timeout_ms=0):
+    """
+    Schedules a function to be called in the future. Sublime Text will block
+    while the function is running
+    """
+    #sublime_api.set_timeout(f, timeout_ms)
+    pass
 
 
 # def set_timeout_async(f, timeout_ms=0):
@@ -280,9 +288,11 @@ def run_command(cmd, args=None):
 #     return sublime_api.get_macro()
 
 
-###########################################################################
-###########################################################################
-###########################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
 
 # class Window(object):
 #     def __init__(self, id):
@@ -572,153 +582,158 @@ def run_command(cmd, args=None):
 #         sublime_api.window_status_message(self.window_id, msg)
 
 
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+
+class Edit(object):
+    def __init__(self, token):
+        self.edit_token = token
+
+
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+######################################################################################################################################################
+
+class Region(object):
+    __slots__ = ['a', 'b', 'xpos']
+
+    def __init__(self, a, b=None, xpos=-1):
+        if b is None:
+            b = a
+        self.a = a
+        self.b = b
+        self.xpos = xpos
+
+    def __str__(self):
+        return "(" + str(self.a) + ", " + str(self.b) + ")"
+
+    def __repr__(self):
+        return "(" + str(self.a) + ", " + str(self.b) + ")"
+
+    def __len__(self):
+        return self.size()
+
+    def __eq__(self, rhs):
+        return isinstance(rhs, Region) and self.a == rhs.a and self.b == rhs.b
+
+    def __lt__(self, rhs):
+        lhs_begin = self.begin()
+        rhs_begin = rhs.begin()
+
+        if lhs_begin == rhs_begin:
+            return self.end() < rhs.end()
+        else:
+            return lhs_begin < rhs_begin
+
+    def empty(self):
+        return self.a == self.b
+
+    def begin(self):
+        if self.a < self.b:
+            return self.a
+        else:
+            return self.b
+
+    def end(self):
+        if self.a < self.b:
+            return self.b
+        else:
+            return self.a
+
+    def size(self):
+        return abs(self.a - self.b)
+
+    def contains(self, x):
+        if isinstance(x, Region):
+            return self.contains(x.a) and self.contains(x.b)
+        else:
+            return x >= self.begin() and x <= self.end()
+
+    def cover(self, rhs):
+        a = min(self.begin(), rhs.begin())
+        b = max(self.end(), rhs.end())
+
+        if self.a < self.b:
+            return Region(a, b)
+        else:
+            return Region(b, a)
+
+    def intersection(self, rhs):
+        if self.end() <= rhs.begin():
+            return Region(0)
+        if self.begin() >= rhs.end():
+            return Region(0)
+
+        return Region(max(self.begin(), rhs.begin()), min(self.end(), rhs.end()))
+
+    def intersects(self, rhs):
+        lb = self.begin()
+        le = self.end()
+        rb = rhs.begin()
+        re = rhs.end()
+
+        return (
+            (lb == rb and le == re) or
+            (rb > lb and rb < le) or (re > lb and re < le) or
+            (lb > rb and lb < re) or (le > rb and le < re))
+
+
 ###########################################################################
 ###########################################################################
 ###########################################################################
 
-# class Edit(object):
-#     def __init__(self, token):
-#         self.edit_token = token
+class Selection(object):
+    def __init__(self, id):
+        self.view_id = id
 
+    def __len__(self):
+        return 555 #TODO-T sublime_api.view_selection_size(self.view_id)
+        #return sublime_api.view_selection_size(self.view_id)
 
-###########################################################################
-###########################################################################
-###########################################################################
+    #def __getitem__(self, index):
+    #    r = sublime_api.view_selection_get(self.view_id, index)
+    #    if r.a == -1:
+    #        raise IndexError()
+    #    return r
 
-# class Region(object):
-#     __slots__ = ['a', 'b', 'xpos']
+    #def __delitem__(self, index):
+    #    sublime_api.view_selection_erase(self.view_id, index)
 
-#     def __init__(self, a, b=None, xpos=-1):
-#         if b is None:
-#             b = a
-#         self.a = a
-#         self.b = b
-#         self.xpos = xpos
+    #def __eq__(self, rhs):
+    #    return rhs is not None and list(self) == list(rhs)
 
-#     def __str__(self):
-#         return "(" + str(self.a) + ", " + str(self.b) + ")"
+    #def __lt__(self, rhs):
+    #    return rhs is not None and list(self) < list(rhs)
 
-#     def __repr__(self):
-#         return "(" + str(self.a) + ", " + str(self.b) + ")"
+    #def __bool__(self):
+    #    return self.view_id != 0
 
-#     def __len__(self):
-#         return self.size()
+    #def is_valid(self):
+    #    return sublime_api.view_buffer_id(self.view_id) != 0
 
-#     def __eq__(self, rhs):
-#         return isinstance(rhs, Region) and self.a == rhs.a and self.b == rhs.b
+    #def clear(self):
+    #    sublime_api.view_selection_clear(self.view_id)
 
-#     def __lt__(self, rhs):
-#         lhs_begin = self.begin()
-#         rhs_begin = rhs.begin()
+    #def add(self, x):
+    #    if isinstance(x, Region):
+    #        sublime_api.view_selection_add_region(self.view_id, x.a, x.b, x.xpos)
+    #    else:
+    #        sublime_api.view_selection_add_point(self.view_id, x)
 
-#         if lhs_begin == rhs_begin:
-#             return self.end() < rhs.end()
-#         else:
-#             return lhs_begin < rhs_begin
+    #def add_all(self, regions):
+    #    for r in regions:
+    #        self.add(r)
 
-#     def empty(self):
-#         return self.a == self.b
+    #def subtract(self, region):
+    #    sublime_api.view_selection_subtract_region(self.view_id, region.a, region.b)
 
-#     def begin(self):
-#         if self.a < self.b:
-#             return self.a
-#         else:
-#             return self.b
-
-#     def end(self):
-#         if self.a < self.b:
-#             return self.b
-#         else:
-#             return self.a
-
-#     def size(self):
-#         return abs(self.a - self.b)
-
-#     def contains(self, x):
-#         if isinstance(x, Region):
-#             return self.contains(x.a) and self.contains(x.b)
-#         else:
-#             return x >= self.begin() and x <= self.end()
-
-#     def cover(self, rhs):
-#         a = min(self.begin(), rhs.begin())
-#         b = max(self.end(), rhs.end())
-
-#         if self.a < self.b:
-#             return Region(a, b)
-#         else:
-#             return Region(b, a)
-
-#     def intersection(self, rhs):
-#         if self.end() <= rhs.begin():
-#             return Region(0)
-#         if self.begin() >= rhs.end():
-#             return Region(0)
-
-#         return Region(max(self.begin(), rhs.begin()), min(self.end(), rhs.end()))
-
-#     def intersects(self, rhs):
-#         lb = self.begin()
-#         le = self.end()
-#         rb = rhs.begin()
-#         re = rhs.end()
-
-#         return (
-#             (lb == rb and le == re) or
-#             (rb > lb and rb < le) or (re > lb and re < le) or
-#             (lb > rb and lb < re) or (le > rb and le < re))
-
-
-###########################################################################
-###########################################################################
-###########################################################################
-
-# class Selection(object):
-#     def __init__(self, id):
-#         self.view_id = id
-
-#     def __len__(self):
-#         return sublime_api.view_selection_size(self.view_id)
-
-#     def __getitem__(self, index):
-#         r = sublime_api.view_selection_get(self.view_id, index)
-#         if r.a == -1:
-#             raise IndexError()
-#         return r
-
-#     def __delitem__(self, index):
-#         sublime_api.view_selection_erase(self.view_id, index)
-
-#     def __eq__(self, rhs):
-#         return rhs is not None and list(self) == list(rhs)
-
-#     def __lt__(self, rhs):
-#         return rhs is not None and list(self) < list(rhs)
-
-#     def __bool__(self):
-#         return self.view_id != 0
-
-#     def is_valid(self):
-#         return sublime_api.view_buffer_id(self.view_id) != 0
-
-#     def clear(self):
-#         sublime_api.view_selection_clear(self.view_id)
-
-#     def add(self, x):
-#         if isinstance(x, Region):
-#             sublime_api.view_selection_add_region(self.view_id, x.a, x.b, x.xpos)
-#         else:
-#             sublime_api.view_selection_add_point(self.view_id, x)
-
-#     def add_all(self, regions):
-#         for r in regions:
-#             self.add(r)
-
-#     def subtract(self, region):
-#         sublime_api.view_selection_subtract_region(self.view_id, region.a, region.b)
-
-#     def contains(self, region):
-#         return sublime_api.view_selection_contains(self.view_id, region.a, region.b)
+    #def contains(self, region):
+    #    return sublime_api.view_selection_contains(self.view_id, region.a, region.b)
 
 
 ###########################################################################
@@ -761,7 +776,8 @@ class View(object):
         self.settings_object = None
 
     def __len__(self):
-        return self.size()
+        #return self.size()
+        return 999 #TODO-T
 
     def __eq__(self, other):
         return isinstance(other, View) and other.view_id == self.view_id
@@ -1210,17 +1226,20 @@ class View(object):
 class Settings(object):
     def __init__(self, id):
         self.settings_id = id
+        self.settings_storage = {}
 
     def get(self, key, default=None):
-        if default is not None:
-            return sublime_api.settings_get_default(self.settings_id, key, default)
-        else:
-            return sublime_api.settings_get(self.settings_id, key)
+        return self.settings_storage.get(key, default)
+        #if default is not None:
+        #    return sublime_api.settings_get_default(self.settings_id, key, default)
+        #else:
+        #    return sublime_api.settings_get(self.settings_id, key)
 
-    def has(self, key):
-        return sublime_api.settings_has(self.settings_id, key)
+#    def has(self, key):
+#        return sublime_api.settings_has(self.settings_id, key)
 
-#     def set(self, key, value):
+    def set(self, key, value):
+        self.settings_storage[key] = value
 #         sublime_api.settings_set(self.settings_id, key, value)
 
 #     def erase(self, key):

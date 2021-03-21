@@ -110,55 +110,55 @@ def _clean_json(s):
     # match_all - Requires the test to succeed for all selections. Defaults to false.
 
 
-    try:
-        with open(r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\default-keymap.json', 'r') as fp:
-        # C:\Dev\SublimePluginsSourceCode\Default.sublime-package\Default (Windows).sublime-keymap
+    #try:
+    #    with open(r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\default-keymap.json', 'r') as fp:
+    #    # C:\Dev\SublimePluginsSourceCode\Default.sublime-package\Default (Windows).sublime-keymap
 
-            # print(fp.read())
-            # s = fp.read()
-            kmap = json.load(fp)
+    #        # print(fp.read())
+    #        # s = fp.read()
+    #        kmap = json.load(fp)
 
-            fixes = { '"': 'dblquote', "'": 'snglquote', '(': 'lparen', ')': 'rparen', 
-                '[': 'lbracket', ']': 'rbracket', '{': 'lbrace', '}': 'rbrace' }
+    #        fixes = { '"': 'dblquote', "'": 'snglquote', '(': 'lparen', ')': 'rparen', 
+    #            '[': 'lbracket', ']': 'rbracket', '{': 'lbrace', '}': 'rbrace' }
 
-            s = []
-            s.append('cmd, keys, args, context')
-
-
-            for entry in kmap:
-                # print(entry)
-                keys = ' '.join(entry['keys'])
-                if keys in fixes:
-                    keys = fixes[keys]
-                cmd = entry['command']
-
-                # args = list(entry.get('args', []))
-                # s = '{}, {}, {}'.format(cmd, keys, ','.join(args))
-
-                # args:
-                # {'extensions': ['cpp', 'cxx', 'cc', 'c', 'hpp', 'hxx', 'hh', 'h', 'ipp', 'inl', 'm', 'mm']}
-                # {'forward': False, 'by': 'pages', 'extend': True}
-                # {'rows': [0.0, 0.5, 1.0], 'cols': [0.0, 1.0], 'cells': [[0, 0, 1, 1], [0, 1, 1, 2]]}
-
-                # context:
-                # [
-                #     {'operand': '(text.html, text.xml) - string - comment', 'key': 'selector', 'operator': 'equal', 'match_all': True},
-                #     {'operand': '.*<$', 'key': 'preceding_text', 'operator': 'regex_match', 'match_all': True}, {'key': 'setting.auto_close_tags'}
-                # ]
+    #        s = []
+    #        s.append('cmd, keys, args, context')
 
 
-                na = '' # or None or 'xxx'
-                repl = '' #'~'
-                args = str(entry.get('args', na)).replace(',', repl)
-                context = str(entry.get('context', na)).replace(',', repl)
-                s.append('{}, {}, {}, {}'.format(cmd, keys, args, context))
+    #        for entry in kmap:
+    #            # print(entry)
+    #            keys = ' '.join(entry['keys'])
+    #            if keys in fixes:
+    #                keys = fixes[keys]
+    #            cmd = entry['command']
 
-            s = '\n'.join(s)
-            # print(s)
-            sbot_common.create_new_view(v.window(), s)
+    #            # args = list(entry.get('args', []))
+    #            # s = '{}, {}, {}'.format(cmd, keys, ','.join(args))
 
-    except Exception as e:
-        print('exception', e)
+    #            # args:
+    #            # {'extensions': ['cpp', 'cxx', 'cc', 'c', 'hpp', 'hxx', 'hh', 'h', 'ipp', 'inl', 'm', 'mm']}
+    #            # {'forward': False, 'by': 'pages', 'extend': True}
+    #            # {'rows': [0.0, 0.5, 1.0], 'cols': [0.0, 1.0], 'cells': [[0, 0, 1, 1], [0, 1, 1, 2]]}
+
+    #            # context:
+    #            # [
+    #            #     {'operand': '(text.html, text.xml) - string - comment', 'key': 'selector', 'operator': 'equal', 'match_all': True},
+    #            #     {'operand': '.*<$', 'key': 'preceding_text', 'operator': 'regex_match', 'match_all': True}, {'key': 'setting.auto_close_tags'}
+    #            # ]
+
+
+    #            na = '' # or None or 'xxx'
+    #            repl = '' #'~'
+    #            args = str(entry.get('args', na)).replace(',', repl)
+    #            context = str(entry.get('context', na)).replace(',', repl)
+    #            s.append('{}, {}, {}, {}'.format(cmd, keys, args, context))
+
+    #        s = '\n'.join(s)
+    #        # print(s)
+    #        sbot_common.create_new_view(v.window(), s)
+
+    #except Exception as e:
+    #    print('exception', e)
 
 
 #-----------------------------------------------------------------------------------

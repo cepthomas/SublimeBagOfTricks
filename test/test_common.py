@@ -1,42 +1,42 @@
-
-
+import unittest
+import sublime
+import sublime_plugin
 import sbot
 import sbot_common
 
-sbot.plugin_loaded()
+
+class TestCommon(unittest.TestCase):
+    def setUp(self):
+        sbot.plugin_loaded()
+
+    def tearDown(self):
+        sbot.plugin_unloaded()
+
+    def test_sbot(self):
+        '''Also has tests for the simple sbot.py.'''
+        # self.assertEqual('foo'.upper(), 'FOO')
+
+        v = sublime.View(600)
+        evt = sbot.SbotEvent()
+        evt.on_selection_modified(v)
+
+        # TODO-T sbot_common stuff:
+        # def trace(*args, cat=None):
+        # # Check for file size limit.
+        # def error(info, exc):
+        # def get_sel_regions(v):
+        # ''' Generic function to get selections or optionally the whole view.'''
+        # def create_new_view(window, text):
+        # ''' Creates a temp view with text. Returns the view.'''
+        # def write_to_console(text):
+        # ''' This is crude but works. Sublime also adds an extra eol when writing to the console. '''
+        # def dump_view(preamble, view):
+        # ''' Helper util. '''
+        # def wait_load_file(view, line):
+        # ''' Open file asynchronously then position at line. '''
+        # class SbotPerfCounter(object):
+        # ''' Container for perf counter. All times in msec. '''
 
 
-sbot.plugin_unloaded()
-
-
-
-#class sublime_plugin.ViewEventListener:
-#    #self.view
-
-#    def on_activated(self):
-#        ''' When focus/tab received. This is the only reliable event - on_load() doesn't get called when showing previously opened files. '''
-
-#    def on_load(self):
-#        ''' Called when file loaded. Doesn't work when starting up! Maybe ST4 improved? '''
-
-#    def on_deactivated(self):
-#        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
-
-#    def on_close(self):
-#        ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
-
-
-#class sublime_plugin.EventListener:
-#    ''' Listener for window specific events of interest. '''
-
-#    # def on_load(self, view):
-#    # def on_activated(self, view):
-#    # def on_deactivated(self, view):
-#    # def on_close(self, view):
-
-#    def on_selection_modified(self, view):
-#        ''' Show the abs position in the status bar. '''
-#        pos = view.sel()[0].begin()
-#        view.set_status("position", 'Pos {}'.format(pos))
-
-
+if __name__ == '__main__':
+    unittest.main()

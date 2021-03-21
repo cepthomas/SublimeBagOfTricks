@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import sublime
 import sublime_plugin
@@ -52,7 +53,7 @@ def error(info, exc):
     ''' Debugging. '''
     trace(info, exc.message, exc.args, cat='ERROR!!!')
     trace(sys.exc_info()[0], cat='ERROR!!!')
-    sublime.error_message(info, exc)
+    sublime.error_message(info)  #, exc)
 
 
 #-----------------------------------------------------------------------------------
@@ -110,7 +111,7 @@ def dump_view(preamble, view):
         s.append('project_file_name:')
         s.append('None' if w is None or w.project_file_name() is None else os.path.split(w.project_file_name())[1])
 
-    trace(" ".join(s));
+    trace(" ".join(s))
             
 
 #-----------------------------------------------------------------------------------

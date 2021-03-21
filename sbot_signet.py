@@ -151,7 +151,7 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         # Remove from collection.
-        rows = _get_persist_rows(v, False)
+        rows = _get_persist_rows(self.view, False)
         if rows is not None:
             rows.clear()
 
