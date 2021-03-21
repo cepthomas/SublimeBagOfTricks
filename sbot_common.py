@@ -48,11 +48,11 @@ def trace(*args, cat=None):
 
 
 #-----------------------------------------------------------------------------------
-def error(*args):
+def error(info, exc):
     ''' Debugging. '''
-    trace(*args, cat='ERROR!!!')
-
-    # sublime.error_message(' '.join(map(str, args)))
+    trace(info, exc.message, exc.args, cat='ERROR!!!')
+    trace(sys.exc_info()[0], cat='ERROR!!!')
+    sublime.error_message(info, exc)
 
 
 #-----------------------------------------------------------------------------------

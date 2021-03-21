@@ -36,11 +36,12 @@ def plugin_unloaded():
 
 
 #-----------------------------------------------------------------------------------
-class SignetEvent(sublime_plugin.EventListener):
-    ''' Listener for events of interest. '''
+class SignetEvent(sublime_plugin.ViewEventListener):
+    ''' Listener for view specific events of interest. '''
 
-    def on_activated(self, view):
+    def on_activated(self):
         ''' When focus/tab received. This is the only reliable event - on_load() doesn't get called when showing previously opened files. '''
+        view = self.view
         global _views_inited
         vid = view.id()
         winid = view.window().id()
@@ -70,14 +71,16 @@ class SignetEvent(sublime_plugin.EventListener):
                     view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
 
 
-    def on_load(self, view):
+    def on_load(self):
         ''' Called when file loaded. Doesn't work when starting up! Maybe ST4 improved? '''
+        view = self.view
         sbot_common.trace('SignetEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
         # if view.file_name() is not None:
 
 
-    def on_deactivated(self, view):
+    def on_deactivated(self):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
+        view = self.view
         winid = view.window().id()
         sbot_common.trace('SignetEvent.on_deactivated', view.id(), winid)
 
@@ -85,8 +88,9 @@ class SignetEvent(sublime_plugin.EventListener):
             _save_sigs(winid, view.window().project_file_name())
 
 
-    def on_close(self, view):
+    def on_close(self):
         ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
+        view = self.view
         sbot_common.trace('SignetEvent.on_close', view.file_name(), view.id())
 
 
@@ -181,8 +185,7 @@ def _save_sigs(winid, stp_fn):
                     json.dump(_sigs[winid], fp, indent=4)
 
         except Exception as e:
-            sres = 'Save signets error: {}'.format(e.args)
-            sbot_common.error(sres)
+            sbot_common.error('Save signets error1', e)
             ok = False
 
     return ok
@@ -210,8 +213,7 @@ def _open_sigs(winid, stp_fn):
             _sigs[winid] = { }
 
         except Exception as e:
-            sres = 'Open signets error: {}'.format(e.args)
-            sbot_common.error(sres)
+            sbot_common.error('Save signets error2', e)
             ok = False
 
     return ok
@@ -317,7 +319,7 @@ def _get_persist_rows(view, init_empty):
         if fn not in _sigs[winid]:
             if init_empty:
                 # Add a new one.
-                _sigs[winid][fn] = {}
+                _sigs[winid][fn] = []
                 vals = _sigs[winid][fn]
         else:
             vals = _sigs[winid][fn]

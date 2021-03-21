@@ -65,10 +65,16 @@ Note that the files used to persist highlights and signets are located next to t
 
 ## Signets (bookmarks)
 Enhanced bookmarks:
-- Persists to sbot project file.
-- Next/previous (optionally) traverses files in project - like VS.
 - `Bookmark` and `mark` are already taken so I shall use `signet` which means in French:
 > "Petit ruban ou filet qu'on insère entre les feuillets d'un livre pour marquer l'endroit que l'on veut retrouver."
+- Persists to sbot-sigs file.
+- Next/previous (optionally) traverses files in project - like VS.
+- Bookmark key mappings have been stolen:
+    - ctrl+f2: sbot_toggle_signet
+    - f2: sbot_next_signet
+    - shift+f2: sbot_previous_signet
+    - ctrl+shift+f2: sbot_clear_signets
+
 
 | Command                  | Description |
 |:--------                 |:-------     |

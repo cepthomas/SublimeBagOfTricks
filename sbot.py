@@ -28,7 +28,7 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class SbotEvent(sublime_plugin.EventListener):
-    ''' Listener for events of interest. '''
+    ''' Listener for window specific events of interest. '''
 
     # def on_load(self, view):
     #     sbot_common.trace('SbotEvent.on_load', view.file_name(), view.id())

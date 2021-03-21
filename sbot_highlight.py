@@ -33,11 +33,12 @@ def plugin_unloaded():
 
 
 #-----------------------------------------------------------------------------------
-class HighlightEvent(sublime_plugin.EventListener):
-    ''' Listener for events of interest. '''
+class HighlightEvent(sublime_plugin.ViewEventListener):
+    ''' Listener for view specific events of interest. '''
 
-    def on_activated(self, view):
+    def on_activated(self):
         ''' When focus/tab received. This is the only reliable init event - on_load() doesn't get called when showing previously opened files. '''
+        view = self.view
         global _views_inited
         vid = view.id()
         winid = view.window().id()
@@ -62,14 +63,16 @@ class HighlightEvent(sublime_plugin.EventListener):
                         _highlight_view(view, token, tparams['whole_word'], tparams['scope'])
 
 
-    def on_load(self, view):
+    def on_load(self):
         ''' Called when file loaded. Doesn't work when starting up! Maybe ST4 improved? '''
+        view = self.view
         sbot_common.trace('HighlightEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
         # if view.file_name() is not None:
 
 
-    def on_deactivated(self, view):
+    def on_deactivated(self):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
+        view = self.view
         winid = view.window().id()
         sbot_common.trace('HighlightEvent.on_deactivated', view.id(), winid)
 
@@ -77,8 +80,9 @@ class HighlightEvent(sublime_plugin.EventListener):
             _save_hls(winid, view.window().project_file_name())
 
 
-    def on_close(self, view):
+    def on_close(self):
         ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
+        view = self.view
         sbot_common.trace('HighlightEvent.on_close', view.file_name(), view.id())
 
 
@@ -215,8 +219,7 @@ def _save_hls(winid, stp_fn):
                 #   json.dump(_hls[winid], fp, indent=4)
 
         except Exception as e:
-            sres = 'Save highlights error: {}'.format(e.args)
-            sublime.error_message(sres)
+            sbot_common.error('Save highlights error1', e)
             ok = False
 
     return ok
@@ -244,8 +247,7 @@ def _open_hls(winid, stp_fn):
             _hls[winid] = { }
 
         except Exception as e:
-            sres = 'Open highlights error: {}'.format(e.args)
-            sublime.error_message(sres)
+            sbot_common.error('Save highlights error2', e)
             ok = False
 
     return ok
