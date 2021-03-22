@@ -183,6 +183,10 @@ class SbotExampleGetNumberCommand(sublime_plugin.WindowCommand):
 class SbotExampleListSelectCommand(sublime_plugin.TextCommand):
     ''' Command: Select from list. sbot_example_list_select '''
 
+    def __init__(self, view):
+        self.panel_items = []
+        super(SbotExampleListSelectCommand, self).__init__(view)
+
     def run(self, edit, cmd=None):
         self.panel_items = ["Duck", "Cat", "Banana"]
         self.view.window().show_quick_panel(self.panel_items, self.on_done_panel)
@@ -226,9 +230,6 @@ class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
     input handlers because the handlers display input in the command palette itself as a part of its operation.
     '''
 
-    def __init__(self, view):
-        self.view = view
-
     def placeholder(self):
         return "placeholder - optional"
 
@@ -252,6 +253,7 @@ class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
 
 #-----------------------------------------------------------------------------------
 class SbotExampleInputCommand(sublime_plugin.TextCommand):
+
     def run(self, edit, my_value): # Has to be called exactly my_value - another convention.
         sbot_common.trace('argument:', my_value)
         # for i in range(len(self.view.sel())):

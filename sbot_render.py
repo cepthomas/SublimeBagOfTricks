@@ -31,11 +31,15 @@ def plugin_unloaded():
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' Make a pretty. '''
 
-    def run(self, edit):
-        v = self.view
-
+    def __init__(self, view):
         # Get prefs.
         self.settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        self.rows = 0
+        self.row_num = 0
+        super(SbotRenderToHtmlCommand, self).__init__(view)
+
+    def run(self, edit):
+        v = self.view
 
         render_max_file = self.settings.get('render_max_file')
 
@@ -102,8 +106,8 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 all_styles[style] = len(all_styles)
 
         def _get_style(style):
-                # Locate the style and return the id.
-                return all_styles.get(style, -1)
+            # Locate the style and return the id.
+            return all_styles.get(style, -1)
 
         def _view_style_to_tuple(view_style):
             tt = (view_style['foreground'], view_style.get('background', None), view_style.get('bold', False), view_style.get('italic', False))
@@ -306,12 +310,12 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def _output_html(view, content=[]):
+def _output_html(view, content=None):
     ''' Common html file formatter. '''
 
     settings = sublime.load_settings(sbot_common.SETTINGS_FN)
     output_type = settings.get('render_output')
-    s = "".join(content)
+    s = "" if content is None else "".join(content)
 
     if output_type == 'clipboard':
         sublime.set_clipboard(s)

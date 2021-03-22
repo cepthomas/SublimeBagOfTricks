@@ -58,7 +58,7 @@ class SbotOpenUrlCommand(sublime_plugin.WindowCommand):
 class SbotShowEolCommand(sublime_plugin.TextCommand):
     ''' Show line ends. '''
 
-    def run(self, edit, all=False):
+    def run(self, edit):
         v = self.view
         w = v.window()
 
@@ -83,7 +83,7 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
 class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
     ''' Insert sequential numbers in first column. Default is to start at 1. '''
 
-    def run(self, edit, all=False):
+    def run(self, edit):
         v = self.view
 
         # Iterate lines.

@@ -88,7 +88,7 @@ def write_to_console(text):
         elif b == r'\r':
             pass
         else:
-            sys.stdout.write(chr(b));
+            sys.stdout.write(chr(b))
 
 
 #-----------------------------------------------------------------------------------
@@ -127,8 +127,8 @@ def wait_load_file(view, line):
 class SbotPerfCounter(object):
     ''' Container for perf counter. All times in msec. '''
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, cid):
+        self.id = cid
         self.vals = []
         self.start_time = 0.0
 

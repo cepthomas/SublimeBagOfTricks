@@ -100,8 +100,8 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
     ''' Remove from project. '''
 
     def __init__(self, window):
-        super(SbotSidebarExcludeCommand, self).__init__(window)
         self.fn = window.project_file_name()
+        super(SbotSidebarExcludeCommand, self).__init__(window)
 
     def run(self, paths):
         if len(paths) > 0:

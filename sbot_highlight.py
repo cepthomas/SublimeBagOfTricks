@@ -93,6 +93,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     Note: Regions added by v.add_regions() can not set the foreground color. The scope color is used
     for the region background color. Also they are not available via extract_scope().
     '''
+
     def run(self, edit, hl_index):
         v = self.view
         settings = sublime.load_settings(sbot_common.SETTINGS_FN)

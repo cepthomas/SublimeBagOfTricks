@@ -32,6 +32,7 @@ def _do_sub(view, edit, reo, sub):
 
 #-----------------------------------------------------------------------------------
 class SbotTrimCommand(sublime_plugin.TextCommand):
+
     def run(self, edit, how):
         if how == 'leading':
             reo = re.compile('^[ \t]+', re.MULTILINE)
@@ -47,11 +48,12 @@ class SbotTrimCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
+
     def run(self, edit, how):
         if how == 'normalize':
             reo = re.compile(r'(?:\s*)(\r?\n)(?:\s*)(?:\r?\n+)', re.MULTILINE)
             sub = r'\1\1'
-        else:
+        else: # remove_all
             reo = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
             sub = ''
         _do_sub(self.view, edit, reo, sub)
@@ -59,6 +61,7 @@ class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveWsCommand(sublime_plugin.TextCommand):
+
     def run(self, edit, how):
         if how == 'normalize':
             reo = re.compile('([ ])[ ]+')
@@ -66,7 +69,7 @@ class SbotRemoveWsCommand(sublime_plugin.TextCommand):
         elif how == 'keep_eol':
             reo = re.compile(r'[ \t\v\f]')
             sub = ''
-        else:
+        else: # remove_all
             reo = re.compile(r'[ \t\r\n\v\f]')
             sub = ''
         _do_sub(self.view, edit, reo, sub)

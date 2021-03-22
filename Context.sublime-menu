@@ -49,12 +49,12 @@
     
     { "caption": "-" },
 
-    { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "all" } },
+    { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "remove_all" } },
     { "caption": "Collapse Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "normalize" } },
 
     { "caption": "-" },
 
-    { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : { "how" : "all" } },
+    { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : { "how" : "remove_all" } },
     { "caption": "Remove WS Except EOL", "command": "sbot_remove_ws", "args" : { "how" : "keep_eol" } },
     { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : { "how" : "normalize" } },
 
