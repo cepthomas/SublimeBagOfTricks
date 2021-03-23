@@ -209,8 +209,6 @@ def _save_hls(winid, stp_fn):
                 # Now save.
                 with open(stp_fn, 'w') as fp:
                     json.dump(_hls[winid], fp, indent=4)
-                #with open(stp_fn + 'xxx.json', 'w') as fp:
-                #   json.dump(_hls[winid], fp, indent=4)
 
         except Exception as e:
             sbot_common.error('Save highlights error1', e)

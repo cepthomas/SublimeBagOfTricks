@@ -164,24 +164,22 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 def _save_sigs(winid, stp_fn):
     ''' General project saver. '''
     ok = True
-    return
-    
     settings = sublime.load_settings(sbot_common.SETTINGS_FN)
 
     if settings.get('enable_persistence') and stp_fn is not None:
-        fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
+        stp_fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
         
         try:
             # Remove invalid files and any empty values.
             if winid in _sigs:
-                for fn, tokens in _sigs[winid].items():
+                for fn, _ in _sigs[winid].items():
                     if not os.path.exists(fn):
                         del _sigs[winid][fn]
                     elif len(_sigs[winid][fn]) == 0:
                         del _sigs[winid][fn]
 
                 # Now save.
-                with open(fn, 'w') as fp:
+                with open(stp_fn, 'w') as fp:
                     json.dump(_sigs[winid], fp, indent=4)
 
         except Exception as e:
