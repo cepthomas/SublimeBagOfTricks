@@ -28,7 +28,7 @@ class SbotSplitViewCommand(sublime_plugin.WindowCommand):
     def run(self):
         w = self.window
 
-        if(len(w.layout()['rows']) > 2):
+        if len(w.layout()['rows']) > 2:
             # Remove split.
             w.run_command("focus_group", { "group": 1 } )
             w.run_command("close_file")

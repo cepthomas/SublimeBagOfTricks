@@ -171,4 +171,3 @@ class SbotSidebarOpenBrowserCommand(sublime_plugin.WindowCommand):
                 if '.htm' in fn:
                     vis = True
         return vis
-

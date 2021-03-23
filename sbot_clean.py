@@ -71,4 +71,3 @@ class SbotRemoveWsCommand(sublime_plugin.TextCommand):
             reo = re.compile(r'[ \t\r\n\v\f]')
             sub = ''
         _do_sub(self.view, edit, reo, sub)
-

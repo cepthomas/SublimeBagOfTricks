@@ -74,7 +74,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     def _do_work(self):
         ''' The worker thread. '''
         v = self.view
-        
+
         # html render msec per line:
         # - medium (5k dense lines) 1.248921079999997 (5000)
         # - small (1k sparse lines) 0.4043940577246477 (1178)
@@ -114,20 +114,20 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         # Start progress.
         sublime.set_timeout(self._update_status, 100)
-        
+
         ## If there are highlights, collect them.
         highlight_scopes = self.settings.get('highlight_scopes')
-        for i in range(len(highlight_scopes)):
+
+        for i, value in enumerate(highlight_scopes):
             # Get the style and invert for highlights.
-            scope = highlight_scopes[i]
-            ss = v.style_for_scope(scope)
+            ss = v.style_for_scope(value)
             background = ss['background'] if 'background' in ss else ss['foreground']
             foreground = html_background
             hl_style = (foreground, background, False, False)
             _add_style(hl_style)
 
             # Collect the highlight regions.
-            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+            reg_name = HIGHLIGHT_REGION_NAME % value
             for region in v.get_regions(reg_name):
                 highlight_regions.append((region, hl_style))
 
@@ -322,11 +322,10 @@ def _output_html(view, content=None):
     # elif output_type == 'new_file':
     #     v = sbot_common.create_new_view(v.window(), s)
     #     v.set_syntax_file('Packages/HTML/HTML.tmLanguage')
-    elif output_type == 'file' or output_type == 'show':
+    elif output_type in ('file', 'show'):
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'
         fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', basefn)
         with open(fn, 'w') as f:
             f.write(s)
         if output_type == 'show':
             webbrowser.open_new_tab(fn)
-

@@ -148,8 +148,17 @@ disable=print-statement,
         line-too-long,
         invalid-name,
         missing-class-docstring,
-        no-self-use
-
+        missing-module-docstring,
+        missing-function-docstring,
+        no-self-use,
+        no-else-return,
+        too-many-lines,
+        too-many-locals,
+        too-many-nested-blocks,
+        too-many-statements,
+        too-many-branches,
+        too-few-public-methods,
+        chained-comparison
         
 
 # Enable the message, report, category or checker with the given id(s). You can

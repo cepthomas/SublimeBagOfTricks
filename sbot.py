@@ -1,11 +1,5 @@
-import os
 import sys
-import json
-import time
-import traceback
-import threading
 import datetime
-import sublime
 import sublime_plugin
 import sbot_common
 
@@ -34,4 +28,3 @@ class SbotEvent(sublime_plugin.EventListener):
         ''' Show the abs position in the status bar. '''
         pos = view.sel()[0].begin()
         view.set_status("position", 'Pos {}'.format(pos))
-

@@ -28,10 +28,10 @@ def plugin_unloaded():
 def trace(*args, cat=None):
     ''' Debugging. '''
     global _trace_fn
-    if _trace_fn == None:
+    if _trace_fn is None:
         _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
 
-    if cat == None:
+    if cat is None:
         s = ' | '.join(map(str, args))
     else:
         s = cat + ' ' + ' | '.join(map(str, args))
@@ -39,7 +39,7 @@ def trace(*args, cat=None):
     # print(s)
 
     with open(_trace_fn, "a+") as f:
-        f.write(s + '\n')    
+        f.write(s + '\n')
 
     # Check for file size limit.
     if os.path.getsize(_trace_fn) > 100000:
@@ -59,7 +59,7 @@ def error(info, exc):
 def get_sel_regions(v):
     ''' Generic function to get selections or optionally the whole view.'''
 
-    regions = []    
+    regions = []
     if len(v.sel()[0]) > 0: # user sel
         regions = v.sel()
     else:
@@ -111,7 +111,7 @@ def dump_view(preamble, view):
         s.append('None' if w is None or w.project_file_name() is None else os.path.split(w.project_file_name())[1])
 
     trace(" ".join(s))
-            
+
 
 #-----------------------------------------------------------------------------------
 def wait_load_file(view, line):
@@ -123,7 +123,7 @@ def wait_load_file(view, line):
 
 
 #-----------------------------------------------------------------------------------
-class SbotPerfCounter(object):
+class SbotPerfCounter():
     ''' Container for perf counter. All times in msec. '''
 
     def __init__(self, cid):
@@ -151,4 +151,3 @@ class SbotPerfCounter(object):
 
     def clear(self):
         self.vals = []
-

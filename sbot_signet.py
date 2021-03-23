@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import sublime
 import sublime_plugin
@@ -99,7 +98,7 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         v = self.view
-        
+
         # Get current row.
         sel_row, _ = v.rowcol(v.sel()[0].a)
 
@@ -168,7 +167,7 @@ def _save_sigs(winid, stp_fn):
 
     if settings.get('enable_persistence') and stp_fn is not None:
         stp_fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
-        
+
         try:
             # Remove invalid files and any empty values.
             if winid in _sigs:
@@ -224,10 +223,8 @@ def _go_to_signet(view, dir):
     w = view.window()
 
     settings = sublime.load_settings(sbot_common.SETTINGS_FN)
-
     signet_nav_files = settings.get('signet_nav_files')
 
-    signet_nav_files
     done = False
     sel_row, _ = v.rowcol(v.sel()[0].a) # current sel
     incr = +1 if dir == NEXT_SIG else -1
@@ -258,7 +255,7 @@ def _go_to_signet(view, dir):
         while not done and ((dir == NEXT_SIG and view_index < len(w.views()) or (dir == PREV_SIG and view_index >= 0))):
             vv = w.views()[view_index]
             sig_rows = _get_display_signet_rows(vv)
-            if(len(sig_rows) > 0):
+            if len(sig_rows) > 0:
                 w.focus_view(vv)
                 vv.run_command("goto_line", {"line": sig_rows[array_end] + 1})
                 done = True
@@ -273,7 +270,8 @@ def _go_to_signet(view, dir):
         for fn, rows in _sigs[winid].items():
             if w.find_open_file(fn) is None and os.path.exists(fn) and len(rows) > 0:
                 vv = w.open_file(fn)
-                sublime.set_timeout(lambda: sbot_common.wait_load_file(vv, rows[array_end]), 10) # already 1-based in file
+                r = rows[array_end]
+                sublime.set_timeout(lambda: sbot_common.wait_load_file(vv, r), 10) # already 1-based in file
                 w.focus_view(vv)
                 done = True
                 break
@@ -285,7 +283,7 @@ def _go_to_signet(view, dir):
         while not done and ((dir == NEXT_SIG and view_index < len(w.views()) or (dir == PREV_SIG and view_index >= 0))):
             vv = w.views()[view_index]
             sig_rows = _get_display_signet_rows(vv)
-            if(len(sig_rows) > 0):
+            if len(sig_rows) > 0:
                 w.focus_view(vv)
                 vv.run_command("goto_line", {"line": sig_rows[array_end] + 1})
                 done = True

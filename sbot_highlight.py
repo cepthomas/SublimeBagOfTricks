@@ -42,7 +42,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
         vid = view.id()
         winid = view.window().id()
         fn = view.file_name()
-        
+
         sbot_common.trace('HighlightEvent.on_activated', fn, vid, winid, _views_inited)
 
         # Lazy init.
@@ -128,8 +128,8 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
         settings = sublime.load_settings(sbot_common.SETTINGS_FN)
         highlight_scopes = settings.get('highlight_scopes')
 
-        for i in range(len(highlight_scopes)):
-            reg_name = HIGHLIGHT_REGION_NAME % highlight_scopes[i]
+        for i, value in enumerate(highlight_scopes):
+            reg_name = HIGHLIGHT_REGION_NAME % value
             v.erase_regions(reg_name)
 
         # Remove from persist collection.
@@ -196,7 +196,7 @@ def _save_hls(winid, stp_fn):
 
     if settings.get('enable_persistence') and stp_fn is not None:
         stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
-        
+
         try:
             # Remove invalid files and any empty values.
             if winid in _hls:
@@ -275,4 +275,3 @@ def _get_persist_tokens(view, init_empty):
             vals = _hls[winid][fn]
 
     return vals
-

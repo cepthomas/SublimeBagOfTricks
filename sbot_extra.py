@@ -114,7 +114,7 @@ def _clean_json(s):
     #        # s = fp.read()
     #        kmap = json.load(fp)
 
-    #        fixes = { '"': 'dblquote', "'": 'snglquote', '(': 'lparen', ')': 'rparen', 
+    #        fixes = { '"': 'dblquote', "'": 'snglquote', '(': 'lparen', ')': 'rparen',
     #            '[': 'lbracket', ']': 'rbracket', '{': 'lbrace', '}': 'rbrace' }
 
     #        s = []
@@ -217,12 +217,12 @@ class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
     ''' Command: Get input from user. sbot_example_user_input
     When a command with arguments is called without them, but it defines an input() method, Sublime will call
     the input() method to see if there is an input handler that can be used to gather the arguments instead.
-    Every input handler represents an argument to the command, and once the entire chain of them is finished, 
+    Every input handler represents an argument to the command, and once the entire chain of them is finished,
     Sublime re-invokes the command with the arguments that it gathered.
 
     This >>>>>> https://forum.sublimetext.com/t/simple-examples-for-textinputhandler/48422/13
     You also need to add the command to the command palette by adding an entry to a sublime-commands file;
-    Something you may have missed is that only commands that appear in the command palette support using 
+    Something you may have missed is that only commands that appear in the command palette support using
     input handlers because the handlers display input in the command palette itself as a part of its operation.
     '''
 
@@ -260,5 +260,4 @@ class SbotExampleInputCommand(sublime_plugin.TextCommand):
         #     self.view.replace(edit, sel, my_value)
 
     def input(self, args):
-        if "text" not in args:
-            return SbotExampleArgumentInputHandler(self.view)
+        return SbotExampleArgumentInputHandler(self.view) if "text" not in args else None
