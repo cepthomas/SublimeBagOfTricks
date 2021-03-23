@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import sublime
-import sublime_plugin
 
 # print('Load sbot_common')
 

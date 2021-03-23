@@ -1,5 +1,4 @@
 import os
-import sys
 import re
 import json
 import sublime
@@ -175,19 +174,13 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
             style_text.append('.st{} {}'.format(i, props))
             content.append('<p><span class=st{}>{}  {}</span></p>'.format(i, scope, props2))
 
-        # Output html.
-        html1 = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<style  type="text/css">\np {\nmargin: 0em;\nfont-family: Consolas;\nfont-size: 1.0em;\nbackground-color: white;\n}\n'
-        html2 = '</style>\n</head>\n<body>\n'
-        html3 = '</body>\n</html>\n'
-
         # Do popup
         html = '''
             <body>
                 <style> p {{ margin: 0em; }} {} </style>
                 {}
-                {}
             </body>
-        '''.format('\n'.join(style_text), '\n'.join(content), html3)
+        '''.format('\n'.join(style_text), '\n'.join(content))
 
         v.show_popup(html, max_width=512)
 
@@ -207,7 +200,7 @@ def _save_hls(winid, stp_fn):
         try:
             # Remove invalid files and any empty values.
             if winid in _hls:
-                for fn, tokens in _hls[winid].items():
+                for fn, _ in _hls[winid].items():
                     if not os.path.exists(fn):
                         del _hls[winid][fn]
                     elif len(_hls[winid][fn]) == 0:

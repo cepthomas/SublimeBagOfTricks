@@ -1,6 +1,3 @@
-import os
-import sys
-import time
 import webbrowser
 import sublime
 import sublime_plugin

@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 import math
 import textwrap
@@ -227,7 +226,8 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         ## Iterate collected lines.
         gutter_size = math.ceil(math.log(len(region_styles), 10))
-        padding = 1.4 + gutter_size * 0.5
+        padding1 = 1.4 + gutter_size * 0.5
+        padding2 = padding1
 
         for line_styles in region_styles:
             if html_line_numbers:
@@ -259,7 +259,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             <style  type="text/css">
             .contentpane {{ font-family: {}; font-size: {}em; background-color: {}; text-indent: -{}em; padding-left: {}em; }}
             p {{ white-space: pre-wrap; margin: 0em; }}
-            '''.format(html_font_face, html_font_size / 16, html_background, padding, padding))
+            '''.format(html_font_face, html_font_size / 16, html_background, padding1, padding2))
 
         html2 = textwrap.dedent('''
             </style>

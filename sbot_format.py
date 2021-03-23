@@ -1,8 +1,5 @@
-import os
-import sys
-import re
 import json
-import sublime
+#import sublime
 import sublime_plugin
 import sbot_common
 
@@ -47,7 +44,6 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                 s = json.dumps(s, indent=4) #, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
                 sres.append(s)
         except Exception as e:
-            has_err = True
             sres.append('Parse error: {}'.format(e.args))
 
         vnew = sbot_common.create_new_view(v.window(), '\n'.join(sres))

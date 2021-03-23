@@ -1,4 +1,4 @@
-import sys
+#import sys
 
 ### Fakes for VS comprehension.
 
@@ -264,7 +264,7 @@ def set_timeout(f, timeout_ms=0):
     while the function is running
     """
     #sublime_api.set_timeout(f, timeout_ms)
-    pass
+    #pass
 
 
 # def set_timeout_async(f, timeout_ms=0):

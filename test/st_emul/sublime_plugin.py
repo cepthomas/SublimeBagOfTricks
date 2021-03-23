@@ -1,13 +1,12 @@
-import imp
-import importlib
-import os
-import sys
-import threading
-import time
-import traceback
-import zipfile
+#import imp
+#import importlib
+#import sys
+#import threading
+#import time
+#import traceback
+#import zipfile
 
-import sublime
+#import sublime
 # import sublime_api
 
 ### Fakes for VS comprehension.

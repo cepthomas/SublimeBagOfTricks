@@ -1,9 +1,5 @@
-import os
-import sys
-import time
 import json
-import re
-import sublime
+#import sublime
 import sublime_plugin
 import sbot_common
 

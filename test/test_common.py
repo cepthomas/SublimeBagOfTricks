@@ -1,6 +1,6 @@
 import unittest
 import sublime
-import sublime_plugin
+#import sublime_plugin
 import sbot
 import sbot_common
 

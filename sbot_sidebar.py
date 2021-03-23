@@ -1,5 +1,4 @@
 import os
-import sys
 import subprocess
 import webbrowser
 import sublime
@@ -88,7 +87,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             sout = subprocess.check_output([paths[0]], universal_newlines=True)
-            v = sbot_common.create_new_view(self.window, sout)
+            sbot_common.create_new_view(self.window, sout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']
@@ -109,7 +108,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
 
             exclude = paths[0]
             dir = exclude if os.path.isdir(exclude) else os.path.split(exclude)[0]
-            fn = '' if os.path.isdir(exclude) else os.path.split(exclude)[1]
+            #fn = '' if os.path.isdir(exclude) else os.path.split(exclude)[1]
 
             # Locate the folder.
             found = False
