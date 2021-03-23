@@ -14,13 +14,13 @@ class SbotTestCommand(sublime_plugin.TextCommand):
     ''' Just for hacking/testing. '''
 
     def run(self, edit, cmd=None):
-        v = self.view
+        view = self.view
 
 
-        # for sheet in w.sheets():
+        # for sheet in window.sheets():
         #     sbot_common.trace('sheet:', sheet)
-        # for view in w.views(): # These are in order L -> R.
-        #     sbot_common.trace('active view:', w.get_view_index(view), view.file_name()) # (group, index)
+        # for view in window.views(): # These are in order L -> R.
+        #     sbot_common.trace('active view:', window.get_view_index(view), view.file_name()) # (group, index)
         # get_project(v).dump() # These are not ordered like file.
 
         # # Phantom phun
@@ -28,7 +28,7 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         # sbot_common.trace(image)
         # html = '<body><p>Hello!</p><img src="file://' + image + '" width="90" height="145"></body>'
         # self.phantset = sublime.PhantomSet(v, "test")
-        # phant = sublime.Phantom(v.sel()[0], html, sublime.LAYOUT_BLOCK)
+        # phant = sublime.Phantom(view.sel()[0], html, sublime.LAYOUT_BLOCK)
         # phants = []
         # phants.append(phant)
         # self.phantset.update(phants)
@@ -36,7 +36,7 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         # global global_thing
         # sbot_common.trace(global_thing)
         # global_thing['item' + str(len(global_thing) + 5)] = 1234
-        # v.show_popup(str(global_thing))
+        # view.show_popup(str(global_thing))
 
 
         # if action == 'white_space':
@@ -48,8 +48,8 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         # elif action == 'indent_guide':
         #     pname, pval1, pval2 = "draw_indent_guides", False, True
         # if pname:
-        #     propertyValue = pval1 if v.settings().get(pname, pval1) != pval1 else pval2
-        #     v.settings().set(pname, propertyValue)
+        #     propertyValue = pval1 if view.settings().get(pname, pval1) != pval1 else pval2
+        #     view.settings().set(pname, propertyValue)
 
 
         # with open(r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\test\new_proj.json', 'r') as fp:
@@ -151,7 +151,7 @@ def _clean_json(s):
 
     #        s = '\n'.join(s)
     #        # print(s)
-    #        sbot_common.create_new_view(v.window(), s)
+    #        sbot_common.create_new_view(view.window(), s)
 
     #except Exception as e:
     #    print('exception', e)

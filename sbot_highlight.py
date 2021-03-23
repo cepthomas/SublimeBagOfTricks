@@ -89,30 +89,29 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
 class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     ''' Highlight specific words using scopes. Parts borrowed from StyleToken.
     Persistence supported via sbot-project container.
-    Note: Regions added by v.add_regions() can not set the foreground color. The scope color is used
+    Note: Regions added by self.view.add_regions() can not set the foreground color. The scope color is used
     for the region background color. Also they are not available via extract_scope().
     '''
 
     def run(self, edit, hl_index):
-        v = self.view
         settings = sublime.load_settings(sbot_common.SETTINGS_FN)
         highlight_scopes = settings.get('highlight_scopes')
 
         # Get whole word or specific span.
-        region = v.sel()[0]
+        region = self.view.sel()[0]
 
         whole_word = region.empty()
         if whole_word:
-            region = v.word(region)
-        token = v.substr(region)
+            region = self.view.word(region)
+        token = self.view.substr(region)
 
         hl_index %= len(highlight_scopes)
         scope = highlight_scopes[hl_index]
-        tokens = _get_persist_tokens(v, True)
+        tokens = _get_persist_tokens(self.view, True)
 
         # Add or replace in collection.
         tokens[token] = { "scope": scope, "whole_word": whole_word }
-        _highlight_view(v, token, whole_word, scope)
+        _highlight_view(self.view, token, whole_word, scope)
 
 
 #-----------------------------------------------------------------------------------
@@ -122,15 +121,13 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         global _hls
 
-        v = self.view
-
         # Clean displayed colors.
         settings = sublime.load_settings(sbot_common.SETTINGS_FN)
         highlight_scopes = settings.get('highlight_scopes')
 
         for i, value in enumerate(highlight_scopes):
             reg_name = HIGHLIGHT_REGION_NAME % value
-            v.erase_regions(reg_name)
+            self.view.erase_regions(reg_name)
 
         # Remove from persist collection.
         winid = self.view.window().id()
@@ -143,7 +140,6 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
 
     def run(self, edit):
-        v = self.view
         settings = sublime.load_settings(sbot_common.SETTINGS_FN)
         scopes = settings.get('highlight_scopes_to_show')
 
@@ -151,11 +147,11 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         content = []
 
         # scopes = set()
-        # for i in range(v.size()):
-        #     scopes.add(v.scope_name(i))
+        # for i in range(self.view.size()):
+        #     scopes.add(self.view.scope_name(i))
 
         for scope in scopes:
-            style = v.style_for_scope(scope)
+            style = self.view.style_for_scope(scope)
             # sbot_common.trace(scope, style)
             props = '{{ color:{}; '.format(style['foreground'])
             props2 = 'fg:{} '.format(style['foreground'])
@@ -182,7 +178,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
             </body>
         '''.format('\n'.join(style_text), '\n'.join(content))
 
-        v.show_popup(html, max_width=512)
+        self.view.show_popup(html, max_width=512)
 
         # Could also: sublime.set_clipboard(html1 + '\n'.join(style_text) + html2 + '\n'.join(content) + html3)
 

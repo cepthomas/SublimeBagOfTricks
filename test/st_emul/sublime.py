@@ -787,18 +787,7 @@ class View():
 
     def id(self):
         return self.view_id
-
-#     def buffer_id(self):
-#         return sublime_api.view_buffer_id(self.view_id)
-
-#     def is_valid(self):
-#         """ Returns true if the View is still a valid handle. Will return False for a closed view, for example. """
-#         return sublime_api.view_buffer_id(self.view_id) != 0
-
-#     def is_primary(self):
-#         return sublime_api.view_is_primary(self.view_id)
-
-#     def window(self):
+    #     def window(self):
 #         window_id = sublime_api.view_window(self.view_id)
 #         if window_id == 0:
 #             return None
@@ -815,6 +804,45 @@ class View():
 #     def close(self):
 #         window_id = sublime_api.view_window(self.view_id)
 #         return sublime_api.window_close_file(window_id, self.view_id)
+
+#     def set_scratch(self, scratch):
+#         """
+#         Sets the scratch flag on the text buffer. When a modified scratch buffer
+#         is closed, it will be closed without prompting to save.
+#         """
+#         return sublime_api.view_set_scratch(self.view_id, scratch)
+
+#     def size(self):
+#         return sublime_api.view_size(self.view_id)
+
+#     def substr(self, x):
+#         if isinstance(x, Region):
+#             return sublime_api.view_cached_substr(self.view_id, x.a, x.b)
+#         else:
+#             s = sublime_api.view_cached_substr(self.view_id, x, x + 1)
+#             # S2 backwards compat
+#             if len(s) == 0:
+#                 return "\x00"
+#             else:
+#                 return s
+
+
+
+
+
+
+
+
+#     def buffer_id(self):
+#         return sublime_api.view_buffer_id(self.view_id)
+
+#     def is_valid(self):
+#         """ Returns true if the View is still a valid handle. Will return False for a closed view, for example. """
+#         return sublime_api.view_buffer_id(self.view_id) != 0
+
+#     def is_primary(self):
+#         return sublime_api.view_is_primary(self.view_id)
+
 
 #     def retarget(self, new_fname):
 #         sublime_api.view_retarget(self.view_id, new_fname)
@@ -846,13 +874,6 @@ class View():
 #     def is_scratch(self):
 #         return sublime_api.view_is_scratch(self.view_id)
 
-#     def set_scratch(self, scratch):
-#         """
-#         Sets the scratch flag on the text buffer. When a modified scratch buffer
-#         is closed, it will be closed without prompting to save.
-#         """
-#         return sublime_api.view_set_scratch(self.view_id, scratch)
-
 #     def encoding(self):
 #         return sublime_api.view_encoding(self.view_id)
 
@@ -864,9 +885,6 @@ class View():
 
 #     def set_line_endings(self, line_ending_name):
 #         return sublime_api.view_set_line_endings(self.view_id, line_ending_name)
-
-#     def size(self):
-#         return sublime_api.view_size(self.view_id)
 
 #     def begin_edit(self, edit_token, cmd, args=None):
 #         sublime_api.view_begin_edit(self.view_id, edit_token, cmd, args)
@@ -906,17 +924,6 @@ class View():
 
 #     def sel(self):
 #         return self.selection
-
-#     def substr(self, x):
-#         if isinstance(x, Region):
-#             return sublime_api.view_cached_substr(self.view_id, x.a, x.b)
-#         else:
-#             s = sublime_api.view_cached_substr(self.view_id, x, x + 1)
-#             # S2 backwards compat
-#             if len(s) == 0:
-#                 return "\x00"
-#             else:
-#                 return s
 
 #     def find(self, pattern, start_pt, flags=0):
 #         return sublime_api.view_find(self.view_id, pattern, start_pt, flags)

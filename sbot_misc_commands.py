@@ -26,21 +26,21 @@ class SbotSplitViewCommand(sublime_plugin.WindowCommand):
     ''' Toggles between split file views.'''
 
     def run(self):
-        w = self.window
+        window = self.window
 
-        if len(w.layout()['rows']) > 2:
+        if len(window.layout()['rows']) > 2:
             # Remove split.
-            w.run_command("focus_group", { "group": 1 } )
-            w.run_command("close_file")
-            w.run_command("set_layout", { "cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]] } )
+            window.run_command("focus_group", { "group": 1 } )
+            window.run_command("close_file")
+            window.run_command("set_layout", { "cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]] } )
         else:
             # Add split.
-            sel_row, _ = w.active_view().rowcol(w.active_view().sel()[0].a) # current sel
-            w.run_command("set_layout", { "cols": [0.0, 1.0], "rows": [0.0, 0.5, 1.0], "cells": [[0, 0, 1, 1], [0, 1, 1, 2]] } )
-            w.run_command("focus_group", { "group": 0 } )
-            w.run_command("clone_file")
-            w.run_command("move_to_group", { "group": 1 } )
-            w.active_view().run_command("goto_line", {"line": sel_row})
+            sel_row, _ = window.active_view().rowcol(window.active_view().sel()[0].a) # current sel
+            window.run_command("set_layout", { "cols": [0.0, 1.0], "rows": [0.0, 0.5, 1.0], "cells": [[0, 0, 1, 1], [0, 1, 1, 2]] } )
+            window.run_command("focus_group", { "group": 0 } )
+            window.run_command("clone_file")
+            window.run_command("move_to_group", { "group": 1 } )
+            window.active_view().run_command("goto_line", {"line": sel_row})
 
 
 #-----------------------------------------------------------------------------------
@@ -56,14 +56,11 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
     ''' Show line ends. '''
 
     def run(self, edit):
-        v = self.view
-        w = v.window()
-
-        if not v.get_regions("eols"):
+        if not self.view.get_regions("eols"):
             eols = []
             ind = 0
             while 1:
-                freg = v.find('[\n\r]', ind)
+                freg = self.view.find('[\n\r]', ind)
                 if freg is not None and not freg.empty(): # second condition is not documented!!
                     eols.append(freg)
                     ind = freg.end() + 1
@@ -71,9 +68,9 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                     break
             if eols:
                 settings = sublime.load_settings(sbot_common.SETTINGS_FN)
-                v.add_regions("eols", eols, settings.get('highlight_eol_scope'))
+                self.view.add_regions("eols", eols, settings.get('highlight_eol_scope'))
         else:
-            v.erase_regions("eols")
+            self.view.erase_regions("eols")
 
 
 #-----------------------------------------------------------------------------------
@@ -81,19 +78,17 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
     ''' Insert sequential numbers in first column. Default is to start at 1. '''
 
     def run(self, edit):
-        v = self.view
-
         # Iterate lines.
-        line_count = v.rowcol(v.size())[0]
+        line_count = self.view.rowcol(self.view.size())[0]
         width = len(str(line_count))
         offset = 0
 
-        for region in sbot_common.get_sel_regions(v):
+        for region in sbot_common.get_sel_regions(self.view):
             line_num = 1
             offset = 0
-            for line_region in v.split_by_newlines(region):
+            for line_region in self.view.split_by_newlines(region):
                 s = "{:0{size}} ".format(line_num, size=width)
-                v.insert(edit, line_region.a + offset, s)
+                self.view.insert(edit, line_region.a + offset, s)
                 line_num += 1
                 # Adjust for inserts.
                 offset += width+1

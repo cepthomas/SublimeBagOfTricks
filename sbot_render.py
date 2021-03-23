@@ -38,11 +38,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         super(SbotRenderToHtmlCommand, self).__init__(view)
 
     def run(self, edit):
-        v = self.view
-
         render_max_file = self.settings.get('render_max_file')
 
-        fsize = v.size() / 1024.0 / 1024.0
+        fsize = self.view.size() / 1024.0 / 1024.0
         if fsize > render_max_file:
             sublime.message_dialog('File too large to render. If you really want to, change your settings')
         else:
@@ -53,27 +51,24 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
     def _update_status(self):
         ''' Runs in main thread. '''
-        v = self.view
-
         if self.row_num == 0:
-            v.set_status('render', 'Render setting up')
-            # v.show_popup('Render setting up')
+            self.view.set_status('render', 'Render setting up')
+            # self.view.show_popup('Render setting up')
             sublime.set_timeout(self._update_status, 100)
         elif self.row_num >= self.rows:
-            v.set_status('render', 'Render done')
-            # v.update_popup('Render done')
-            # v.hide_popup()
+            self.view.set_status('render', 'Render done')
+            # self.view.update_popup('Render done')
+            # self.view.hide_popup()
         else:
             if self.rows % 100 == 0:
-                v.set_status('render', 'Render {} of {}'.format(self.row_num, self.rows))
-                # v.update_popup('Render {} of {}'.format(self.row_num, self.rows))
+                self.view.set_status('render', 'Render {} of {}'.format(self.row_num, self.rows))
+                # self.view.update_popup('Render {} of {}'.format(self.row_num, self.rows))
 
             # sublime.set_timeout(lambda: self._update_status(), 100)
             sublime.set_timeout(self._update_status, 100)
 
     def _do_work(self):
         ''' The worker thread. '''
-        v = self.view
 
         # html render msec per line:
         # - medium (5k dense lines) 1.248921079999997 (5000)
@@ -91,11 +86,11 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         # my_style = (foreground, background, bold, italic)
 
         ## Collect scope/style info.
-        all_styles = {} # k:style v:id
+        all_styles = {} # k:style self.view:id
         region_styles = [] # One [(Region, style)] per line
         highlight_regions = [] # (Region, style))
 
-        self.rows, _ = v.rowcol(v.size())
+        self.rows, _ = self.view.rowcol(self.view.size())
         self.row_num = 0
 
         ### Local helpers.
@@ -120,7 +115,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         for i, value in enumerate(highlight_scopes):
             # Get the style and invert for highlights.
-            ss = v.style_for_scope(value)
+            ss = self.view.style_for_scope(value)
             background = ss['background'] if 'background' in ss else ss['foreground']
             foreground = html_background
             hl_style = (foreground, background, False, False)
@@ -128,23 +123,23 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
             # Collect the highlight regions.
             reg_name = HIGHLIGHT_REGION_NAME % value
-            for region in v.get_regions(reg_name):
+            for region in self.view.get_regions(reg_name):
                 highlight_regions.append((region, hl_style))
 
         # Put all in order.
-        highlight_regions.sort(key=lambda v: v[0].a)
+        highlight_regions.sort(key=lambda self.view: self.view[0].a)
 
         ## Tokenize selection by syntax scope.
         pc = sbot_common.SbotPerfCounter('render_html')
 
-        for region in sbot_common.get_sel_regions(v):
-            for line_region in v.split_by_newlines(region):
+        for region in sbot_common.get_sel_regions(self.view):
+            for line_region in self.view.split_by_newlines(region):
                 pc.start()
                 self.row_num += 1
 
                 if self.row_num % 100 == 0:
                     time.sleep(0.01)
-                    v.show_popup('!!!!!')
+                    self.view.show_popup('!!!!!')
 
                 line_styles = [] # (Region, style))
 
@@ -180,7 +175,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                         del highlight_regions[0]
                     else:
                         # Plain ordinary style. Did it change?
-                        new_style = _view_style_to_tuple(v.style_for_scope(v.scope_name(point)))
+                        new_style = _view_style_to_tuple(self.view.style_for_scope(self.view.scope_name(point)))
 
                         if new_style != current_style:
                             # Save last chunk maybe.
@@ -237,7 +232,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
             for region, style in line_styles:
                 #[(Region, style(ref))]
-                text = v.substr(region)
+                text = self.view.substr(region)
 
                 # Locate the style.
                 id = _get_style(style)
@@ -276,7 +271,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             </html>
             ''')
 
-        _output_html(v, [html1, style_text, html2, "".join(content), html3])
+        _output_html(self.view, [html1, style_text, html2, "".join(content), html3])
 
 
 #-----------------------------------------------------------------------------------
@@ -284,8 +279,6 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     ''' Turn md into html.'''
 
     def run(self, edit):
-        v = self.view
-
         # Get prefs.
         settings = sublime.load_settings(sbot_common.SETTINGS_FN)
         md_background = settings.get('md_background')
@@ -297,13 +290,13 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
         html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(md_background, md_font_face, md_font_size))
         html.append("</style></head><body>")
 
-        for region in sbot_common.get_sel_regions(v):
-            html.append(v.substr(region))
+        for region in sbot_common.get_sel_regions(self.view):
+            html.append(self.view.substr(region))
 
         html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
         html.append("</body></html>")
 
-        _output_html(v, '\n'.join(html))
+        _output_html(self.view, '\n'.join(html))
 
     def is_visible(self):
         return self.view.settings().get('syntax').endswith('Markdown.sublime-syntax')
@@ -320,8 +313,8 @@ def _output_html(view, content=None):
     if output_type == 'clipboard':
         sublime.set_clipboard(s)
     # elif output_type == 'new_file':
-    #     v = sbot_common.create_new_view(v.window(), s)
-    #     v.set_syntax_file('Packages/HTML/HTML.tmLanguage')
+    #     view = sbot_common.create_new_view(self.view.window(), s)
+    #     view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
     elif output_type in ('file', 'show'):
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'
         fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', basefn)

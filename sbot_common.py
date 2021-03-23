@@ -56,16 +56,16 @@ def error(info, exc):
 
 
 #-----------------------------------------------------------------------------------
-def get_sel_regions(v):
+def get_sel_regions(view):
     ''' Generic function to get selections or optionally the whole view.'''
 
     regions = []
-    if len(v.sel()[0]) > 0: # user sel
-        regions = v.sel()
+    if len(view.sel()[0]) > 0: # user sel
+        regions = view.sel()
     else:
         settings = sublime.load_settings(SETTINGS_FN)
         if settings.get('sel_all'):
-            regions = [sublime.Region(0, v.size())]
+            regions = [sublime.Region(0, view.size())]
     return regions
 
 
@@ -101,14 +101,14 @@ def dump_view(preamble, view):
     s.append('None' if view is None else str(view.id()))
 
     if view is not None:
-        w = view.window()
+        window = view.window()
         fn = view.file_name()
 
         s.append('file_name:')
         s.append('None' if fn is None else os.path.split(fn)[1])
 
         s.append('project_file_name:')
-        s.append('None' if w is None or w.project_file_name() is None else os.path.split(w.project_file_name())[1])
+        s.append('None' if window is None or window.project_file_name() is None else os.path.split(window.project_file_name())[1])
 
     trace(" ".join(s))
 

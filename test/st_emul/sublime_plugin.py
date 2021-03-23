@@ -203,15 +203,15 @@
 
 #         # Create any require ViewEventListener objects
 #         if len(module_view_event_listener_classes) > 0:
-#             for w in sublime.windows():
-#                 for v in w.views():
+#             for window in sublime.windows():
+#                 for v in window.views():
 #                     create_view_event_listeners(
 #                         module_view_event_listener_classes, v)
 
 #         # Synthesize any required on_activated calls
-#         w = sublime.active_window()
-#         if w:
-#             v = w.active_view()
+#         window = sublime.active_window()
+#         if window:
+#             v = window.active_view()
 #             if v:
 #                 for el in on_activated_targets:
 #                     try:
@@ -243,10 +243,10 @@
 #         pending_on_activated_async_callbacks['ViewEventListener'] = []
 
 #     for el in els:
-#         w = sublime.active_window()
-#         if not w:
+#         window = sublime.active_window()
+#         if not window:
 #             continue
-#         v = w.active_view()
+#         v = window.active_view()
 #         if not v:
 #             continue
 #         try:
@@ -255,10 +255,10 @@
 #             traceback.print_exc()
 
 #     for vel_cls in vels:
-#         w = sublime.active_window()
-#         if not w:
+#         window = sublime.active_window()
+#         if not window:
 #             continue
-#         v = w.active_view()
+#         v = window.active_view()
 #         if not v:
 #             continue
 #         vel = find_view_event_listener(v, vel_cls)
@@ -306,14 +306,14 @@
 
 #     # Create ViewEventListener instances
 #     if len(view_event_listener_classes) > 0:
-#         for w in sublime.windows():
-#             for v in w.views():
+#         for window in sublime.windows():
+#             for v in window.views():
 #                 attach_view(v)
 
 #     # Synthesize an on_activated call
-#     w = sublime.active_window()
-#     if w:
-#         view_id = sublime_api.window_active_view(w.window_id)
+#     window = sublime.active_window()
+#     if window:
+#         view_id = sublime_api.window_active_view(window.window_id)
 #         if view_id != 0:
 #             try:
 #                 on_activated(view_id)
@@ -379,8 +379,8 @@
 # def check_all_view_event_listeners():
 #     global check_all_view_event_listeners_scheduled
 #     check_all_view_event_listeners_scheduled = False
-#     for w in sublime.windows():
-#         for v in w.views():
+#     for window in sublime.windows():
+#         for v in window.views():
 #             check_view_event_listeners(v)
 
 
