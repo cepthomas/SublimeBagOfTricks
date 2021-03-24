@@ -36,6 +36,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         self.rows = 0
         self.row_num = 0
         super(SbotRenderToHtmlCommand, self).__init__(view)
+        self.view = view
 
     def run(self, edit):
         render_max_file = self.settings.get('render_max_file')
@@ -127,7 +128,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 highlight_regions.append((region, hl_style))
 
         # Put all in order.
-        highlight_regions.sort(key=lambda self.view: self.view[0].a)
+        #highlight_regions.sort(key=lambda self.view: self.view[0].a) TODO-T Why this not work?
+        v = self.view
+        highlight_regions.sort(key=lambda v: v[0].a)
 
         ## Tokenize selection by syntax scope.
         pc = sbot_common.SbotPerfCounter('render_html')

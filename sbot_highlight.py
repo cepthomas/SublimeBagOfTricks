@@ -66,7 +66,6 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
         ''' Called when file loaded. Doesn't work when starting up! Maybe ST4 improved? '''
         view = self.view
         sbot_common.trace('HighlightEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
-        # if view.file_name() is not None:
 
 
     def on_deactivated(self):
