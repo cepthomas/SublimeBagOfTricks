@@ -98,23 +98,19 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
 class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
     ''' Remove from project. '''
 
-    def __init__(self, window):#TODO-T remove this
-        self.fn = window.project_file_name()
-        super(SbotSidebarExcludeCommand, self).__init__(window)
-
     def run(self, paths):
         if len(paths) > 0:
             pdata = self.window.project_data()
 
             exclude = paths[0]
             path = exclude if os.path.isdir(exclude) else os.path.split(exclude)[0]
-            #fn = '' if os.path.isdir(exclude) else os.path.split(exclude)[1]
+            fn = self.window.project_file_name()
 
             # Locate the folder.
             found = False
             for folder in pdata["folders"]:
                 fpath = folder["path"]
-                apath = os.path.split(self.fn)[0] if(fpath == '.') else os.path.abspath(fpath)
+                apath = os.path.split(fn)[0] if(fpath == '.') else os.path.abspath(fpath)
 
                 if path.startswith(apath):
                     # Make a relative ref.
@@ -141,10 +137,11 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
             if os.path.isdir(paths[0]):
                 pdata = self.window.project_data()
                 path = paths[0]
+                fn = self.window.project_file_name()
 
                 for folder in pdata["folders"]:
                     fpath = folder["path"]
-                    apath = os.path.split(self.fn)[0] if fpath == '.' else os.path.abspath(fpath)
+                    apath = os.path.split(fn)[0] if fpath == '.' else os.path.abspath(fpath)
                     if path == apath:
                         vis = False
                         break
