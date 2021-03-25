@@ -179,7 +179,7 @@ class SbotExampleGetNumberCommand(sublime_plugin.WindowCommand):
 class SbotExampleListSelectCommand(sublime_plugin.TextCommand):
     ''' Command: Select from list. sbot_example_list_select '''
 
-    def __init__(self, view):
+    def __init__(self, view):#TODO-T remove this
         self.panel_items = []
         super(SbotExampleListSelectCommand, self).__init__(view)
 

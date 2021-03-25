@@ -87,7 +87,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         # my_style = (foreground, background, bold, italic)
 
         ## Collect scope/style info.
-        all_styles = {} # k:style self.view:id
+        all_styles = {} # k:style v:id
         region_styles = [] # One [(Region, style)] per line
         highlight_regions = [] # (Region, style))
 
@@ -128,9 +128,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 highlight_regions.append((region, hl_style))
 
         # Put all in order.
-        #highlight_regions.sort(key=lambda self.view: self.view[0].a) TODO-T Why this not work?
-        v = self.view
-        highlight_regions.sort(key=lambda v: v[0].a)
+        highlight_regions.sort(key=lambda r: r[0].a)
 
         ## Tokenize selection by syntax scope.
         pc = sbot_common.SbotPerfCounter('render_html')
@@ -207,7 +205,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         ## Create css.
         style_text = ""
-        for style, id in all_styles.items():
+        for style, stid in all_styles.items():
             props = '{{ color:{}; '.format(style[0])
             if style[1] is not None:
                 props += 'background-color:{}; '.format(style[1])
@@ -216,7 +214,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             if style[3]:
                 props += 'font-style:italic; '
             props += '}'
-            style_text += '.st{} {}\n'.format(id, props)
+            style_text += '.st{} {}\n'.format(stid, props)
 
         ## Content text.
         content = []
@@ -238,9 +236,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 text = self.view.substr(region)
 
                 # Locate the style.
-                id = _get_style(style)
-                if id >= 0:
-                    content.append('<span class=st{}>{}</span>'.format(id, escape(text)))
+                stid = _get_style(style)
+                if stid >= 0:
+                    content.append('<span class=st{}>{}</span>'.format(stid, escape(text)))
                 else:
                     content.append(text) # plain text
 

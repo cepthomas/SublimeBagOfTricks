@@ -44,8 +44,8 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
-            dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            cmd = 'wt -d "{}"'.format(dir)
+            path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+            cmd = 'wt -d "{}"'.format(path)
             subprocess.call(cmd, shell=True)
 
 
@@ -55,8 +55,8 @@ class SbotSidebarFolderCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
-            dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            cmd = 'explorer "{}"'.format(dir)
+            path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+            cmd = 'explorer "{}"'.format(path)
             subprocess.call(cmd, shell=True)
 
     def is_visible(self, paths):
@@ -70,10 +70,10 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
-            dir = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            cmd = 'tree "{}" /a /f | clip'.format(dir)
+            path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+            cmd = 'tree "{}" /a /f | clip'.format(path)
             subprocess.call(cmd, shell=True)
-            # subprocess.call(['tree', dir, '/a', '/f', '|', 'clip'])#, shell=True)
+            # subprocess.call(['tree', path, '/a', '/f', '|', 'clip'])#, shell=True)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.isdir(paths[0])
@@ -98,7 +98,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
 class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
     ''' Remove from project. '''
 
-    def __init__(self, window):
+    def __init__(self, window):#TODO-T remove this
         self.fn = window.project_file_name()
         super(SbotSidebarExcludeCommand, self).__init__(window)
 
@@ -107,7 +107,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
             pdata = self.window.project_data()
 
             exclude = paths[0]
-            dir = exclude if os.path.isdir(exclude) else os.path.split(exclude)[0]
+            path = exclude if os.path.isdir(exclude) else os.path.split(exclude)[0]
             #fn = '' if os.path.isdir(exclude) else os.path.split(exclude)[1]
 
             # Locate the folder.
@@ -116,7 +116,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
                 fpath = folder["path"]
                 apath = os.path.split(self.fn)[0] if(fpath == '.') else os.path.abspath(fpath)
 
-                if dir.startswith(apath):
+                if path.startswith(apath):
                     # Make a relative ref.
                     rpath = os.path.relpath(exclude, apath)
                     patfold = "folder_exclude_patterns" if os.path.isdir(exclude) else "file_exclude_patterns"
@@ -140,12 +140,12 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
         if len(paths) > 0:
             if os.path.isdir(paths[0]):
                 pdata = self.window.project_data()
-                dir = paths[0]
+                path = paths[0]
 
                 for folder in pdata["folders"]:
                     fpath = folder["path"]
                     apath = os.path.split(self.fn)[0] if fpath == '.' else os.path.abspath(fpath)
-                    if dir == apath:
+                    if path == apath:
                         vis = False
                         break
             # else: Just a file is ok.

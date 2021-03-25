@@ -158,7 +158,8 @@ disable=print-statement,
         too-many-statements,
         too-many-branches,
         too-few-public-methods,
-        chained-comparison
+        chained-comparison,
+        arguments-differ
         
 
 # Enable the message, report, category or checker with the given id(s). You can

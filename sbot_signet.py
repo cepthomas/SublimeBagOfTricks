@@ -215,8 +215,8 @@ def _open_sigs(winid, stp_fn):
 
 
 #-----------------------------------------------------------------------------------
-def _go_to_signet(view, dir):
-    ''' Navigate to signet in whole collection. dir is NEXT_SIG or PREV_SIG. '''
+def _go_to_signet(view, direction):
+    ''' Navigate to signet in whole collection. direction is NEXT_SIG or PREV_SIG. '''
     window = view.window()
 
     settings = sublime.load_settings(sbot_common.SETTINGS_FN)
@@ -224,18 +224,18 @@ def _go_to_signet(view, dir):
 
     done = False
     sel_row, _ = view.rowcol(view.sel()[0].a) # current sel
-    incr = +1 if dir == NEXT_SIG else -1
-    array_end = 0 if dir == NEXT_SIG else -1
+    incr = +1 if direction == NEXT_SIG else -1
+    array_end = 0 if direction == NEXT_SIG else -1
 
     # 1) NEXT_SIG: If there's another bookmark below >>> goto it
     # 1) PREV_SIG: If there's another bookmark above >>> goto it
     if not done:
         sig_rows = _get_display_signet_rows(view)
-        if dir == PREV_SIG:
+        if direction == PREV_SIG:
             sig_rows.reverse()
 
         for sr in sig_rows:
-            if (dir == NEXT_SIG and sr > sel_row) or (dir == PREV_SIG and sr < sel_row):
+            if (direction == NEXT_SIG and sr > sel_row) or (direction == PREV_SIG and sr < sel_row):
                 view.run_command("goto_line", {"line": sr + 1})
                 done = True
                 break
@@ -249,7 +249,7 @@ def _go_to_signet(view, dir):
     # 2) PREV_SIG: Else if there's an open signet file to the left of this tab >>> focus tab, goto last signet
     if not done:
         view_index = window.get_view_index(view)[1] + incr
-        while not done and ((dir == NEXT_SIG and view_index < len(window.views()) or (dir == PREV_SIG and view_index >= 0))):
+        while not done and ((direction == NEXT_SIG and view_index < len(window.views()) or (direction == PREV_SIG and view_index >= 0))):
             vv = window.views()[view_index]
             sig_rows = _get_display_signet_rows(vv)
             if len(sig_rows) > 0:
@@ -267,8 +267,19 @@ def _go_to_signet(view, dir):
         for fn, rows in _sigs[winid].items():
             if window.find_open_file(fn) is None and os.path.exists(fn) and len(rows) > 0:
                 vv = window.open_file(fn)
-                r = rows[array_end]
-                sublime.set_timeout(lambda: sbot_common.wait_load_file(vv, r), 10) # already 1-based in file
+                endrow = rows[array_end]
+
+
+                #The name sort_key in the body of the lambda will be looked up when the function is actually called, so it will see
+                #the value sort_key had most recently. Since you are calling sort immediately, the value of sort_key will not change
+                #before the resulting function object is used, so you can safely ignore the warning. To silence it, you can make sort_key
+                #the default value of a parameter to the lambda:
+                #results.sort(key=lambda k: get_from_dot_path(k, sort_key), reverse=(order == -1))
+                #results.sort(key=lambda k, sk=sort_key: get_from_dot_path(k, sk), reverse=(order == -1))
+
+
+
+                sublime.set_timeout(lambda r=endrow: sbot_common.wait_load_file(vv, r), 10) # already 1-based in file
                 window.focus_view(vv)
                 done = True
                 break
@@ -276,8 +287,8 @@ def _go_to_signet(view, dir):
     # 4) NEXT_SIG: Else >>> find first tab/file with signets, focus tab, goto first signet
     # 4) PREV_SIG: Else >>> find last tab/file with signets, focus tab, goto last signet
     if not done:
-        view_index = 0 if dir == NEXT_SIG else len(window.views()) - 1
-        while not done and ((dir == NEXT_SIG and view_index < len(window.views()) or (dir == PREV_SIG and view_index >= 0))):
+        view_index = 0 if direction == NEXT_SIG else len(window.views()) - 1
+        while not done and ((direction == NEXT_SIG and view_index < len(window.views()) or (direction == PREV_SIG and view_index >= 0))):
             vv = window.views()[view_index]
             sig_rows = _get_display_signet_rows(vv)
             if len(sig_rows) > 0:

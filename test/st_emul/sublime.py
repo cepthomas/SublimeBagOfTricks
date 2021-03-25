@@ -1,4 +1,9 @@
-import sys
+#import sys
+
+TRANSIENT = 4
+IGNORECASE = 2
+LITERAL = 1
+
 
 ################# Added stuff ###################################################
 
@@ -7,14 +12,14 @@ def _etrace(*args):
     print('EMUL', s)
 
 # Current window.
-_window = Window(909)
+_window = None # Window(909)
 
 # Current views.
 _views = []
 _view_id = 100
 
 # Settings.
-_settings = Settings(1234)
+_settings = None # Settings(1234)
 
 
 ################# Functions ###################################################
@@ -57,6 +62,8 @@ def set_clipboard(text):
 
 def load_settings(base_name):
     global _settings
+    if _settings is None:
+        _settings = Settings(1234)
     return _settings
     #settings_id = sublime_api.load_settings(base_name)
     #return Settings(settings_id)
@@ -74,11 +81,10 @@ def active_window():
 ################# View ###################################################
 
 class View():
-    def __init__(self, id):
-        self.view_id = id
+    def __init__(self, view_id):
+        self.view_id = view_id
         self.buffer = ''
         self.selection = Selection(id)
-        # self.settings_object = None
 
     def __len__(self):
         return self.size()
@@ -139,10 +145,8 @@ class View():
         #     self.view_id, location, content, flags, max_width, max_height,
         #     on_navigate, on_hide)
 
-
-################## TODO-T all below
     def substr(self, x):
-        pass
+        return 'TODO-T'
         # if isinstance(x, Region):
         #     return sublime_api.view_cached_substr(self.view_id, x.a, x.b)
         # else:
@@ -154,19 +158,19 @@ class View():
         #         return s
 
     def insert(self, edit, pt, text):
-        pass
+        return True # TODO-T
         # if edit.edit_token == 0:
         #     raise ValueError("Edit objects may not be used after the TextCommand's run method has returned")
         # return sublime_api.view_insert(self.view_id, edit.edit_token, pt, text)
 
     def replace(self, edit, r, text):
-        pass
+        return True # TODO-T
         # if edit.edit_token == 0:
         #     raise ValueError("Edit objects may not be used after the TextCommand's run method has returned")
         # sublime_api.view_replace(self.view_id, edit.edit_token, r, text)
 
     def run_command(self, cmd, args=None):
-        pass
+        return True # TODO-T
         # sublime_api.view_run_command(self.view_id, cmd, args)
 # view.run_command('append', {'characters': text }) # insert has some odd behavior - indentation
 # view.run_command("goto_line", {"line": line})
@@ -174,15 +178,14 @@ class View():
 # view.run_command(menu_items[index]['command'], {'cmd': cmd})
 
     def sel(self):
-        pass
-        # return self.selection
+        return self.selection
 
     def find(self, pattern, start_pt, flags=0):
-        pass
+        return True # TODO-T
         # return sublime_api.view_find(self.view_id, pattern, start_pt, flags)
 
     def find_all(self, pattern, flags=0, fmt=None, extractions=None):
-        pass
+        return True # TODO-T
         # if fmt is None:
         #     return sublime_api.view_find_all(self.view_id, pattern, flags)
         # else:
@@ -194,56 +197,56 @@ class View():
         #     return ret
 
     def scope_name(self, pt):
-        pass
+        return 'TODO-T'
         # return sublime_api.view_scope_name(self.view_id, pt)
 
     def style_for_scope(self, scope):
-        pass
+        return 'TODO-T'
         # return sublime_api.view_style_for_scope(self.view_id, scope)
 
     def split_by_newlines(self, r):
-        pass
+        return ['TODO-T']
         # return sublime_api.view_split_by_newlines(self.view_id, r)
 
     def word(self, x):
-        pass
+        return 'TODO-T'
         # if isinstance(x, Region):
         #     return sublime_api.view_word_from_region(self.view_id, x)
         # else:
         #     return sublime_api.view_word_from_point(self.view_id, x)
 
     def rowcol(self, tp):
-        pass
+        return (-1, -1)
         # return sublime_api.view_row_col(self.view_id, tp)
 
     def text_point(self, row, col):
-        pass
+        return False # TODO-T
         # return sublime_api.view_text_point(self.view_id, row, col)
 
     def add_regions(self, key, regions, scope="", icon="", flags=0):
-        pass
+        pass # TODO-T
         # if not isinstance(icon, "".__class__):
         #     raise ValueError("icon must be a string")
         # sublime_api.view_add_regions(self.view_id, key, regions, scope, icon, flags)
 
     def get_regions(self, key):
-        pass
+        pass # TODO-T
         # return sublime_api.view_get_regions(self.view_id, key)
 
     def erase_regions(self, key):
-        pass
+        pass # TODO-T
         # sublime_api.view_erase_regions(self.view_id, key)
 
     def set_status(self, key, value):
-        pass
+        _etrace('set_status', key, value)
         # sublime_api.view_set_status(self.view_id, key, value)
 
 
 ################# Window ###################################################
 
-class Window(object):
-    def __init__(self, id):
-        self.window_id = id
+class Window():
+    def __init__(self, view_id):
+        self.window_id = view_id
         self.settings_object = None
 
     def id(self):
@@ -280,10 +283,8 @@ class Window(object):
         #     self.settings_object = Settings(sublime_api.window_settings(self.window_id))
         # return self.settings_object
 
-
-################## TODO-T all below
     def run_command(self, cmd, args=None):
-        pass
+        return True # TODO-T
         # sublime_api.window_run_command(self.window_id, cmd, args)
 # window.run_command("focus_group", { "group": 1 } )
 # window.run_command("close_file")
@@ -293,7 +294,7 @@ class Window(object):
 
     def new_file(self, flags=0, syntax=""):
         """ flags must be either 0 or TRANSIENT """
-        return None
+        return None # TODO-T
         # return View(sublime_api.window_new_file(self.window_id, flags, syntax))
 
     def open_file(self, fname, flags=0, group=-1):
@@ -303,11 +304,11 @@ class Window(object):
         TRASIENT: don't add the file to the list of open buffers
         FORCE_GROUP: don't select the file if it's opened in a different group
         """
-        return None
+        return None # TODO-T
         # return View(sublime_api.window_open_file(self.window_id, fname, flags, group))
 
     def find_open_file(self, fname):
-        return None
+        return None # TODO-T
         # view_id = sublime_api.window_find_open_file(self.window_id, fname)
         # if view_id == 0:
         #     return None
@@ -320,27 +321,27 @@ class Window(object):
         #     sublime_api.window_focus_view(self.window_id, view.view_id)
 
     def get_view_index(self, view):
-        return (-1, -1) #group, and index
+        return (-1, -1)  # TODO-T #group, and index
         # if view:
         #     return sublime_api.window_get_view_index(self.window_id, view.view_id)
         # else:
         #     return (-1, -1)
 
     def views(self):
-        return None
+        return None # TODO-T
         # view_ids = sublime_api.window_views(self.window_id)
         # return [View(x) for x in view_ids]
 
     def layout(self):
-        return None
+        return None # TODO-T
         # return sublime_api.window_get_layout(self.window_id)
 
     def project_data(self):
-        return None
+        return None # TODO-T
         # return sublime_api.window_get_project_data(self.window_id)
 
     def set_project_data(self, v):
-        pass
+        pass # TODO-T
         # sublime_api.window_set_project_data(self.window_id, v)
 
 
@@ -429,24 +430,24 @@ class Region():
 ################# Selection ###################################################
 
 class Selection():
-    def __init__(self, id):
-        self.view_id = id
+    def __init__(self, view_id):
+        self.view_id = view_id
         self.regions = []
 
     def __len__(self):
         return len(self.regions)
         #return sublime_api.view_selection_size(self.view_id)
 
-    # def __getitem__(self, index):
-    #     if len(self.regions) > 0:
-    #         return self.regions[index]
-    #     else:
-    #         raise IndexError()
-    #     return None
-    #     #r = sublime_api.view_selection_get(self.view_id, index)
-    #     #if r.a == -1:
-    #     #    raise IndexError()
-    #     #return r
+    def __getitem__(self, index):
+        if len(self.regions) > 0:
+            return self.regions[index]
+        else:
+            raise IndexError()
+        return None
+        #r = sublime_api.view_selection_get(self.view_id, index)
+        #if r.a == -1:
+        #    raise IndexError()
+        #return r
 
     # def __delitem__(self, index):
     #     if len(self.regions) > 0 and len(self.regions) < index:
@@ -472,9 +473,9 @@ class Selection():
 
     def add(self, x):
         if isinstance(x, Region):
-            self.regions.add(Region(self.view_id, x.a, x.b, x.xpos))
+            self.regions.append(Region(x.a, x.b, x.xpos))
         else:
-            self.regions.add(Region(self.view_id, x, x, x))
+            self.regions.append(Region(x, x, x))
         # if isinstance(x, Region):
         #     sublime_api.view_selection_add_region(self.view_id, x.a, x.b, x.xpos)
         # else:
@@ -493,15 +494,15 @@ class Selection():
         for r in self.regions:
             if r.contains(region):
                 return True
-        return False        
+        return False
         # return sublime_api.view_selection_contains(self.view_id, region.a, region.b)
 
 
 ################# Settings ###################################################
 
 class Settings():
-    def __init__(self, id):
-        self.settings_id = id
+    def __init__(self, view_id):
+        self.settings_id = view_id
         self.settings_storage = {}
 
     def get(self, key, default=None):
@@ -512,8 +513,9 @@ class Settings():
         #    return sublime_api.settings_get(self.settings_id, key)
 
     def has(self, key):
-        return sublime_api.settings_has(self.settings_id, key)
+        return key in self.settings_storage
+        # return sublime_api.settings_has(self.settings_id, key)
 
     def set(self, key, value):
-        return key in self.settings_storage
+        self.settings_storage[key] = value
         # sublime_api.settings_set(self.settings_id, key, value)
