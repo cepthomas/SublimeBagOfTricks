@@ -112,9 +112,10 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
         # Update collection.
         crows = _get_persist_rows(self.view, True)
-        crows.clear()
-        for r in drows:
-            crows.append(r + 1)
+        if crows is not None:
+            crows.clear()
+            for r in drows:
+                crows.append(r + 1)
 
         # Update visual signets, brutally. This is the ST way.
         regions = []
