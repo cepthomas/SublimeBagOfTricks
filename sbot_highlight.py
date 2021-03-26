@@ -108,8 +108,8 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
         scope = highlight_scopes[hl_index]
         tokens = _get_persist_tokens(self.view, True)
 
-        # Add or replace in collection.
-        tokens[token] = { "scope": scope, "whole_word": whole_word }
+        if tokens is not None:
+            tokens[token] = { "scope": scope, "whole_word": whole_word }
         _highlight_view(self.view, token, whole_word, scope)
 
 
