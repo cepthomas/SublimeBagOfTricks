@@ -157,6 +157,20 @@ def _clean_json(s):
     #    print('exception', e)
 
 
+    # try:
+    #     # Each of these classes is layered over a supplied raw FileIO object (f)
+    #     f = io.FileIO(fn) # Open the file (raw I/O)
+    #     g = io.BufferedReader(f) # Put buffering around it
+    #     read_ch = rdr.read(1)
+    #     currentChar = read_ch[0] if len(read_ch) > 0 else -1
+    #     next_ch = rdr.peek(1)
+    #     nextChar = next_ch[0] if len(next_ch) > 0 else -1
+    # except Exception as e:
+    #     ret = $"ERROR: {e.GetType()} {e.Message}"
+    # # Clean up.
+    # io.close(g)
+    # io.close(f)
+
 #-----------------------------------------------------------------------------------
 class SbotExampleGetNumberCommand(sublime_plugin.WindowCommand):
     ''' A window command. sbot_example_get_number '''

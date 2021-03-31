@@ -50,9 +50,7 @@ class TestCommon(unittest.TestCase):
         evt = sbot.SbotEvent()
         evt.on_selection_modified(view)
 
-        self.assertEqual(1, 2, 'just a test test')
-
-
+        #self.assertEqual(1, 2, 'just a test test')
 
 
 # TODO-T sbot_common stuff:

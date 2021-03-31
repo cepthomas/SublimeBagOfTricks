@@ -70,8 +70,8 @@ def load_settings(base_name):
 
 def set_timeout(f, timeout_ms=0):
     """ TODO-T Schedules a function to be called in the future. Sublime Text will block while the function is running """
+    f()
     #sublime_api.set_timeout(f, timeout_ms)
-    #pass
 
 def active_window():
     return _window
@@ -84,7 +84,7 @@ class View():
     def __init__(self, view_id):
         self.view_id = view_id
         self.buffer = ''
-        self.selection = Selection(id)
+        self.selection = Selection(view_id)
 
     def __len__(self):
         return self.size()
@@ -109,7 +109,7 @@ class View():
         #     return Window(window_id)
 
     def file_name(self):
-        return 'TODO-T'
+        return 'test_file_name_{}'.format(self.view_id)
         # name = sublime_api.view_file_name(self.view_id)
         # if len(name) == 0:
         #     return None
@@ -121,7 +121,7 @@ class View():
         # return sublime_api.view_is_loading(self.view_id)
 
     def close(self):
-        return 'TODO-T'
+        return True
         # window_id = sublime_api.view_window(self.view_id)
         # return sublime_api.window_close_file(window_id, self.view_id)
 
