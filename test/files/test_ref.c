@@ -1,9 +1,5 @@
 /**
- * @file gsib-common.c
- *
- * @brief Common utilities.
- *
- * @copyright 2020 Ceres Innovation, All rights reserved.
+ * @file test.c
  */
 
 

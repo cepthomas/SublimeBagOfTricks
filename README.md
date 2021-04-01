@@ -94,12 +94,13 @@ Commands added to the sidebar. Just the stuff I want.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_sb_copy_name        | Copy file/dir name to clipboard |
-| sbot_sb_copy_path        | Copy full file/dir path to clipboard |
-| sbot_sb_terminal         | Open a Windows Terminal here |
-| sbot_sb_folder           | Open a Windows Explorer here |
-| sbot_sb_open_browser     | Open html file in your browser |
-| sbot_sb_tree             | Run tree cmd to clipboard |
+| sbot_sidebar_copy_name   | Copy file/dir name to clipboard |
+| sbot_sidebar_copy_path   | Copy full file/dir path to clipboard |
+| sbot_sidebar_terminal    | Open a Windows Terminal here |
+| sbot_sidebar_folder      | Open a Windows Explorer here |
+| sbot_sidebar_open_browser| Open html file in your browser |
+| sbot_sidebar_tree        | Run tree cmd to new view |
+| sbot_sidebar_exec        | Run selected executable to new view |
 | sbot_sidebar_exclude     | Hide selected file/dir in project |
 
 
@@ -114,7 +115,10 @@ Trimming etc.
 
 
 ## Format
-Prettify json. xml, html later when ST4.
+Prettify json. This makes C++ (not! C) comments into valid json elements and removes any trailing commas. This is
+them passed through the standard python json module.
+
+To add xml, html later when ST4 is supported - needs python 3.8 + lxml.
 
 | Command                  | Description |
 |:--------                 |:-------     |
@@ -126,7 +130,7 @@ Prettify json. xml, html later when ST4.
 ## Miscellany
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_split_view          | Toggles simple horizontal split screen, like e.g. `MS Word` |
+| sbot_split_view          | Toggles simple horizontal split screen |
 | sbot_show_eol            | Toggles showing EOLs |
 | sbot_insert_line_indexes | Insert sequential numbers in first column |
 
@@ -141,6 +145,12 @@ Leftovers that will eventually be deleted or subsumed.
 | sbot_example_input       | User text input |
 | sbot_example_list_select | User list sel |
 | sbot_example_msg_box     | User message |
+
+# Test
+
+The 'test' directory contains a VS solution to do some basic unit testing of sbot functions.
+The 'st_emul' directory contains stubs for the sublime api stuff. Function abstraction in conjunction with mocks
+provides a reasonable amount of algorithm unit tests.
 
 # Notes
 

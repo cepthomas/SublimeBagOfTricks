@@ -71,9 +71,11 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            cmd = 'tree "{}" /a /f | clip'.format(path)
-            subprocess.call(cmd, shell=True)
-            # subprocess.call(['tree', path, '/a', '/f', '|', 'clip'])#, shell=True)
+            # cmd = 'tree "{}" /a /f | clip'.format(path)
+            # subprocess.call(cmd, shell=True)
+            cmd = 'tree "{}" /a /f'.format(path)
+            sout = subprocess.check_output(cmd, universal_newlines=True, shell=True)
+            sbot_common.create_new_view(self.window, sout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.isdir(paths[0])

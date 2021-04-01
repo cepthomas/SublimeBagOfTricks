@@ -1,5 +1,6 @@
 ﻿{
-    "MarkPitch": {
+    "MarkPitch":
+    {
         "Original": 0,
 
 
@@ -8,93 +9,75 @@
     },
 
 
-
+// This file also has trailing commas
 
     "Material": "Stuff is \"comportium\", finest kind!",           
 
-    "MarksPerPage": {
+    "MarksPerPage":
+    {
         "Original": 0,             
-        "Value": 45
-    },
+        "Value": 45,  },
 
 
 
 
-    "Comment": "This \n is a line comment...",
+    //   This is single line comment...          
+    //   This is "single" line comment with embedded quote...          
 
     "MinGoodMarks": {
         "Original": 0,
         "Value": 36
     },
+
     "RepeatLength": {
-        "Original": 0,
-        "Value": 479.425
+        "Original": 0,"Value": 479.425
     },
-    "SpecLimits": [
-        {
+    "SpecLimits": {
             "ItKeystone": {
                 "Original": 105,
-                "Comment": "This \n is also a line comment...",
+                // This \n also is a single line comment...
                 "Value": 110
             },
-            "ItMagnification": {
-                "Original": 122,
-                "Value": 133
-            },
+                    "ItMagnification":
+                                {
+                                    "Original": 122,
+                                    "Value": 133,
+                                },
 
-            "ItPosition": {
+            "ItPosition":
+     {
                 "Original": 134,
                 "Value": 166
             },
             "ItSkew": {
                 "Original": 176,
                 "Value": 189
-            }
-        },
-
-        {"Some true Thing" : true},
-
-        {
-            "ItMagnification": {
-                "Original": 256,
-                "Value": 208
             },
 
-            "Some null Thing" : null,
+        "Some true Thing" : true,
 
-            "ItSkew": {
-                "Original": 639,
-                "Value": 767676
-            }
-        },
 
+"an_array":[
         "Plain string",
-        98765,
-        5.5509,
-        true,
-        false,
+98765,
+5.5509,
+true,
+false,
         null,
 
         {
-            "ItKeystone": {
+            "ItKeystone_default": {
                 "Original": 845,
                 "Value": 9090909
             },
-            "ItMagnification": {
+            "ItMagnification_default": {
                 "Original": 61235,
                 "Some false Thing" : false,
-                "Value": -45
+                "Value": -45,
+                "another_array": [ 1,2,3,4,5]
             },
-            "ItPosition": {
-                "Original": 777,
-                "Value": 931
-            },
-            "ItSkew": {
-                "Original": 609,
-                "Value": 278
-            }
-        }
-    ],
+        }],
+
     "TiffVersion": "ABC-123",
     "TrackSpacing": {
         "Original": 0,
@@ -103,5 +86,6 @@
     "XtBarcodeOffset": {
         "Original": 0,
         "Value": -160
-    }
+    },
+}
 }

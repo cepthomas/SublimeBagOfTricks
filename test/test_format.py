@@ -20,7 +20,7 @@ class TestFormatJson(unittest.TestCase):
 
         view = sublime.View(601)
 
-        with open(r'.\files\test_clean.json', 'r') as fp:
+        with open(r'.\files\test.json', 'r') as fp:
             s = fp.read()
 
             #sel = sublime.Selection(view.id())

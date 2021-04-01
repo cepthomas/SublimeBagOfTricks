@@ -69,7 +69,7 @@ def load_settings(base_name):
     #return Settings(settings_id)
 
 def set_timeout(f, timeout_ms=0):
-    """ TODO-T Schedules a function to be called in the future. Sublime Text will block while the function is running """
+    """ Schedules a function to be called in the future. Sublime Text will block while the function is running """
     f()
     #sublime_api.set_timeout(f, timeout_ms)
 

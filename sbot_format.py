@@ -1,6 +1,5 @@
 import json
 import string
-#import sublime
 import sublime_plugin
 import sbot_common
 
@@ -8,13 +7,11 @@ import sbot_common
 # print('Load sbot_format')
 
 _has_lxml = False
-
-#try:
-#    import lxml
-#    _has_lxml = True
-#except Exception as e:
-#    # sbot_common.trace(e)
-#    _has_lxml = False
+try:
+   import lxml
+   _has_lxml = True
+except Exception as e:
+   _has_lxml = False
 
 
 #-----------------------------------------------------------------------------------
@@ -84,7 +81,6 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
 
 
     def _do_one_region(self, s):
-        # TODO-ST4 enum ScanState { SS_STRING, SS_COMMENT, SS_DEFAULT, SS_DONE } 
         SS_DEFAULT = 0    # Idle
         SS_STRING = 1     # Process a quoted string
         SS_COMMENT = 2    # Processing a comment

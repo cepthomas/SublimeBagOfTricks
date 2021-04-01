@@ -3,7 +3,7 @@
 <Column AssaySpecId="10544" ColumnType="Anti-IgG (PEG)" TestSpec="08 ABSCR4 IgG" DumpTime="02/05/2020 11:30:53" Test="Test  [Test:c52c1f8c-6929-4f81-a4df-a16f09747ec3]&#xA;    TestSpecification [TestSpecification:37ff1761-c467-4cc9-afe7-e8884dbce3b3]">
 <ValidationMessages>
 <ValidationMessage MessageIndex="0" Message="RAV log: Column [0] of cassette [AHG anti-IgG] passed quality check during inspection." /><ValidationMessage MessageIndex="1" Message="RAV log: Column [CassetteColumnSpecification  16787135] for Assay [10544] punched once." /><ValidationMessage MessageIndex="2" Message="RAV log: Correct Punch Tool [B33A1E] used for Cassette [AHG anti-IgG]." /><ValidationMessage MessageIndex="3" Message="RAV log: Correct Punch Tool Pin used for Cassette Column [Anti-IgG (PEG)] with punch offset [0]" />
-<ValidationMessage MessageIndex="4" Message="RAV log: Correct cassette type [AHG anti-IgG] used for Assay [10544]." /><ValidationMessage MessageIndex="5" Message="RAV log: Correct column type [Anti-IgG (PEG)] used for Assay [10544]." /><ValidationMessage MessageIndex="6" Message="RAV log: Shelf expiration checking is disabled." />
+      <ValidationMessage MessageIndex="4" Message="RAV log: Correct cassette type [AHG anti-IgG] used for Assay [10544]." /><ValidationMessage MessageIndex="5" Message="RAV log: Correct column type [Anti-IgG (PEG)] used for Assay [10544]." /><ValidationMessage MessageIndex="6" Message="RAV log: Shelf expiration checking is disabled." />
 <ValidationMessage MessageIndex="7" Message="RAV log: Cassette placed in correct incubator type [Heated]." /><ValidationMessage MessageIndex="8" Message="RAV log: Number of centrifugation cycles (1) is correct." /><ValidationMessage MessageIndex="9" Message="RAV log: Correct duration [75 s] and rotation speed [793 revolutions/min] applied in profile [0]." />
 <ValidationMessage MessageIndex="10" Message="RAV log: Correct duration [225 s] and rotation speed [1509 revolutions/min] applied in profile [1]." />
 <ValidationMessage MessageIndex="11" Message="RAV log: Total centrifugation duration [00:05:00] within minimum required duration [00:04:40] and maximum required duration [00:05:20]." />
@@ -74,39 +74,31 @@
 <RavAspirate xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <StartTime>2020-02-05T16:08:35.4201021Z</StartTime>
 <EndTime>2020-02-05T16:08:39.0237085Z</EndTime>
-<LiquidClassName>ReagentCells_08</LiquidClassName>
-<NetDispenseVolumesInLiter>
-<double>4.9999999999999989E-05</double>
-</NetDispenseVolumesInLiter>
-<TargetPositionCidIdentifier>SRDR:1/SLOT:RR,2,5</TargetPositionCidIdentifier>
-<AspiratedLiquidsStrings>
-<string>LiquidSpec [0.8% ABSCR4 Cell 3], Barcode [3112045123], Lot [123], Volume [5E-05 l]</string>
-</AspiratedLiquidsStrings>
-</RavAspirate>
+<LiquidClassName>ReagentCells_08</LiquidClassName><NetDispenseVolumesInLiter><double>4.9999999999999989E-05</double></NetDispenseVolumesInLiter><TargetPositionCidIdentifier>SRDR:1/SLOT:RR,2,5</TargetPositionCidIdentifier><AspiratedLiquidsStrings><string>LiquidSpec [0.8% ABSCR4 Cell 3], Barcode [3112045123], Lot [123], Volume [5E-05 l]</string></AspiratedLiquidsStrings></RavAspirate>
 <RavDispense2Column xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<StartTime>2020-02-05T16:08:39.335709Z</StartTime>
-<EndTime>2020-02-05T16:08:41.4729128Z</EndTime>
-<LiquidClassName>ReagentCells_08</LiquidClassName>
-<NetDispenseVolumeInLiter>4.9999999999999989E-05</NetDispenseVolumeInLiter>
-<DispenseMode>Center</DispenseMode>
-<NeedleStateDuringDispense>Ok</NeedleStateDuringDispense>
-<TargetPositionCidIdentifier>CINC:1/SLOT:PIPA,HT,2,1</TargetPositionCidIdentifier>
-<LiquidsStrings>
-<string>LiquidSpec [0.8% ABSCR4 Cell 3], Barcode [3112045123], Lot [123], Volume [5E-05 l]</string>
-</LiquidsStrings>
-</RavDispense2Column>
-<RavPickFromIncubator xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<StartTime>2020-02-05T16:24:16.9753559Z</StartTime>
-<EndTime>2020-02-05T16:24:17.8021573Z</EndTime>
-<IncubationType>Heated</IncubationType>
-</RavPickFromIncubator>
-<RavPlaceInCentrifuge xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<StartTime>2020-02-05T16:24:19.0969596Z</StartTime>
-<EndTime>2020-02-05T16:24:20.9065628Z</EndTime>
-<CentrifugeCidIdentifier>CENT:2</CentrifugeCidIdentifier>
-</RavPlaceInCentrifuge>
-<RavCentrifugeCassettes xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<StartTime>2020-02-05T16:25:05.6006413Z</StartTime>
+          <StartTime>2020-02-05T16:08:39.335709Z</StartTime>
+          <EndTime>2020-02-05T16:08:41.4729128Z</EndTime>
+          <LiquidClassName>ReagentCells_08</LiquidClassName>
+          <NetDispenseVolumeInLiter>4.9999999999999989E-05</NetDispenseVolumeInLiter>
+          <DispenseMode>Center</DispenseMode>
+          <NeedleStateDuringDispense>Ok</NeedleStateDuringDispense>
+          <TargetPositionCidIdentifier>CINC:1/SLOT:PIPA,HT,2,1</TargetPositionCidIdentifier>
+          <LiquidsStrings>
+          <string>LiquidSpec [0.8% ABSCR4 Cell 3], Barcode [3112045123], Lot [123], Volume [5E-05 l]</string>
+          </LiquidsStrings>
+          </RavDispense2Column>
+          <RavPickFromIncubator xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <StartTime>2020-02-05T16:24:16.9753559Z</StartTime>
+          <EndTime>2020-02-05T16:24:17.8021573Z</EndTime>
+          <IncubationType>Heated</IncubationType>
+          </RavPickFromIncubator>
+          <RavPlaceInCentrifuge xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <StartTime>2020-02-05T16:24:19.0969596Z</StartTime>
+          <EndTime>2020-02-05T16:24:20.9065628Z</EndTime>
+          <CentrifugeCidIdentifier>CENT:2</CentrifugeCidIdentifier>
+          </RavPlaceInCentrifuge>
+          <RavCentrifugeCassettes xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <StartTime>2020-02-05T16:25:05.6006413Z</StartTime>
 <EndTime>2020-02-05T16:30:12.889981Z</EndTime>
 <CentrifugeNumber>2</CentrifugeNumber>
 <RotationProfile>
