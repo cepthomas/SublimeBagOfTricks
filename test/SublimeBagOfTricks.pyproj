@@ -37,7 +37,6 @@
     <Compile Include="..\sbot_render.py" />
     <Compile Include="..\sbot_sidebar.py" />
     <Compile Include="..\sbot_signet.py" />
-    <Compile Include="files\test.py" />
     <Compile Include="st_emul\sublime.py" />
     <Compile Include="st_emul\sublime_plugin.py" />
     <Compile Include="test_common.py" />
@@ -55,16 +54,16 @@
     <Content Include="files\mark1.bmp" />
     <Content Include="files\nonascii.txt" />
     <Content Include="files\test.c" />
+    <Content Include="files\test.py" />
     <Content Include="files\test.cs" />
     <Content Include="files\test.html" />
     <Content Include="files\test.json" />
     <Content Include="files\test.xml" />
-      <Publish>False</Publish>
-    </Content>
     <Content Include="files\test_exec.bat" />
     <Content Include="files\test_ref.c" />
     <Content Include="files\test_ref.html" />
     <Content Include="files\test_ref.xml" />
+    <Content Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
