@@ -30,6 +30,7 @@ def _do_sub(view, edit, reo, sub):
 
 #-----------------------------------------------------------------------------------
 class SbotTrimCommand(sublime_plugin.TextCommand):
+    '''sbot_trim how=leading|trailing|both'''
 
     def run(self, edit, how):
         if how == 'leading':
@@ -46,6 +47,7 @@ class SbotTrimCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
+    '''sbot_remove_empty_lines  how=remove_all|normalize'''
 
     def run(self, edit, how):
         if how == 'normalize':
@@ -59,6 +61,7 @@ class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveWsCommand(sublime_plugin.TextCommand):
+    '''sbot_remove_ws  how=remove_all|keep_eol|normalize'''
 
     def run(self, edit, how):
         if how == 'normalize':

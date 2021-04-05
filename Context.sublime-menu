@@ -59,9 +59,7 @@
     { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : { "how" : "normalize" } },
 
     { "caption": "-" },
-    { "caption": "Remove Lines With Selections", "command": "sbot_remove_sel_lines" },
 
-    { "caption": "-" },
     { "caption": "Insert Line Indexes", "command": "sbot_insert_line_indexes" },
     { "caption": "Show EOL", "command": "sbot_show_eol" },
 ]

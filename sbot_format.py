@@ -1,17 +1,16 @@
 import sys
 import json
 import string
+import re
+import xml
+import xml.dom.minidom
 import sublime_plugin
 import sbot_common
 
 
 # print('Load sbot_format')
 
-_has_lxml = False
-modulename = 'lxml'
-#print(sys.modules)
-if modulename in sys.modules:
-    _has_lxml = True
+INDENT = '    '
 
 
 #-----------------------------------------------------------------------------------
@@ -38,20 +37,18 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         sres = []
         err = False
 
-        for reg in sbot_common.get_sel_regions(self.view):
-            s = self.view.substr(reg)
-            s = self._do_one_region(s)
-            sres.append(s)
-            if s.startswith('Error'):
-                err = True
-                break
+        reg = sbot_common.get_sel_regions(self.view)[0]
+        s = self.view.substr(reg)
+        s = self._do_one(s)
+        sres.append(s)
+        if s.startswith('Error'):
+            err = True
 
         vnew = sbot_common.create_new_view(self.view.window(), '\n'.join(sres))
-
         if not err:
             vnew.set_syntax_file('Packages/JavaScript/JSON.sublime-syntax')
 
-    def _do_one_region(self, s):
+    def _do_one(self, s):
         ''' Clean and reformat the string. Returns the new string. '''
 
         SS_DEFAULT = 0    # Idle
@@ -70,26 +67,11 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
 
         # Iterate the string.
         try:
-
             slen = len(s)
             i = 0
             while i < slen:
                 current_char = s[i]
                 next_char = s[i + 1] if i < slen-1 else -1
-
-                # Prefilter and update position.
-                # if current_char == -1:
-                #     state = SS_DONE
-                # elif current_char == '\n':
-                #     originalLine++
-                #     originalColumn = 0
-                # elif current_char == '\r':
-                #     originalColumn = 0
-                # elif current_char == '\t':
-                #     originalColumn = ((originalColumn / tabWidth) + 1) * tabWidth
-                # else:
-                #     originalColumn += 1
-
 
                 # Remove whitespace and transform comments into legal json.
                 if state == SS_STRING:
@@ -139,12 +121,11 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
             ret = ''.join(sreg)
             # Remove any trailing commas.
             ret = ret.replace(",}", "}").replace(",]", "]")
-            # Run it through the formatter. If there are errors they will be caught and handled by the caller.
-            #print(ret)
+            # Run it through the formatter.
             ret = json.loads(ret)
-            ret = json.dumps(ret, indent=4) #, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
-        except json.JSONDecodeError as je:
-            ret = 'Error: {}'.format(je.args)
+            ret = json.dumps(ret, indent=4)
+        #except json.JSONDecodeError as je:
+        #    ret = 'Error: {}'.format(je.args)
         except Exception as e:
             ret = 'Error: {}'.format(e.args)
 
@@ -155,26 +136,87 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
 class SbotFormatXmlCommand(sublime_plugin.TextCommand):
     ''' sbot_format_xml'''
 
-    def run(self, edit):
-        # Installation: pip3 install lxml.
-        # Use lxml.etree.parse(source) to parse the XML file source and return an ElementTree object.
-        # lxml.etree.tostring(element_or_tree, encoding="unicode" pretty_print=True) to pretty print the contents of the XML file,
-        #   with element_or_tree as the result of the previous step.
-        # tree = lxml.etree.parse("small.xml")
-        # pretty = lxml.etree.tostring(tree, encoding="unicode", pretty_print=True)
-        view = self.view
-
     def is_visible(self):
-        return _has_lxml and self.view.settings().get('syntax').endswith('XML.sublime-syntax')
+        return self.view.settings().get('syntax').endswith('XML.sublime-syntax')
+
+    def run(self, edit):
+        err = False
+
+        reg = sbot_common.get_sel_regions(self.view)[0]
+        s = self.view.substr(reg)
+        s = self._do_one(s)
+        if s.startswith('Error'):
+            err = True
+
+        vnew = sbot_common.create_new_view(self.view.window(), s)
+        if not err:
+            vnew.set_syntax_file('Packages/XML/XML.sublime-syntax')
+
+    def _do_one(self, s):
+        ''' Clean and reformat the string. Returns the new string. '''
+
+        def clean(node):
+            for n in node.childNodes:
+                if n.nodeType == xml.dom.minidom.Node.TEXT_NODE:
+                    if n.nodeValue:
+                        n.nodeValue = n.nodeValue.strip()
+                elif n.nodeType == xml.dom.minidom.Node.ELEMENT_NODE:
+                    clean(n)
+
+        try:
+            top = xml.dom.minidom.parseString(s)
+            clean(top)
+            top.normalize()
+            ret = top.toprettyxml(indent=INDENT)
+        except Exception as e:
+            ret = 'Error: {}'.format(e.args)
+
+        return ret
 
 
 #-----------------------------------------------------------------------------------
 class SbotFormatHtmlCommand(sublime_plugin.TextCommand):
     ''' sbot_format_html'''
 
-    def run(self, edit):
-        # Like xml.
-        view = self.view
+    def __init__(self, view):
+        self.sres = []
+        self.index = 0
 
     def is_visible(self):
-        return _has_lxml and self.view.settings().get('syntax').endswith('HTML.sublime-syntax')
+        return False #self.view.settings().get('syntax').endswith('HTML.sublime-syntax')
+
+    def run(self, edit):
+        sres = []
+        err = False
+
+        reg = sbot_common.get_sel_regions(self.view)[0]
+        s = self.view.substr(reg)
+        s = self._do_one(s)
+        sres.append(s)
+        if s.startswith('Error'):
+            err = True
+
+        vnew = sbot_common.create_new_view(self.view.window(), '\n'.join(sres))
+        if not err:
+            vnew.set_syntax_file('Packages/HTML/HTML.sublime-syntax')
+
+    def _do_one(self, s):
+        ''' Clean and reformat the string. Returns the new string. '''
+
+        # TODO-F https://packagecontrol.io/packages/HTMLBeautify
+        ret = _trim_all(s)
+
+        return ret
+
+
+#-----------------------------------------------------------------------------------
+def _trim_all(s):
+    # lead/trail ws
+    reo = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
+    s = reo.sub('', s)
+
+    # empty lines
+    reo = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
+    s = reo.sub('', s)
+
+    return s
