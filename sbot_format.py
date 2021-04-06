@@ -114,8 +114,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                         sreg.append(current_char)
                 else: # state == SS_DONE:
                     pass
-
-                i += 1
+                i += 1 # next
 
             # Prep for formatting.
             ret = ''.join(sreg)
@@ -172,51 +171,3 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
             ret = 'Error: {}'.format(e.args)
 
         return ret
-
-
-#-----------------------------------------------------------------------------------
-class SbotFormatHtmlCommand(sublime_plugin.TextCommand):
-    ''' sbot_format_html'''
-
-    def __init__(self, view):
-        self.sres = []
-        self.index = 0
-
-    def is_visible(self):
-        return False #self.view.settings().get('syntax').endswith('HTML.sublime-syntax')
-
-    def run(self, edit):
-        sres = []
-        err = False
-
-        reg = sbot_common.get_sel_regions(self.view)[0]
-        s = self.view.substr(reg)
-        s = self._do_one(s)
-        sres.append(s)
-        if s.startswith('Error'):
-            err = True
-
-        vnew = sbot_common.create_new_view(self.view.window(), '\n'.join(sres))
-        if not err:
-            vnew.set_syntax_file('Packages/HTML/HTML.sublime-syntax')
-
-    def _do_one(self, s):
-        ''' Clean and reformat the string. Returns the new string. '''
-
-        # TODO-F https://packagecontrol.io/packages/HTMLBeautify
-        ret = _trim_all(s)
-
-        return ret
-
-
-#-----------------------------------------------------------------------------------
-def _trim_all(s):
-    # lead/trail ws
-    reo = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
-    s = reo.sub('', s)
-
-    # empty lines
-    reo = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
-    s = reo.sub('', s)
-
-    return s

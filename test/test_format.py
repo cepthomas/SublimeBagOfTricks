@@ -44,21 +44,6 @@ class TestFormat(unittest.TestCase):
             res = cmd._do_one(s)
             self.assertEqual(res, "Error: ('not well-formed (invalid token): line 6, column 4',)")
 
-    def test_format_html(self):
-        v = sublime.View(603)
-
-        with open(r'.\files\test.html', 'r') as fp:
-            # The happy path.
-            s = fp.read()
-            cmd = sbot_format.SbotFormatHtmlCommand(v)
-            res = cmd._do_one(s)
-            self.assertEqual(res[100:150], '?????????')
-
-            # Make it a bad file.
-            s = s.replace('??????', '')
-            res = cmd._do_one(s)
-            self.assertEqual(res, '?????????')
-
 
 if __name__ == '__main__':
     unittest.main()

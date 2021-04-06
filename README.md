@@ -118,13 +118,10 @@ Trimming etc.
 Prettify json. This makes C++ (not! C) comments into valid json elements and removes any trailing commas. This is
 them passed through the standard python json module.
 
-To add xml, html later when ST4 is supported - needs python 3.8 + lxml.
-
 | Command                  | Description |
 |:--------                 |:-------     |
 | sbot_format_json         | Format json content and show in new view |
 | sbot_format_xml          | Format xml content and show in new view |
-| sbot_format_html         | Format html content and show in new view |
 
 
 ## Miscellany

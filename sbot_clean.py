@@ -74,3 +74,17 @@ class SbotRemoveWsCommand(sublime_plugin.TextCommand):
             reo = re.compile(r'[ \t\r\n\v\f]')
             sub = ''
         _do_sub(self.view, edit, reo, sub)
+
+
+#-----------------------------------------------------------------------------------
+def trim_all(s):
+    ''' Remove lead/trail ws and empty lines.'''
+    # lead/trail ws
+    reo = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
+    s = reo.sub('', s)
+
+    # empty lines
+    reo = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
+    s = reo.sub('', s)
+
+    return s

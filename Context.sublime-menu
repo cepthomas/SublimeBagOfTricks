@@ -39,7 +39,6 @@
 
     { "caption": "Format json", "command": "sbot_format_json" },
     { "caption": "Format xml", "command": "sbot_format_xml" },
-    { "caption": "Format html", "command": "sbot_format_html" },
 
     { "caption": "-" },
 
