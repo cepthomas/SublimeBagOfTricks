@@ -109,7 +109,8 @@ if(negative)
 }
 return ok;
 }
-/* -------------------------------------------------------------------------- */bool common_sendTrace(uint8_t msgid, const char* text, uint32_t val)
+/* -------------------------------------------------------------------------- */
+bool common_sendTrace(uint8_t msgid, const char* text, uint32_t val)
 {
 // Send the text.
 can_status_t cstat = canManager_sendTrace(msgid, text);
