@@ -1,6 +1,6 @@
 #import sys
 
-# TODO-T Implement !!!! as needed.
+# Implement IMPL as needed.
 
 TRANSIENT = 4
 IGNORECASE = 2
@@ -148,7 +148,7 @@ class View():
         #     on_navigate, on_hide)
 
     def substr(self, x):
-        return '!!!!'
+        return 'IMPL'
         # if isinstance(x, Region):
         #     return sublime_api.view_cached_substr(self.view_id, x.a, x.b)
         # else:
@@ -160,19 +160,19 @@ class View():
         #         return s
 
     def insert(self, edit, pt, text):
-        return True # !!!!
+        return True # IMPL
         # if edit.edit_token == 0:
         #     raise ValueError("Edit objects may not be used after the TextCommand's run method has returned")
         # return sublime_api.view_insert(self.view_id, edit.edit_token, pt, text)
 
     def replace(self, edit, r, text):
-        return True # !!!!
+        return True # IMPL
         # if edit.edit_token == 0:
         #     raise ValueError("Edit objects may not be used after the TextCommand's run method has returned")
         # sublime_api.view_replace(self.view_id, edit.edit_token, r, text)
 
     def run_command(self, cmd, args=None):
-        return True # !!!!
+        return True # IMPL
         # sublime_api.view_run_command(self.view_id, cmd, args)
         # view.run_command("goto_line", {"line": line})
 
@@ -180,11 +180,11 @@ class View():
         return self.selection
 
     def find(self, pattern, start_pt, flags=0):
-        return True # !!!!
+        return True # IMPL
         # return sublime_api.view_find(self.view_id, pattern, start_pt, flags)
 
     def find_all(self, pattern, flags=0, fmt=None, extractions=None):
-        return True # !!!!
+        return True # IMPL
         # if fmt is None:
         #     return sublime_api.view_find_all(self.view_id, pattern, flags)
         # else:
@@ -196,19 +196,19 @@ class View():
         #     return ret
 
     def scope_name(self, pt):
-        return '!!!!'
+        return 'IMPL'
         # return sublime_api.view_scope_name(self.view_id, pt)
 
     def style_for_scope(self, scope):
-        return '!!!!'
+        return 'IMPL'
         # return sublime_api.view_style_for_scope(self.view_id, scope)
 
     def split_by_newlines(self, r):
-        return ['!!!!']
+        return ['IMPL']
         # return sublime_api.view_split_by_newlines(self.view_id, r)
 
     def word(self, x):
-        return '!!!!'
+        return 'IMPL'
         # if isinstance(x, Region):
         #     return sublime_api.view_word_from_region(self.view_id, x)
         # else:
@@ -219,21 +219,21 @@ class View():
         # return sublime_api.view_row_col(self.view_id, tp)
 
     def text_point(self, row, col):
-        return False # !!!!
+        return False # IMPL
         # return sublime_api.view_text_point(self.view_id, row, col)
 
     def add_regions(self, key, regions, scope="", icon="", flags=0):
-        pass # !!!!
+        pass # IMPL
         # if not isinstance(icon, "".__class__):
         #     raise ValueError("icon must be a string")
         # sublime_api.view_add_regions(self.view_id, key, regions, scope, icon, flags)
 
     def get_regions(self, key):
-        pass # !!!!
+        pass # IMPL
         # return sublime_api.view_get_regions(self.view_id, key)
 
     def erase_regions(self, key):
-        pass # !!!!
+        pass # IMPL
         # sublime_api.view_erase_regions(self.view_id, key)
 
     def set_status(self, key, value):
@@ -283,13 +283,13 @@ class Window():
         # return self.settings_object
 
     def run_command(self, cmd, args=None):
-        return True # !!!!
+        return True # IMPL
         # sublime_api.window_run_command(self.window_id, cmd, args)
         # window.run_command("focus_group", { "group": 1 } )
 
     def new_file(self, flags=0, syntax=""):
         """ flags must be either 0 or TRANSIENT """
-        return None # !!!!
+        return None # IMPL
         # return View(sublime_api.window_new_file(self.window_id, flags, syntax))
 
     def open_file(self, fname, flags=0, group=-1):
@@ -299,11 +299,11 @@ class Window():
         TRASIENT: don't add the file to the list of open buffers
         FORCE_GROUP: don't select the file if it's opened in a different group
         """
-        return None # !!!!
+        return None # IMPL
         # return View(sublime_api.window_open_file(self.window_id, fname, flags, group))
 
     def find_open_file(self, fname):
-        return None # !!!!
+        return None # IMPL
         # view_id = sublime_api.window_find_open_file(self.window_id, fname)
         # if view_id == 0:
         #     return None
@@ -316,27 +316,27 @@ class Window():
         #     sublime_api.window_focus_view(self.window_id, view.view_id)
 
     def get_view_index(self, view):
-        return (-1, -1)  # !!!! #group, and index
+        return (-1, -1)  # IMPL #group, and index
         # if view:
         #     return sublime_api.window_get_view_index(self.window_id, view.view_id)
         # else:
         #     return (-1, -1)
 
     def views(self):
-        return None # !!!!
+        return None # IMPL
         # view_ids = sublime_api.window_views(self.window_id)
         # return [View(x) for x in view_ids]
 
     def layout(self):
-        return None # !!!!
+        return None # IMPL
         # return sublime_api.window_get_layout(self.window_id)
 
     def project_data(self):
-        return None # !!!!
+        return None # IMPL
         # return sublime_api.window_get_project_data(self.window_id)
 
     def set_project_data(self, v):
-        pass # !!!!
+        pass # IMPL
         # sublime_api.window_set_project_data(self.window_id, v)
 
 

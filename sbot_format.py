@@ -118,8 +118,11 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
 
             # Prep for formatting.
             ret = ''.join(sreg)
+
             # Remove any trailing commas.
-            ret = ret.replace(",}", "}").replace(",]", "]")
+            ret = re.sub(',}','}', ret)
+            ret = re.sub(',]',']', ret)
+
             # Run it through the formatter.
             ret = json.loads(ret)
             ret = json.dumps(ret, indent=4)
