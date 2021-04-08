@@ -129,6 +129,7 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 | Command                  | Description |
 |:--------                 |:-------     |
 | sbot_split_view          | Toggles simple horizontal split screen |
+| sbot_cmd_line            | Simple way to run a quick command |
 
 
 # Test

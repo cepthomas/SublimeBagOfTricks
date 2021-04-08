@@ -1,24 +1,25 @@
+import subprocess
 import webbrowser
 import sublime
 import sublime_plugin
 import sbot_common
 
 
-# print('Load sbot_misc_commands')
+# print('Load sbot_misc')
 
-# Misc commands.
+# Misc stuff that doesn't warrant its own module.
 
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. '''
-    sbot_common.trace('plugin_loaded sbot_misc_commands')
+    sbot_common.trace('plugin_loaded sbot_misc')
 
 
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
     ''' Clean up module global stuff. '''
-    sbot_common.trace('plugin_unloaded sbot_misc_commands')
+    sbot_common.trace('plugin_unloaded sbot_misc')
 
 
 #-----------------------------------------------------------------------------------
@@ -51,3 +52,18 @@ class SbotOpenUrlCommand(sublime_plugin.WindowCommand):
         webbrowser.open_new_tab(url)
 
 
+#-----------------------------------------------------------------------------------
+class SbotCmdLineCommand(sublime_plugin.WindowCommand):
+    ''' Run a simple command in the project dir. '''
+
+    def run(self):
+        # Bottom input area.
+        self.window.show_input_panel(self.window.extract_variables()['folder'] + '>', "", self.on_done, None, None)
+
+    def on_done(self, text):
+        try:
+            print(self.window.extract_variables())
+            sout = subprocess.check_output(text, cwd=self.window.extract_variables()['folder'], universal_newlines=True, shell=True)
+        except Exception as e:
+            sout = 'Error: {}'.format(e.args)
+        sbot_common.create_new_view(self.window, sout)

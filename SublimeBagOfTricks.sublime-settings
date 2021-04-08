@@ -27,7 +27,7 @@
     "highlight_scopes": [ "string", "constant.language", "comment", "markup.list", "variable", "invalid" ],
     // "highlight_scopes": [ "region.redish", "region.orangish", "region.yellowish", "region.greenish", "region.cyanish", "region.bluish", "region.purplish", "region.pinkish" ],
     // Scope for coloring eols.
-    "highlight_eol_scope": "constant.character.escape",
+    "highlight_eol_scope": "region.purplish",
     // Scope list for sbot_show_scopes command.
     "highlight_scopes_to_show": [
         "comment", "constant", "constant.character.escape", "constant.language", "constant.numeric", "entity.name",
