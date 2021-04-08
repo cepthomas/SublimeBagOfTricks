@@ -123,6 +123,20 @@ def wait_load_file(view, line):
 
 
 #-----------------------------------------------------------------------------------
+def trim_all(s):
+    ''' Remove lead/trail ws and empty lines.'''
+    # lead/trail ws
+    reo = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
+    s = reo.sub('', s)
+
+    # empty lines
+    reo = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
+    s = reo.sub('', s)
+
+    return s
+
+
+#-----------------------------------------------------------------------------------
 class SbotPerfCounter():
     ''' Container for perf counter. All times in msec. '''
 

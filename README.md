@@ -30,6 +30,7 @@ Note that the files used to persist highlights and signets are located next to t
 | sbot_clear_highlight     | Remove highlight in selection |
 | sbot_clear_all_highlights| Remove all highlights |
 | sbot_show_scopes         | Popup that shows style for scopes |
+| sbot_show_eol            | Toggles showing EOLs |
 
 | Setting                  | Description |
 |:--------                 |:-------     |
@@ -112,15 +113,15 @@ Trimming etc.
 | sbot_trim                | Line end ws trim, arg:`how` should be `leading` or `trailing` or `both` |
 | sbot_remove_empty_lines  | Like it says, arg:`normalize`=True leaves one |
 | sbot_remove_ws           | Like it says, arg:`normalize`=True leaves one |
+| sbot_insert_line_indexes | Insert sequential numbers in first column |
 
 
 ## Format
-Prettify json. This makes C++ (not! C) comments into valid json elements and removes any trailing commas. This is
-them passed through the standard python json module.
+Prettify json and xml. Was also going to handle html but it's easier to just to used an online formatter for this very occasional need.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_format_json         | Format json content and show in new view |
+| sbot_format_json         | Format json content and show in new view - makes C++ (not! C) comments into valid json elements and removes any trailing commas|
 | sbot_format_xml          | Format xml content and show in new view |
 
 
@@ -128,20 +129,7 @@ them passed through the standard python json module.
 | Command                  | Description |
 |:--------                 |:-------     |
 | sbot_split_view          | Toggles simple horizontal split screen |
-| sbot_show_eol            | Toggles showing EOLs |
-| sbot_insert_line_indexes | Insert sequential numbers in first column |
 
-
-## Examples
-Leftovers that will eventually be deleted or subsumed.
-
-| Command                  | Description |
-|:--------                 |:-------     |
-| sbot_example_menu        | Menu |
-| sbot_example_get_number  | User text input |
-| sbot_example_input       | User text input |
-| sbot_example_list_select | User list sel |
-| sbot_example_msg_box     | User message |
 
 # Test
 
@@ -175,7 +163,7 @@ Accumulated notes that will probably eventually go away. A lot is snipped from t
 - Read the [API](https://www.sublimetext.com/docs/api_reference.html).
 - I learned the hard way that ST doesn't handle python modules/packages as you expect. It may load modules multiple times, making the
   standard way of handling globals difficult if not impossible.
-  [Details}(https://forum.sublimetext.com/t/accessing-settings-from-within-a-multi-module-st-package/46128/5).
+  [Details](https://forum.sublimetext.com/t/accessing-settings-from-within-a-multi-module-st-package/46128/5).
 - EventListeners are instantiated exactly once (on plugin load time), as are ApplicationCommands. WindowCommands are instantiated for
   each window and TextCommands for each view, or even every time a command is run???
 - There is one global context and all plugins share the same process.

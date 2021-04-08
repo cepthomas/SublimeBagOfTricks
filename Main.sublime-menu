@@ -63,27 +63,4 @@
             },
         ]
     },
-
-    // New top level menu. For some reason this needs to be after the preceding sections.
-    {
-        "caption": "Extra",
-        "id": "sbot_extra",
-        "children":
-        [
-            { "command": "open_file", "caption": "Notes", "args": {"file": "${packages}/SublimeBagOfTricks/notes.txt"} },
-            
-            { "command": "sbot_example_input" },
-            // { "command": "arithmetic" },
-            { "command": "sbot_example_menu", "caption": "Menu" },
-            { "command": "sbot_example_list_select", "caption": "List Select" },
-            {
-                "caption": "Menu Dropdown",
-                "id": "sbot_example_dropdown",
-                "children":
-                [
-                    { "command": "sbot_example_get_number", "caption": "Get Number" },
-                ]
-            }
-        ]
-    },
 ]

@@ -77,14 +77,21 @@ class SbotRemoveWsCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def trim_all(s):
-    ''' Remove lead/trail ws and empty lines.'''
-    # lead/trail ws
-    reo = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
-    s = reo.sub('', s)
+class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
+    ''' Insert sequential numbers in first column. Default is to start at 1. '''
 
-    # empty lines
-    reo = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
-    s = reo.sub('', s)
+    def run(self, edit):
+        # Iterate lines.
+        line_count = self.view.rowcol(self.view.size())[0]
+        width = len(str(line_count))
+        offset = 0
 
-    return s
+        for region in sbot_common.get_sel_regions(self.view):
+            line_num = 1
+            offset = 0
+            for line_region in self.view.split_by_newlines(region):
+                s = "{:0{size}} ".format(line_num, size=width)
+                self.view.insert(edit, line_region.a + offset, s)
+                line_num += 1
+                # Adjust for inserts.
+                offset += width+1

@@ -1,6 +1,4 @@
 [
-    { "caption": "TEST TEST TEST", "command": "sbot_test" },
-    { "caption": "-" },
     { "caption": "Split View", "command": "sbot_split_view" },
     { "caption": "-" },
     {

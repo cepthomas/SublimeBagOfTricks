@@ -16,7 +16,6 @@ class SbotTestCommand(sublime_plugin.TextCommand):
     def run(self, edit, cmd=None):
         view = self.view
 
-
         # for sheet in window.sheets():
         #     sbot_common.trace('sheet:', sheet)
         # for view in window.views(): # These are in order L -> R.
@@ -33,38 +32,10 @@ class SbotTestCommand(sublime_plugin.TextCommand):
         # phants.append(phant)
         # self.phantset.update(phants)
 
-        # global global_thing
-        # sbot_common.trace(global_thing)
-        # global_thing['item' + str(len(global_thing) + 5)] = 1234
-        # view.show_popup(str(global_thing))
-
-
-        # if action == 'white_space':
-        #     pname, pval1, pval2 = "draw_white_space", "all", "selection"
-        # elif action == 'gutter':
-        #     pname, pval1, pval2 = "gutter", False, True
-        # elif action == 'line_no':
-        #     pname, pval1, pval2 = "line_numbers", False, True
-        # elif action == 'indent_guide':
-        #     pname, pval1, pval2 = "draw_indent_guides", False, True
-        # if pname:
-        #     propertyValue = pval1 if view.settings().get(pname, pval1) != pval1 else pval2
-        #     view.settings().set(pname, propertyValue)
-
-
-        # with open(r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages\SublimeBagOfTricks\test\new_proj.json', 'r') as fp:
-        #     o = json.load(fp)
-        #     sigs = o['signets']
-        #     hls = o['highlights']
-        #     for k, v in sigs.items():
-        #         sbot_common.trace(k, v)
-        #     for k, v in hls.items():
-        #         sbot_common.trace(k, v)
-
 
 #-----------------------------------------------------------------------------------
 class SbotExampleGetNumberCommand(sublime_plugin.WindowCommand):
-    ''' A window command. sbot_example_get_number '''
+    ''' A window command that gets input from bottom input area. sbot_example_get_number '''
 
     def run(self):
         # Bottom input area.
@@ -104,31 +75,43 @@ class SbotExampleMenuCommand(sublime_plugin.TextCommand):
     def run(self, edit, cmd=None):
         # Individual menu items.
         CMD1 = {'text': 'UserInput',  'command' : 'sbot_example_user_input'}
-        CMD2 = {'text': 'GetNumber',  'command' : 'sbot_example_get_number'}
-        CMD3 = {'text': 'MsgBox',     'command' : 'sbot_example_msg_box'}
-        CMD4 = {'text': 'ListSelect', 'command' : 'sbot_example_list_select'}
+        CMD2 = {'text': 'MsgBox',     'command' : 'sbot_example_msg_box'} # not impl
+        CMD3 = {'text': 'ListSelect', 'command' : 'sbot_example_list_select'}
 
         menu_items = [CMD1, CMD2, CMD3, CMD4]
 
         def on_done(index):
             if index >= 0:
-                self.view.run_command(menu_items[index]['command'], {'cmd': cmd})
+                cmd = menu_items[index]['command']
+                self.view.run_command(cmd)
 
         self.view.window().show_quick_panel([item['text'] for item in menu_items], on_done)
 
 
 #-----------------------------------------------------------------------------------
+class SbotExampleUserInputCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, my_value): # Has to be called exactly my_value - another convention.
+        print('!!!! run()', my_value)
+        sbot_common.trace('argument:', my_value)
+
+    def input(self, args):
+        print('!!!! input()', args)
+        return SbotExampleArgumentInputHandler() if "my_value" not in args else None
+
+
+#-----------------------------------------------------------------------------------
 class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
-    ''' Command: Get input from user. sbot_example_user_input
+    '''
     When a command with arguments is called without them, but it defines an input() method, Sublime will call
     the input() method to see if there is an input handler that can be used to gather the arguments instead.
     Every input handler represents an argument to the command, and once the entire chain of them is finished,
     Sublime re-invokes the command with the arguments that it gathered.
 
-    This >>>>>> https://forum.sublimetext.com/t/simple-examples-for-textinputhandler/48422/13
-    You also need to add the command to the command palette by adding an entry to a sublime-commands file;
-    Something you may have missed is that only commands that appear in the command palette support using
-    input handlers because the handlers display input in the command palette itself as a part of its operation.
+    TextInputHandlers can be used to accept textual input in the Command Palette. Return a subclass of this from the input() method of a command.
+
+    For an input handler to be shown to the user, the command returning the input handler MUST be made available in the Command Palette
+    by adding the command to a Default.sublime-commands file.
     '''
 
     def placeholder(self):
@@ -141,28 +124,4 @@ class SbotExampleArgumentInputHandler(sublime_plugin.TextInputHandler):
         return "description - optional"
 
     def initial_text(self):
-        # # Check if something selected.
-        # if len(self.view.sel()) > 0:
-        #     if(self.view.sel()[0].size() == 0):
-        #         return "initial_text"
-        #     else:
-        #         return self.view.substr(self.view.sel()[0])
-        # else:
-        #     return "wtf?"
-        return 'initial_text'
-
-
-#-----------------------------------------------------------------------------------
-class SbotExampleInputCommand(sublime_plugin.TextCommand):
-
-    def run(self, edit, my_value): # Has to be called exactly my_value - another convention.
-        sbot_common.trace('argument:', my_value)
-        # for i in range(len(self.view.sel())):
-        #     sel = self.view.sel()[i]
-        #     data = self.view.substr(sel)
-        #     # sbot_common.trace("*** sel:{0} data:{1}".format(sel, data))
-        #     # replace selected text.
-        #     self.view.replace(edit, sel, my_value)
-
-    def input(self, args):
-        return SbotExampleArgumentInputHandler(self.view) if "text" not in args else None
+        return 'Put whatever here'
