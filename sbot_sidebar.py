@@ -162,11 +162,5 @@ class SbotSidebarOpenBrowserCommand(sublime_plugin.WindowCommand):
         webbrowser.open_new_tab(paths[0])
 
     def is_visible(self, paths):
-        vis = False
-
-        if len(paths) > 0:
-            if os.path.isfile(paths[0]):
-                fn = os.path.split(paths[0])[1]
-                if '.htm' in fn:
-                    vis = True
+        vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.html', '.svg']
         return vis
