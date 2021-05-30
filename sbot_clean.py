@@ -65,7 +65,7 @@ class SbotRemoveWsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, how):
         if how == 'normalize':
-            reo = re.compile('([ ])[ ]+')
+            reo = re.compile('([ ])[ ]+') # TODO doesn't trim trailing.
             sub = r'\1'
         elif how == 'keep_eol':
             reo = re.compile(r'[ \t\v\f]')

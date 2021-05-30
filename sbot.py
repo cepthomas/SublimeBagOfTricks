@@ -7,6 +7,8 @@ import sbot_common
 
 # The core and system stuff.
 
+# TODO Option for .hls/.sigs files location.
+
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
