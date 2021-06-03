@@ -2,7 +2,7 @@
     { "caption": "-", "id": "sbot_sidebar_addons" },
     { "caption": "Copy Name", "command": "sbot_sidebar_copy_name", "args": { "paths": [] }},
     { "caption": "Copy Path", "command": "sbot_sidebar_copy_path", "args": { "paths": [] }},
-    { "caption": "Open Folder", "command": "sbot_sidebar_folder", "args": { "paths": [] }},
+    { "caption": "Open Folder", "command": "sbot_sidebar_open_folder", "args": { "paths": [] }},
     { "caption": "Open Terminal", "command": "sbot_sidebar_terminal", "args": { "paths": [] }},
     { "caption": "Open in Browser", "command": "sbot_sidebar_open_browser", "args": { "paths": [] }},
     { "caption": "Tree", "command": "sbot_sidebar_tree", "args": { "paths": [] }},

@@ -50,7 +50,7 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotSidebarFolderCommand(sublime_plugin.WindowCommand):
+class SbotSidebarOpenFolderCommand(sublime_plugin.WindowCommand):
     ''' Open current folder. '''
 
     def run(self, paths):
@@ -60,7 +60,7 @@ class SbotSidebarFolderCommand(sublime_plugin.WindowCommand):
             subprocess.call(cmd, shell=True)
 
     def is_visible(self, paths):
-        vis = len(paths) > 0 and os.path.isdir(paths[0])
+        vis = len(paths) > 0 # and os.path.isdir(paths[0])
         return vis
 
 
@@ -78,7 +78,7 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
             sbot_common.create_new_view(self.window, sout)
 
     def is_visible(self, paths):
-        vis = len(paths) > 0 and os.path.isdir(paths[0])
+        vis = len(paths) > 0 # and os.path.isdir(paths[0])
         return vis
 
 

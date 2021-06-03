@@ -98,7 +98,7 @@ Commands added to the sidebar. Just the stuff I want.
 | sbot_sidebar_copy_name   | Copy file/dir name to clipboard |
 | sbot_sidebar_copy_path   | Copy full file/dir path to clipboard |
 | sbot_sidebar_terminal    | Open a Windows Terminal here |
-| sbot_sidebar_folder      | Open a Windows Explorer here |
+| sbot_sidebar_open_folder | Open a Windows Explorer here |
 | sbot_sidebar_open_browser| Open html file in your browser |
 | sbot_sidebar_tree        | Run tree cmd to new view |
 | sbot_sidebar_exec        | Run selected executable to new view |
@@ -135,12 +135,12 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 # Test
 
 - The `test` directory contains a VS solution to do some basic unit testing of sbot functions.
-- The `st_emul` directory contains stubs for the sublime api stuff. Function abstraction in conjunction with mocks
+- The `st_emul_STX` directories contains stubs for the sublime api stuff. Function abstraction in conjunction with mocks
 provides a reasonable amount of algorithm unit tests.
 
 # Notes
 
-Accumulated notes and discoveries.
+Accumulated notes and discoveries. These pertain to ST3, ST4 may have changed.
 - In general, `line` refers to editor lines and is 1-based. `row` refers to buffer contents as an array and is 0-based.
 - Project collections, variables, functions, etc use:
   - `persisted` is the json compatible file format.
