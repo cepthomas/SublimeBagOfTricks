@@ -4,7 +4,7 @@ The focus is not on code development but rather general text processing.
 
 No support as yet for PackageControl.
 
-Built for Windows and ST3. Other OSes and ST2 might require some hacking.
+Built for Windows and ST3. Seems to be happy with ST4. Other OSes and ST2 might require some hacking.
 
 ![logo](felix.jpg)
 
@@ -16,9 +16,10 @@ Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 | Setting                  | Description |
 |:--------                 |:-------     |
 | persistence_path         | Where to store signet and highlight persistence. `local` = sublime-project location, `store` is package store, otherwise none. |
+| sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
 
 
-## Colorizing
+## Highlighting
 - Word colorizing similar to [StyleToken](https://github.com/vcharnahrebel/style-token).
 - Persists to sbot project file.
 - Also a handy scope popup that shows you the style associated with each scope.
@@ -60,7 +61,6 @@ Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 | md_background            | If you need to change the markdown bg color (not done automatically from color scheme) |
 | render_output            | One of: `clipboard`, `file` (original fn or temp + .html), `show` |
 | render_max_file          | Max file size to render |
-| sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
 
 
 ## Signets (bookmarks)
@@ -130,11 +130,17 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 | sbot_cmd_line            | Simple way to run a quick command |
 
 
-# Test
+# Files
 
-- The `test` directory contains a VS solution to do some basic unit testing of sbot functions.
-- The `st_emul_STX` directories contains stubs for the sublime api stuff. Function abstraction in conjunction with mocks
-provides a reasonable amount of algorithm unit tests.
+| Directory                | Description |
+|:--------                 |:-------     |
+| .                        | Standard plugin stuff - menus, commands, scripts, ... |
+| store                    | `.*-hls` and `.*-sigs` files if persistence is `store` |
+| temp                     | Trace files and rendered html |
+| test                     | VS solution to do some basic unit testing of sbot functions |
+| test\files               | Misc files for testing |
+| test\st_emul             | Stubs for the sublime api |
+
 
 # Notes
 

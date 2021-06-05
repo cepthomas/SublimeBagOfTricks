@@ -1,6 +1,6 @@
 #import sys
 
-# Implement IMPL as needed. TODOST4 Support changes.
+# Implement IMPL as needed. TODOST4 What changed?
 
 TRANSIENT = 4
 IGNORECASE = 2
