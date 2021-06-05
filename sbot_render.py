@@ -200,7 +200,8 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 pc.stop()
 
         # Done all lines.
-        sbot_common.trace('loop:', pc.dump())
+        
+        # sbot_common.trace('loop:', pc.dump())
         # return
 
         ## Create css.

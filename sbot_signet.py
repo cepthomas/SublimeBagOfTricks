@@ -46,7 +46,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
         winid = view.window().id()
         fn = view.file_name()
 
-        sbot_common.trace('SignetEvent.on_activated', fn, vid, winid)
+        # sbot_common.trace('SignetEvent.on_activated', fn, vid, winid)
 
         # Lazy init.
         if fn is not None: # Sometimes this happens...
@@ -81,7 +81,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
         view = self.view
         winid = view.window().id()
-        sbot_common.trace('SignetEvent.on_deactivated', view.id(), winid)
+        # sbot_common.trace('SignetEvent.on_deactivated', view.id(), winid)
 
         if winid in _sigs:
             _save_sigs(winid, view.window().project_file_name())
