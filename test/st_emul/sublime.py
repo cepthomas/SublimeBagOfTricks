@@ -1,6 +1,6 @@
 #import sys
 
-# Implement IMPL as needed. TODO Support ST4.
+# Implement IMPL as needed. TODOST4 Support changes.
 
 TRANSIENT = 4
 IGNORECASE = 2
@@ -33,7 +33,7 @@ def version():
 #     return sublime_api.executable_path()
 
 def packages_path():
-    return r'C:\Users\cepth\AppData\Roaming\Sublime Text 3\Packages'
+    return r'C:\Users\cepth\AppData\Roaming\Sublime Text\Packages'
 
 # def installed_packages_path():
 #     return sublime_api.installed_packages_path()

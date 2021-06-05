@@ -51,7 +51,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
     def _do_one(self, s):
         ''' Clean and reformat the string. Returns the new string. '''
 
-        # TODO4 Use enum ScanState { SS_STRING, SS_COMMENT, SS_DEFAULT, SS_DONE } 
+        # TODOST4 Use enum ScanState { SS_STRING, SS_COMMENT, SS_DEFAULT, SS_DONE } 
         SS_DEFAULT = 0    # Idle
         SS_STRING = 1     # Process a quoted string
         SS_COMMENT = 2    # Processing a comment

@@ -63,6 +63,7 @@
     <Content Include="files\test_ref.c" />
     <Content Include="files\test_ref.html" />
     <Content Include="files\test_ref.xml" />
+    <Content Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

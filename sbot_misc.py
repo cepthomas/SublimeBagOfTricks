@@ -62,7 +62,7 @@ class SbotCmdLineCommand(sublime_plugin.WindowCommand):
 
     def on_done(self, text):
         try:
-            print(self.window.extract_variables())
+            # print(self.window.extract_variables())
             sout = subprocess.check_output(text, cwd=self.window.extract_variables()['folder'], universal_newlines=True, shell=True)
         except Exception as e:
             sout = 'Error: {}'.format(e.args)

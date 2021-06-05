@@ -71,7 +71,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
 
 
     def on_load(self):
-        ''' Called when file loaded. Doesn't work when starting up! Maybe ST4 improved? '''
+        ''' Called when file loaded. Doesn't work when starting up! TODOST4 Maybe improved? '''
         view = self.view
         sbot_common.trace('SignetEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
         # if view.file_name() is not None:
@@ -162,11 +162,9 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 def _save_sigs(winid, stp_fn):
     ''' General project saver. '''
     ok = True
-    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+    ppath = sbot_common.get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
-    if settings.get('enable_persistence') and stp_fn is not None:
-        stp_fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
-
+    if ppath is not None:
         try:
             # Remove invalid files and any empty values.
             if winid in _sigs:
@@ -177,11 +175,11 @@ def _save_sigs(winid, stp_fn):
                         del _sigs[winid][fn]
 
                 # Now save.
-                with open(stp_fn, 'w') as fp:
+                with open(ppath, 'w') as fp:
                     json.dump(_sigs[winid], fp, indent=4)
 
         except Exception as e:
-            sbot_common.error('Save signets error1', e)
+            sbot_common.error('Save signets error', e)
             ok = False
 
     return ok
@@ -191,15 +189,12 @@ def _save_sigs(winid, stp_fn):
 def _open_sigs(winid, stp_fn):
     ''' General project opener. '''
     global _sigs
-
     ok = True
-    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+    ppath = sbot_common.get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
-    if settings.get('enable_persistence') and stp_fn is not None:
-        fn = stp_fn.replace('.sublime-project', SIGNET_FILE_EXT)
-
+    if ppath is not None:
         try:
-            with open(fn, 'r') as fp:
+            with open(ppath, 'r') as fp:
                 values = json.load(fp)
                 _sigs[winid] = values
 
@@ -209,7 +204,7 @@ def _open_sigs(winid, stp_fn):
             _sigs[winid] = { }
 
         except Exception as e:
-            sbot_common.error('Save signets error2', e)
+            sbot_common.error('Open signets error', e)
             ok = False
 
     return ok

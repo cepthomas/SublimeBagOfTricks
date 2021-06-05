@@ -5,7 +5,6 @@ import sublime
 import sbot_format
 
 
-
 class TestFormat(unittest.TestCase):
 
     def setUp(self):
@@ -37,7 +36,7 @@ class TestFormat(unittest.TestCase):
             s = fp.read()
             cmd = sbot_format.SbotFormatXmlCommand(v)
             res = cmd._do_one(s)
-            self.assertEqual(res[100:150], 'ype="Anti-IgG (PEG)" TestSpec="08 ABSCR4 IgG" Dump')
+            self.assertEqual(res[100:150], 'nType="Anti-IgG (PEG)" TestSpec="08 ABSCR4 IgG" Du')
 
             # Make it a bad file.
             s = s.replace('ColumnType=', '')

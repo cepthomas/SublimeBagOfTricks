@@ -15,9 +15,8 @@ Built for Windows and ST3. Other OSes and ST2 might require some hacking.
 
 | Setting                  | Description |
 |:--------                 |:-------     |
-| enable_persistence       | Save/load signet/highlight persistence - default is true |
+| persistence_path         | Where to store signet and highlight persistence. `local` = sublime-project location, `store` is package store, otherwise none. |
 
-Note that the files used to persist highlights and signets are located next to the .sublime-project file.
 
 ## Colorizing
 - Word colorizing similar to [StyleToken](https://github.com/vcharnahrebel/style-token).
@@ -76,7 +75,6 @@ Enhanced bookmarks:
     - shift+f2: sbot_previous_signet
     - ctrl+shift+f2: sbot_clear_signets
 
-
 | Command                  | Description |
 |:--------                 |:-------     |
 | sbot_toggle_signet       | Toggle at row |
@@ -91,7 +89,7 @@ Enhanced bookmarks:
 
 
 ## SideBar
-Commands added to the sidebar. Just the stuff I want.
+Commands added to the sidebar. Like SideBarEnhancements but just the stuff I want.
 
 | Command                  | Description |
 |:--------                 |:-------     |

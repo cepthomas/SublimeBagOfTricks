@@ -28,6 +28,15 @@ class TestCommon(unittest.TestCase):
 
         #self.assertEqual(1, 2, 'just a test test')
 
+    def test_persistence_path(self):
+        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        settings.set('persistence_path', 'local')
+        pers_path = sbot_common.get_persistence_path('abc123.sublime-project', '.xyz')
+        self.assertEqual(pers_path, "abc123.xyz")
+
+        settings.set('persistence_path', 'store')
+        pers_path = sbot_common.get_persistence_path('abc123.sublime-project', '.xyz')
+        self.assertEqual(pers_path, r"C:\Users\cepth\AppData\Roaming\Sublime Text\Packages\SublimeBagOfTricks\store\abc123.xyz")
 
 if __name__ == '__main__':
     unittest.main()

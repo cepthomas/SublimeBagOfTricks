@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import sublime
+import sublime_plugin
 
 # print('Load sbot_common')
 
@@ -36,8 +37,6 @@ def trace(*args, cat=None):
     else:
         s = cat + ' ' + ' | '.join(map(str, args))
 
-    # print(s)
-
     with open(_trace_fn, "a+") as f:
         f.write(s + '\n')
 
@@ -50,15 +49,14 @@ def trace(*args, cat=None):
 #-----------------------------------------------------------------------------------
 def error(info, exc):
     ''' Debugging. '''
-    trace(info, exc.message, exc.args, cat='ERROR!!!')
+    trace(info, exc, exc.args, cat='ERROR!!!')
     trace(sys.exc_info()[0], cat='ERROR!!!')
-    sublime.error_message(info)  #, exc)
+    sublime.error_message(info + '\n' + str(exc)) # TODO better eay?
 
 
 #-----------------------------------------------------------------------------------
 def get_sel_regions(view):
     ''' Generic function to get selections or optionally the whole view.'''
-
     regions = []
     if len(view.sel()[0]) > 0: # user sel
         regions = view.sel()
@@ -134,6 +132,24 @@ def trim_all(s):
     s = reo.sub('', s)
 
     return s
+
+
+#-----------------------------------------------------------------------------------
+def get_persistence_path(stp_fn, ext):
+    ''' General file name maker. '''
+    ppath = None
+    settings = sublime.load_settings(SETTINGS_FN)
+
+    if stp_fn is not None:
+        spp = settings.get('persistence_path')
+        stp_fn = stp_fn.replace('.sublime-project', ext)
+        if spp == 'local':
+            ppath = stp_fn
+        elif spp == 'store':
+            stp_fn = os.path.basename(stp_fn)
+            ppath = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'store', stp_fn)
+
+    return ppath
 
 
 #-----------------------------------------------------------------------------------

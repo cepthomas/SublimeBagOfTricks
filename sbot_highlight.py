@@ -63,7 +63,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
 
 
     def on_load(self):
-        ''' Called when file loaded. Doesn't work when starting up! Maybe ST4 improved? '''
+        ''' Called when file loaded. Doesn't work when starting up! TODOST4 Maybe improved? '''
         view = self.view
         sbot_common.trace('HighlightEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
 
@@ -208,12 +208,9 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
 def _save_hls(winid, stp_fn):
     ''' General project saver. '''
     ok = True
+    ppath = sbot_common.get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
 
-    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
-
-    if settings.get('enable_persistence') and stp_fn is not None:
-        stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
-
+    if ppath is not None:
         try:
             # Remove invalid files and any empty values.
             if winid in _hls:
@@ -224,7 +221,7 @@ def _save_hls(winid, stp_fn):
                         del _hls[winid][fn]
 
                 # Now save.
-                with open(stp_fn, 'w') as fp:
+                with open(ppath, 'w') as fp:
                     json.dump(_hls[winid], fp, indent=4)
 
         except Exception as e:
@@ -239,14 +236,11 @@ def _open_hls(winid, stp_fn):
     ''' General project opener. '''
     global _hls
     ok = True
+    ppath = sbot_common.get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
 
-    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
-
-    if settings.get('enable_persistence') and stp_fn is not None:
-        stp_fn = stp_fn.replace('.sublime-project', HIGHLIGHT_FILE_EXT)
-
+    if ppath is not None:
         try:
-            with open(stp_fn, 'r') as fp:
+            with open(ppath, 'r') as fp:
                 values = json.load(fp)
                 _hls[winid] = values
 
