@@ -15,7 +15,7 @@ Built for Windows and ST3. Seems to be happy with ST4. Other OSes and ST2 might 
 
 | Setting                  | Description |
 |:--------                 |:-------     |
-| persistence_path         | Where to store signet and highlight persistence. `local` = sublime-project location, `store` is package store, otherwise none. |
+| persistence_path         | Where to store signet and highlight persistence.<br/>`'local'` is sublime-project location<br/>`'store'` is package store<br/>`''` is none
 | sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
 
 
@@ -26,17 +26,18 @@ Built for Windows and ST3. Seems to be happy with ST4. Other OSes and ST2 might 
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_highlight_text      | Highlight text 1 through 6 using highlight_scopes |
+| sbot_highlight_text      | Highlight text 1 through 6 from `highlight_scopes` |
 | sbot_clear_highlight     | Remove highlight in selection |
 | sbot_clear_all_highlights| Remove all highlights |
 | sbot_show_scopes         | Popup that shows style for scopes |
 | sbot_show_eol            | Toggles showing EOLs |
 
+
 | Setting                  | Description |
 |:--------                 |:-------     |
-| highlight_scopes         | List of scopes for marking text |
-| highlight_scopes_to_show | Scope list for sbot_show_scopes command |
-| highlight_eol_scope      | Scope for coloring eols |
+| highlight_scopes         | List of scope names for marking text - index corresponds to `sbot_highlight_text` arg |
+| highlight_scopes_to_show | List of scope names for `sbot_show_scopes` command |
+| highlight_eol_scope      | Scope name for coloring eols |
 
 
 ## Render To Html
@@ -54,13 +55,13 @@ Built for Windows and ST3. Seems to be happy with ST4. Other OSes and ST2 might 
 |:--------                 |:-------     |
 | html_font_face           | For rendered html |
 | html_font_size           | For rendered html |
-| html_background          | If you need to change the bg color (not done automatically from color scheme) |
+| html_background          | Color name if you need to change the bg color (not done automatically from color scheme) |
 | html_line_numbers        | Optionally add line numbers |
 | md_font_face             | For rendered markdown |
 | md_font_size             | For rendered markdown |
 | md_background            | If you need to change the markdown bg color (not done automatically from color scheme) |
-| render_output            | One of: `clipboard`, `file` (original fn or temp + .html), `show` |
-| render_max_file          | Max file size to render |
+| render_output            | Where to render to.<br/>`'clipboard'`<br/>`'file'` original fn or temp + .html<br/>`'show'`in browser |
+| render_max_file          | Max file size in Mb to render |
 
 
 ## Signets (bookmarks)
@@ -70,10 +71,10 @@ Enhanced bookmarks:
 - Persists to sbot-sigs file.
 - Next/previous (optionally) traverses files in project - like VS.
 - Bookmark key mappings have been stolen:
-    - ctrl+f2: sbot_toggle_signet
-    - f2: sbot_next_signet
-    - shift+f2: sbot_previous_signet
-    - ctrl+shift+f2: sbot_clear_signets
+    - `ctrl+f2`: sbot_toggle_signet
+    - `f2`: sbot_next_signet
+    - `shift+f2`: sbot_previous_signet
+    - `ctrl+shift+f2`: sbot_clear_signets
 
 | Command                  | Description |
 |:--------                 |:-------     |
@@ -84,8 +85,8 @@ Enhanced bookmarks:
   
 | Setting                  | Description |
 |:--------                 |:-------     |
-| signet_scope             | ST scope name for gutter icon color |
-| signet_nav_files         | Next/prev traverses all files otherwise just open one |
+| signet_scope             | Scope name for gutter icon color |
+| signet_nav_files         | Next/prev traverses all files otherwise just current file |
 
 
 ## SideBar
@@ -108,10 +109,9 @@ Trimming etc.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_trim                | Line end ws trim, arg:`how` should be `leading` or `trailing` or `both` |
-| sbot_remove_empty_lines  | Like it says, arg:`normalize`=True leaves one |
-| sbot_remove_ws           | Like it says, arg:`normalize`=True leaves one |
-| sbot_insert_line_indexes | Insert sequential numbers in first column |
+| sbot_trim                | Line ends ws trim, arg `'how'`:<br/>`'leading'`<br/>`'trailing'`<br/>`'both'` |
+| sbot_remove_empty_lines  | Like it says, arg `'how'`:<br/>`'remove_all'`all lines<br/>`'normalize' `compact to one |
+| sbot_remove_ws           | Like it says, arg `'how'`:<br/>`'remove_all'`all ws<br/>`'keep_eol'`keep eols<br/>`'normalize' `compact to one ws |
 
 
 ## Format
@@ -119,7 +119,7 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_format_json         | Format json content and show in new view - makes C++ (not! C) comments into valid json elements and removes any trailing commas|
+| sbot_format_json         | Format json content and show in new view - makes C++ (not C!) comments into valid json elements and removes any trailing commas |
 | sbot_format_xml          | Format xml content and show in new view |
 
 
@@ -131,15 +131,16 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 
 
 # Files
+Plugin files.
 
 | Directory                | Description |
 |:--------                 |:-------     |
 | .                        | Standard plugin stuff - menus, commands, scripts, ... |
-| store                    | `.*-hls` and `.*-sigs` files if persistence is `store` |
+| store                    | `.*-hls` and `.*-sigs` files if persistence_path is `store` |
 | temp                     | Trace files and rendered html |
 | test                     | VS solution to do some basic unit testing of sbot functions |
-| test\files               | Misc files for testing |
 | test\st_emul             | Stubs for the sublime api |
+| test\files               | Misc files for testing |
 
 
 # Notes
