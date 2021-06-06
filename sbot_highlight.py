@@ -65,7 +65,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
     def on_load(self):
         ''' Called when file loaded. Doesn't work when starting up! TODOST4 Maybe improved? '''
         view = self.view
-        sbot_common.trace('HighlightEvent.on_load', view.file_name(), view.id(), view.window, view.window().project_file_name())
+        sbot_common.trace('HighlightEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
 
 
     def on_deactivated(self):
@@ -225,7 +225,7 @@ def _save_hls(winid, stp_fn):
                     json.dump(_hls[winid], fp, indent=4)
 
         except Exception as e:
-            sbot_common.error('Save highlights error1', e)
+            sbot_common.unhandled_exception('Save highlights error', e)
             ok = False
 
     return ok
@@ -244,13 +244,13 @@ def _open_hls(winid, stp_fn):
                 values = json.load(fp)
                 _hls[winid] = values
 
-        except FileNotFoundError as e:
+        except FileNotFoundError as fe:
             # Assumes new file.
             sublime.status_message('Creating new highlights file')
             _hls[winid] = { }
 
         except Exception as e:
-            sbot_common.error('Save highlights error2', e)
+            sbot_common.unhandled_exception('Open highlights error', e)
             ok = False
 
     return ok

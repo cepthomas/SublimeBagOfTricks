@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import datetime
+import traceback
 import sublime
 import sublime_plugin
 
@@ -28,10 +29,12 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 def trace(*args, cat=''):
-    ''' Debugging. '''
+    ''' Trace debugging. '''
     global _trace_fn
     if _trace_fn is None:
         _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
+
+    s = '{} {}{}'.format(datetime.datetime.now().time(), cat, ' | '.join(map(str, args)))
 
     with open(_trace_fn, "a+") as f:
         f.write(s + '\n')
@@ -43,11 +46,12 @@ def trace(*args, cat=''):
 
 
 #-----------------------------------------------------------------------------------
-def error(info, exc):
-    ''' Debugging. '''
-    trace(info, str(exc), exc.args, cat='ERROR!!!')
-    trace(sys.exc_info()[0], cat='ERROR!!!')
-    sublime.error_message(info + '\n' + str(exc)) # TODO better eay?
+def unhandled_exception(info, exc):
+    ''' Trace debugging. '''
+    st = traceback.format_exc()#limit=None, chain=True)
+    trace(info, exc.args, cat='ERROR!!!')
+    trace(st, cat='ERROR!!!')
+    sublime.error_message(info + '\n' + st)
 
 
 #-----------------------------------------------------------------------------------

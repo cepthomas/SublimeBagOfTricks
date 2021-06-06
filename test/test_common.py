@@ -38,5 +38,11 @@ class TestCommon(unittest.TestCase):
         pers_path = sbot_common.get_persistence_path('abc123.sublime-project', '.xyz')
         self.assertEqual(pers_path, r"C:\Users\cepth\AppData\Roaming\Sublime Text\Packages\SublimeBagOfTricks\store\abc123.xyz")
 
+    def test_trace_error(self):
+        try:
+            raise Exception('arg1', 'arg2', 'arg3')
+        except Exception as e:
+            sbot_common.unhandled_exception('test_trace_error', e)
+
 if __name__ == '__main__':
     unittest.main()
