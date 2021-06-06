@@ -283,13 +283,13 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Get prefs.
         settings = sublime.load_settings(sbot_common.SETTINGS_FN)
-        md_background = settings.get('md_background')
-        md_font_size = settings.get('md_font_size')
-        md_font_face = settings.get('md_font_face')
+        html_background = settings.get('html_background')
+        html_font_size = settings.get('html_font_size')
+        html_font_face = settings.get('html_font_face')
 
         html = []
         html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
-        html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(md_background, md_font_face, md_font_size))
+        html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(html_background, html_font_face, html_font_size))
         html.append("</style></head><body>")
 
         for region in sbot_common.get_sel_regions(self.view):

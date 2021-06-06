@@ -30,10 +30,8 @@
     <Compile Include="..\sbot.py" />
     <Compile Include="..\sbot_clean.py" />
     <Compile Include="..\sbot_common.py" />
-    <Compile Include="..\sbot_extra.py" />
     <Compile Include="..\sbot_format.py" />
     <Compile Include="..\sbot_highlight.py" />
-    <Compile Include="..\sbot_misc_commands.py" />
     <Compile Include="..\sbot_render.py" />
     <Compile Include="..\sbot_sidebar.py" />
     <Compile Include="..\sbot_signet.py" />

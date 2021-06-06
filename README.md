@@ -53,13 +53,10 @@ Built for Windows and ST3. Seems to be happy with ST4. Other OSes and ST2 might 
 
 | Setting                  | Description |
 |:--------                 |:-------     |
-| html_font_face           | For rendered html |
-| html_font_size           | For rendered html |
+| html_font_face           | For rendered html/markdown |
+| html_font_size           | For rendered html/markdown |
 | html_background          | Color name if you need to change the bg color (not done automatically from color scheme) |
 | html_line_numbers        | Optionally add line numbers |
-| md_font_face             | For rendered markdown |
-| md_font_size             | For rendered markdown |
-| md_background            | If you need to change the markdown bg color (not done automatically from color scheme) |
 | render_output            | Where to render to.<br/>`'clipboard'`<br/>`'file'` original fn or temp + .html<br/>`'show'`in browser |
 | render_max_file          | Max file size in Mb to render |
 
