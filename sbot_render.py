@@ -291,6 +291,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
         html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
         html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(html_background, html_font_face, html_font_size))
         html.append("</style></head><body>")
+        # To support Unicode input, you must add <meta charset="utf-8"> to the *top* of your document (in the first 512 bytes).
 
         for region in sbot_common.get_sel_regions(self.view):
             html.append(self.view.substr(region))
@@ -320,7 +321,7 @@ def _output_html(view, content=None):
     elif output_type in ('file', 'show'):
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'
         fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', basefn)
-        with open(fn, 'w') as f:
+        with open(fn, 'w', encoding='utf-8') as f: # need to explicitly set encoding because default windows is ascii
             f.write(s)
         if output_type == 'show':
             webbrowser.open_new_tab(fn)

@@ -131,3 +131,5 @@ dmypy.json
 # Project files
 /temp/
 /test/TestResults
+/store/*.sbot-hls
+/store/*.sbot-sigs
