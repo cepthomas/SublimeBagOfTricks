@@ -80,7 +80,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         html_font_size = self.settings.get('html_font_size')
         html_font_face = self.settings.get('html_font_face')
         html_background = self.settings.get('html_background')
-        html_line_numbers = self.settings.get('html_line_numbers')
+        html_line_numbers = self.settings.get('html_line_numbers') # TODO separate for w/wo line numbers
         html_background = self.settings.get('html_background')
 
         # Use tuples for everything as they can be hashable keys.

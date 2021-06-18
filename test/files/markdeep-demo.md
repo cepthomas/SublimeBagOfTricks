@@ -1939,7 +1939,7 @@ boilerplate footers and headers, and styling. The syntax is:
 
 The inserted document must be a standalone Markdeep document, including the Markdeep line.  It
 can have any file extension, although `.html` is recommended and there **must** be a period
-in the filename to disambiguate it versus arbitrary TODO-style notes.
+in the filename to disambiguate it versus arbitrary TO_DO-style notes.
 
 The included document will be inserted inline, meaning that footnotes, figure numbering, and
 other kinds of references will flow correctly. Recursive inclusion is allowed. All paths in an
@@ -1948,7 +1948,7 @@ release may be able to make those paths absolute.
 
 Here is an example of embedding `example.md.html` into `features.md.html`:
 
-            `(insert example.md.html here)` XYZ add quotes
+            `(insert example.md.html here)` XYZ add ticks
 
 
 Other File Types
