@@ -1,6 +1,6 @@
 #import sys
 
-# Implement IMPL as needed. TODOST4 What changed?
+# Implement IMPL as needed.
 
 TRANSIENT = 4
 IGNORECASE = 2

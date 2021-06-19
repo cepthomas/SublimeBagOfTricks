@@ -15,16 +15,16 @@ HIGHLIGHT_FILE_EXT = '.sbot-hls'
 # The current highlight collections. Key is window id which corresponds to a project.
 _hls = {}
 
-# Need to track these because ST window/view lifecycle is unreliable.
+# Need to track what's been initialized.
 _views_inited = set()
 
 
 #-----------------------------------------------------------------------------------
 class HighlightEvent(sublime_plugin.ViewEventListener):
-    ''' Listener for view specific events of interest. '''
+    ''' Listener for view specific events of interest. See lifecycle notes in README.md. '''
 
     def on_activated(self):
-        ''' When focus/tab received. This is the only reliable init event - on_load() doesn't get called when showing previously opened files. '''
+        ''' When focus/tab received. '''
         view = self.view
         global _views_inited
         vid = view.id()
@@ -51,13 +51,13 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
 
 
     def on_load(self):
-        ''' Called when file loaded. Doesn't work when starting up! TODOST4 Maybe improved? '''
+        ''' Called when file loaded. '''
         view = self.view
         trace(TraceCat.LOAD, 'HighlightEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
 
 
     def on_deactivated(self):
-        ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
+        ''' Save to file when focus/tab lost. '''
         view = self.view
         winid = view.window().id()
         trace(TraceCat.ACTV, 'HighlightEvent.on_deactivated', view.id(), winid)
@@ -67,7 +67,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
 
 
     def on_close(self):
-        ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
+        ''' Called when a view is closed. Note there may still be other views into the same buffer. '''
         view = self.view
         trace(TraceCat.LOAD, 'HighlightEvent.on_close', view.file_name(), view.id())
 

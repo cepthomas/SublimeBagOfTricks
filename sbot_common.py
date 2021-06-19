@@ -19,7 +19,7 @@ class TraceCat(enum.Flag):
     ACTV = enum.auto() # on_activated, on_deactivated
     LOAD = enum.auto() # on_load, on_close
 
-_trace_cat = TraceCat.ERROR_ERROR_ERROR | TraceCat.INFO | TraceCat.ACTV | TraceCat.LOAD
+_trace_cat = TraceCat.ERROR_ERROR_ERROR | TraceCat.INFO | TraceCat.LOAD
 _trace_fn = None
 
 

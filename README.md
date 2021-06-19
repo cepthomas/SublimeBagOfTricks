@@ -4,7 +4,7 @@ The focus is not on code development but rather general text processing.
 
 No support as yet for PackageControl.
 
-Built for Windows and ST3. Seems to be happy with ST4. Other OSes and ST2 might require some hacking.
+Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 
 ![logo](felix.jpg)
 
@@ -127,7 +127,9 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 | sbot_cmd_line            | Simple way to run a quick command |
 
 
-# Files
+# Implementation
+
+## Files
 Plugin files.
 
 | Directory                | Description |
@@ -140,15 +142,29 @@ Plugin files.
 | test\files               | Misc files for testing |
 
 
-# Notes
+## General Notes
 
-Accumulated notes and discoveries. These pertain to ST3, ST4 may have changed.
-- In general, `line` refers to editor lines and is 1-based. `row` refers to buffer contents as an array and is 0-based.
+- In the code, `line` refers to editor lines and is 1-based. `row` refers to buffer contents as an array and is 0-based.
 - Project collections, variables, functions, etc use:
-  - `persisted` is the json compatible file format.
-  - `visual` is the way ST API handles elements.
-  - `internal` is the plugin format.
+    - `persisted` is the json compatible file format.
+    - `visual` is the way ST API handles elements.
+    - `internal` is the plugin format.
 - Commands can't end with `<underscore numeral>` e.g. `my_cmd_1` should be `stpt_cmd1`.
 - `package-metadata.json` is used for package management so remove it while developing/debugging plugins because PackageControl
-  will delete the entire package.
+  will delete the entire package. TODO there's a better way to do this apparently.
 - If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
+
+## Lifecycle Notes
+
+`ViewEventListener` is instantiated once per view and:
+- `on_load()` is normally called when the file is loaded. However it is not called if ST startup shows previously opened files,
+  or if it is shown as a (single-click) preview.
+- `on_close()` is normally called when a view is closed but it does not appear to be consistent. Perhaps if ST is closed
+  without closing the views first?
+
+Why does it matter? Highlighting and signets persist their state per file and the application needs to hook the open/close
+events in order to do so. Because the two obvious events don't work as expected (by me at least), some
+less-than-beautiful hacks happen:
+- `on_activated()` is normally called when the view gets focus. This is reliable so is used instead of on_load(), along with
+  some stuff to track if it's been initialized.
+- `on_deactivated()` is used in place of `on_close()` to save the persistence file every time the view loses focus. Good enough.
