@@ -9,18 +9,6 @@ from sbot_common import *
 # print('Load sbot_sidebar')
 
 
-# #-----------------------------------------------------------------------------------
-# def plugin_loaded():
-#     ''' Initialize module global stuff. '''
-#     trace('plugin_loaded sbot_sidebar')
-
-
-# #-----------------------------------------------------------------------------------
-# def plugin_unloaded():
-#     ''' Clean up module global stuff. '''
-#     trace('plugin_unloaded sbot_sidebar')
-
-
 #-----------------------------------------------------------------------------------
 class SbotSidebarCopyNameCommand(sublime_plugin.WindowCommand):
     ''' Get file name to clipboard. '''

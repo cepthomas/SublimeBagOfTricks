@@ -6,18 +6,6 @@ from sbot_common import *
 # print('Load sbot_clean')
 
 
-# #-----------------------------------------------------------------------------------
-# def plugin_loaded():
-#     ''' Initialize module global stuff. '''
-#    trace('plugin_loaded sbot_clean')
-
-
-# #-----------------------------------------------------------------------------------
-# def plugin_unloaded():
-#     ''' Clean up module global stuff. '''
-#    trace('plugin_unloaded sbot_clean')
-
-
 #-----------------------------------------------------------------------------------
 def _do_sub(view, edit, reo, sub):
     # Generic substitution function.

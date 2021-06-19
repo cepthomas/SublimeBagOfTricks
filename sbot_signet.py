@@ -21,19 +21,6 @@ _sigs = {}
 _views_inited = set()
 
 
-
-# #-----------------------------------------------------------------------------------
-# def plugin_loaded():
-#     ''' Initialize module global stuff. '''
-#     trace('plugin_loaded sbot_signet')
-
-
-# #-----------------------------------------------------------------------------------
-# def plugin_unloaded():
-#     ''' Clean up module global stuff. '''
-#     trace('plugin_unloaded sbot_signet')
-
-
 #-----------------------------------------------------------------------------------
 class SignetEvent(sublime_plugin.ViewEventListener):
     ''' Listener for view specific events of interest. '''

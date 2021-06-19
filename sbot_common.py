@@ -22,17 +22,6 @@ class TraceCat(enum.Flag):
 _trace_cat = TraceCat.ALWAYS_ERR | TraceCat.ALWAYS_INFO | TraceCat.EVENT_ACTIVATE | TraceCat.EVENT_LOAD
 _trace_fn = None
 
-# #-----------------------------------------------------------------------------------
-# def plugin_loaded():
-#     ''' Initialize module global stuff. '''
-#     trace(TraceCat.PLUGIN_LOAD, 'plugin_loaded sbot_common')
-
-
-# #-----------------------------------------------------------------------------------
-# def plugin_unloaded():
-#     ''' Clean up module global stuff. '''
-#     trace(TraceCat.PLUGIN_LOAD, 'plugin_unloaded sbot_common')
-
 
 #-----------------------------------------------------------------------------------
 def trace(cat, *args):

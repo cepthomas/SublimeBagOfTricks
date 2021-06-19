@@ -13,18 +13,6 @@ from sbot_common import *
 INDENT = '    '
 
 
-# #-----------------------------------------------------------------------------------
-# def plugin_loaded():
-#     ''' Initialize module global stuff. '''
-#    trace('plugin_loaded sbot_format')
-
-
-# #-----------------------------------------------------------------------------------
-# def plugin_unloaded():
-#     ''' Clean up module global stuff. '''
-#    trace('plugin_unloaded sbot_format')
-
-
 #-----------------------------------------------------------------------------------
 class SbotFormatJsonCommand(sublime_plugin.TextCommand):
     ''' sbot_format_json'''
