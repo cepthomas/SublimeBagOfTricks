@@ -9,6 +9,7 @@ import sublime_plugin
 
 # print('Load sbot_common')
 
+
 # Definitions.
 SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
 

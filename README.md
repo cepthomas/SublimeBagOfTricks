@@ -150,12 +150,9 @@ Plugin files.
     - `visual` is the way ST API handles elements.
     - `internal` is the plugin format.
 - Commands can't end with `<underscore numeral>` e.g. `my_cmd_1` should be `stpt_cmd1`.
-- `package-metadata.json` is used for package management so remove it while developing/debugging plugins because PackageControl
-  will delete the entire package. TODO there's a better way to do this apparently.
 - If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
 
-## Lifecycle Notes
-
+## Event Handling
 `ViewEventListener` is instantiated once per view and:
 - `on_load()` is normally called when the file is loaded. However it is not called if ST startup shows previously opened files,
   or if it is shown as a (single-click) preview.
@@ -168,3 +165,32 @@ less-than-beautiful hacks happen:
 - `on_activated()` is normally called when the view gets focus. This is reliable so is used instead of on_load(), along with
   some stuff to track if it's been initialized.
 - `on_deactivated()` is used in place of `on_close()` to save the persistence file every time the view loses focus. Good enough.
+
+## Module Loading
+ST doesn't load modules like plain python and can cause some surprises.
+
+Here's a startup sequence:
+```
+ST: reloading plugin SublimeBagOfTricks.__init__
+ST: reloading plugin SublimeBagOfTricks.sbot
+Python: load sbot_common
+Python: load sbot
+Python: load sbot_clean
+Python: load sbot_common
+Python: load sbot_format
+Python: load sbot_highlight
+Python: load sbot_misc
+Python: load sbot_render
+Python: load sbot_sidebar
+Python: load sbot_signet
+>>> Re-saved sbot_common.py
+ST: reloading plugin SublimeBagOfTricks.sbot_common
+Python: load sbot_common
+```
+
+The problem is that sbot_common gets reloaded but other modules are not aware. This makes handling globals
+difficult.
+
+From ST: For the specific case of Sublime plugins, when your plugin modules are loaded by sublime it invokes the dir function on the
+loaded module to find all of the symbols it contains and ignores everything that’s not a subclass of one of the special
+ plugin classes (i.e. ApplicationCommand, WindowCommand, TextCommand, EventListener and ViewEventListener).

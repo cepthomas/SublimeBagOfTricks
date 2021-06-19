@@ -10,6 +10,7 @@ from sbot_common import *
 
 # print('Load sbot_render')
 
+
 HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
 
 

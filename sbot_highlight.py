@@ -7,6 +7,7 @@ from sbot_common import *
 
 # print('Load sbot_highlight')
 
+
 # Definitions.
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 HIGHLIGHT_FILE_EXT = '.sbot-hls'
