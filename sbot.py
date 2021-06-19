@@ -1,7 +1,7 @@
 import sys
 import datetime
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 # print('Load sbot')
 
@@ -11,13 +11,13 @@ import sbot_common
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. This fires only once for all instances of sublime. '''
-    sbot_common.trace('===================== Starting {} ======================='.format(datetime.datetime.now()))
-    sbot_common.trace('Using python', sys.version)
+    trace(TraceCat.ALWAYS_INFO, '===================== Starting {} ======================='.format(datetime.datetime.now()))
+    trace(TraceCat.ALWAYS_INFO, 'Using python', sys.version)
 
 
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
-    sbot_common.trace("plugin_unloaded()")
+    trace(TraceCat.ALWAYS_INFO, "plugin_unloaded()")
 
 
 #-----------------------------------------------------------------------------------

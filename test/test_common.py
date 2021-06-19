@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import MagicMock
 import sublime
 import sbot
-import sbot_common
+from sbot_common import *
 
 
 
@@ -29,20 +29,20 @@ class TestCommon(unittest.TestCase):
         #self.assertEqual(1, 2, 'just a test test')
 
     def test_persistence_path(self):
-        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        settings = sublime.load_settings(SETTINGS_FN)
         settings.set('persistence_path', 'local')
-        pers_path = sbot_common.get_persistence_path('abc123.sublime-project', '.xyz')
+        pers_path = get_persistence_path('abc123.sublime-project', '.xyz')
         self.assertEqual(pers_path, "abc123.xyz")
 
         settings.set('persistence_path', 'store')
-        pers_path = sbot_common.get_persistence_path('abc123.sublime-project', '.xyz')
+        pers_path = get_persistence_path('abc123.sublime-project', '.xyz')
         self.assertEqual(pers_path, r"C:\Users\cepth\AppData\Roaming\Sublime Text\Packages\SublimeBagOfTricks\store\abc123.xyz")
 
     def test_trace_error(self):
         try:
             raise Exception('arg1', 'arg2', 'arg3')
         except Exception as e:
-            sbot_common.unhandled_exception('test_trace_error', e)
+            unhandled_exception('test_trace_error', e)
 
 if __name__ == '__main__':
     unittest.main()

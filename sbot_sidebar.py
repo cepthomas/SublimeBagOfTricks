@@ -3,22 +3,22 @@ import subprocess
 import webbrowser
 import sublime
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 
 # print('Load sbot_sidebar')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module global stuff. '''
-    sbot_common.trace('plugin_loaded sbot_sidebar')
+# #-----------------------------------------------------------------------------------
+# def plugin_loaded():
+#     ''' Initialize module global stuff. '''
+#     trace('plugin_loaded sbot_sidebar')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    ''' Clean up module global stuff. '''
-    sbot_common.trace('plugin_unloaded sbot_sidebar')
+# #-----------------------------------------------------------------------------------
+# def plugin_unloaded():
+#     ''' Clean up module global stuff. '''
+#     trace('plugin_unloaded sbot_sidebar')
 
 
 #-----------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
             # subprocess.call(cmd, shell=True)
             cmd = 'tree "{}" /a /f'.format(path)
             sout = subprocess.check_output(cmd, universal_newlines=True, shell=True)
-            sbot_common.create_new_view(self.window, sout)
+            create_new_view(self.window, sout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 # and os.path.isdir(paths[0])
@@ -89,7 +89,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             sout = subprocess.check_output([paths[0]], universal_newlines=True, shell=True)
-            sbot_common.create_new_view(self.window, sout)
+            create_new_view(self.window, sout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']
@@ -130,7 +130,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
             if found:
                 self.window.set_project_data(pdata)
             else:
-                sbot_common.trace('not found:', paths[0])
+                trace('not found:', paths[0])
 
     def is_visible(self, paths):
         # Disallow project folders - they should use builtin remove_folder.

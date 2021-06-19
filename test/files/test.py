@@ -3,7 +3,7 @@ import sys
 import re
 import sublime
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 
 

@@ -6,7 +6,7 @@ import webbrowser
 from html import escape
 import sublime
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 # print('Load sbot_render')
 
@@ -14,16 +14,16 @@ HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
 
 
 
-#-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module global stuff. '''
-    sbot_common.trace('plugin_loaded sbot_render')
+# #-----------------------------------------------------------------------------------
+# def plugin_loaded():
+#     ''' Initialize module global stuff. '''
+#     trace('plugin_loaded sbot_render')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    ''' Clean up module global stuff. '''
-    sbot_common.trace('plugin_unloaded sbot_render')
+# #-----------------------------------------------------------------------------------
+# def plugin_unloaded():
+#     ''' Clean up module global stuff. '''
+#     trace('plugin_unloaded sbot_render')
 
 
 #-----------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
     def __init__(self, view):
         # Get prefs.
-        self.settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        self.settings = sublime.load_settings(SETTINGS_FN)
         self.rows = 0
         self.row_num = 0
         super(SbotRenderToHtmlCommand, self).__init__(view)
@@ -80,7 +80,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         html_font_size = self.settings.get('html_font_size')
         html_font_face = self.settings.get('html_font_face')
         html_background = self.settings.get('html_background')
-        html_line_numbers = self.settings.get('html_line_numbers') # TODO separate for w/wo line numbers
+        html_line_numbers = self.settings.get('html_line_numbers') # TODO separate commands for w/wo line numbers
         html_background = self.settings.get('html_background')
 
         # Use tuples for everything as they can be hashable keys.
@@ -131,9 +131,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         highlight_regions.sort(key=lambda r: r[0].a)
 
         ## Tokenize selection by syntax scope.
-        pc = sbot_common.SbotPerfCounter('render_html')
+        pc = SbotPerfCounter('render_html')
 
-        for region in sbot_common.get_sel_regions(self.view):
+        for region in get_sel_regions(self.view):
             for line_region in self.view.split_by_newlines(region):
                 pc.start()
                 self.row_num += 1
@@ -201,7 +201,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         # Done all lines.
         
-        # sbot_common.trace('loop:', pc.dump())
+        # trace('loop:', pc.dump())
         # return
 
         ## Create css.
@@ -282,7 +282,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         # Get prefs.
-        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        settings = sublime.load_settings(SETTINGS_FN)
         html_background = settings.get('html_background')
         html_font_size = settings.get('html_font_size')
         html_font_face = settings.get('html_font_face')
@@ -293,7 +293,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
         html.append("</style></head><body>")
         # To support Unicode input, you must add <meta charset="utf-8"> to the *top* of your document (in the first 512 bytes).
 
-        for region in sbot_common.get_sel_regions(self.view):
+        for region in get_sel_regions(self.view):
             html.append(self.view.substr(region))
 
         html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
@@ -309,14 +309,14 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 def _output_html(view, content=None):
     ''' Common html file formatter. '''
 
-    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+    settings = sublime.load_settings(SETTINGS_FN)
     output_type = settings.get('render_output')
     s = "" if content is None else "".join(content)
 
     if output_type == 'clipboard':
         sublime.set_clipboard(s)
     # elif output_type == 'new_file':
-    #     view = sbot_common.create_new_view(self.view.window(), s)
+    #     view = create_new_view(self.view.window(), s)
     #     view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
     elif output_type in ('file', 'show'):
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'

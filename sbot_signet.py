@@ -2,7 +2,7 @@ import os
 import json
 import sublime
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 # print('Load sbot_signet')
 
@@ -22,16 +22,16 @@ _views_inited = set()
 
 
 
-#-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module global stuff. '''
-    sbot_common.trace('plugin_loaded sbot_signet')
+# #-----------------------------------------------------------------------------------
+# def plugin_loaded():
+#     ''' Initialize module global stuff. '''
+#     trace('plugin_loaded sbot_signet')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    ''' Clean up module global stuff. '''
-    sbot_common.trace('plugin_unloaded sbot_signet')
+# #-----------------------------------------------------------------------------------
+# def plugin_unloaded():
+#     ''' Clean up module global stuff. '''
+#     trace('plugin_unloaded sbot_signet')
 
 
 #-----------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
         winid = view.window().id()
         fn = view.file_name()
 
-        # sbot_common.trace('SignetEvent.on_activated', fn, vid, winid)
+        trace(TraceCat.EVENT_ACTIVATE, 'SignetEvent.on_activated', fn, vid, winid)
 
         # Lazy init.
         if fn is not None: # Sometimes this happens...
@@ -66,14 +66,14 @@ class SignetEvent(sublime_plugin.ViewEventListener):
                     for r in rows:
                         pt = view.text_point(r-1, 0) # ST is 0-based
                         regions.append(sublime.Region(pt, pt))
-                    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+                    settings = sublime.load_settings(SETTINGS_FN)
                     view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
 
 
     def on_load(self):
         ''' Called when file loaded. Doesn't work when starting up! TODOST4 Maybe improved? '''
         view = self.view
-        sbot_common.trace('SignetEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
+        trace(TraceCat.EVENT_LOAD, 'SignetEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
         # if view.file_name() is not None:
 
 
@@ -81,7 +81,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
         view = self.view
         winid = view.window().id()
-        # sbot_common.trace('SignetEvent.on_deactivated', view.id(), winid)
+        trace(TraceCat.EVENT_ACTIVATE, 'SignetEvent.on_deactivated', view.id(), winid)
 
         if winid in _sigs:
             _save_sigs(winid, view.window().project_file_name())
@@ -90,7 +90,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
     def on_close(self):
         ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
         view = self.view
-        sbot_common.trace('SignetEvent.on_close', view.file_name(), view.id())
+        trace(TraceCat.EVENT_LOAD, 'SignetEvent.on_close', view.file_name(), view.id())
 
 
 #-----------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
             pt = self.view.text_point(r, 0) # 0-based
             regions.append(sublime.Region(pt, pt))
 
-        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        settings = sublime.load_settings(SETTINGS_FN)
         self.view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
 
 
@@ -162,7 +162,7 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
 def _save_sigs(winid, stp_fn):
     ''' General project saver. '''
     ok = True
-    ppath = sbot_common.get_persistence_path(stp_fn, SIGNET_FILE_EXT)
+    ppath = get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
     if ppath is not None:
         try:
@@ -179,7 +179,7 @@ def _save_sigs(winid, stp_fn):
                     json.dump(_sigs[winid], fp, indent=4)
 
         except Exception as e:
-            sbot_common.unhandled_exception('Save signets error', e)
+            unhandled_exception('Save signets error', e)
             ok = False
 
     return ok
@@ -190,7 +190,7 @@ def _open_sigs(winid, stp_fn):
     ''' General project opener. '''
     global _sigs
     ok = True
-    ppath = sbot_common.get_persistence_path(stp_fn, SIGNET_FILE_EXT)
+    ppath = get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
     if ppath is not None:
         try:
@@ -204,7 +204,7 @@ def _open_sigs(winid, stp_fn):
             _sigs[winid] = { }
 
         except Exception as e:
-            sbot_common.unhandled_exception('Open signets error', e)
+            unhandled_exception('Open signets error', e)
             ok = False
 
     return ok
@@ -215,7 +215,7 @@ def _go_to_signet(view, direction):
     ''' Navigate to signet in whole collection. direction is NEXT_SIG or PREV_SIG. '''
     window = view.window()
 
-    settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+    settings = sublime.load_settings(SETTINGS_FN)
     signet_nav_files = settings.get('signet_nav_files')
 
     done = False
@@ -275,7 +275,7 @@ def _go_to_signet(view, direction):
 
 
 
-                sublime.set_timeout(lambda r=endrow: sbot_common.wait_load_file(vv, r), 10) # already 1-based in file
+                sublime.set_timeout(lambda r=endrow: wait_load_file(vv, r), 10) # already 1-based in file
                 window.focus_view(vv)
                 done = True
                 break

@@ -5,7 +5,7 @@ import re
 import xml
 import xml.dom.minidom
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 
 # print('Load sbot_format')
@@ -13,16 +13,16 @@ import sbot_common
 INDENT = '    '
 
 
-#-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module global stuff. '''
-    sbot_common.trace('plugin_loaded sbot_format')
+# #-----------------------------------------------------------------------------------
+# def plugin_loaded():
+#     ''' Initialize module global stuff. '''
+#    trace('plugin_loaded sbot_format')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    ''' Clean up module global stuff. '''
-    sbot_common.trace('plugin_unloaded sbot_format')
+# #-----------------------------------------------------------------------------------
+# def plugin_unloaded():
+#     ''' Clean up module global stuff. '''
+#    trace('plugin_unloaded sbot_format')
 
 
 #-----------------------------------------------------------------------------------
@@ -37,14 +37,14 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         sres = []
         err = False
 
-        reg = sbot_common.get_sel_regions(self.view)[0]
+        reg = get_sel_regions(self.view)[0]
         s = self.view.substr(reg)
         s = self._do_one(s)
         sres.append(s)
         if s.startswith('Error'):
             err = True
 
-        vnew = sbot_common.create_new_view(self.view.window(), '\n'.join(sres))
+        vnew = create_new_view(self.view.window(), '\n'.join(sres))
         if not err:
             vnew.set_syntax_file('Packages/JavaScript/JSON.sublime-syntax')
 
@@ -146,13 +146,13 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         err = False
 
-        reg = sbot_common.get_sel_regions(self.view)[0]
+        reg = get_sel_regions(self.view)[0]
         s = self.view.substr(reg)
         s = self._do_one(s)
         if s.startswith('Error'):
             err = True
 
-        vnew = sbot_common.create_new_view(self.view.window(), s)
+        vnew = create_new_view(self.view.window(), s)
         if not err:
             vnew.set_syntax_file('Packages/XML/XML.sublime-syntax')
 

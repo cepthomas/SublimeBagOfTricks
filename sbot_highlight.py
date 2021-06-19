@@ -3,7 +3,7 @@ import re
 import json
 import sublime
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 # print('Load sbot_highlight')
 
@@ -19,16 +19,16 @@ _hls = {}
 _views_inited = set()
 
 
-#-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module global stuff. '''
-    sbot_common.trace('plugin_loaded sbot_highlight')
+# #-----------------------------------------------------------------------------------
+# def plugin_loaded():
+#     ''' Initialize module global stuff. '''
+#     trace('plugin_loaded sbot_highlight')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    ''' Clean up module global stuff. '''
-    sbot_common.trace('plugin_unloaded sbot_highlight')
+# #-----------------------------------------------------------------------------------
+# def plugin_unloaded():
+#     ''' Clean up module global stuff. '''
+#     trace('plugin_unloaded sbot_highlight')
 
 
 #-----------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
         winid = view.window().id()
         fn = view.file_name()
 
-        # sbot_common.trace('HighlightEvent.on_activated', fn, vid, winid, _views_inited)
+        trace(TraceCat.EVENT_ACTIVATE, 'HighlightEvent.on_activated', fn, vid, winid, _views_inited)
 
         # Lazy init.
         if fn is not None: # Sometimes this happens...
@@ -65,14 +65,14 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
     def on_load(self):
         ''' Called when file loaded. Doesn't work when starting up! TODOST4 Maybe improved? '''
         view = self.view
-        sbot_common.trace('HighlightEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
+        trace(TraceCat.EVENT_LOAD, 'HighlightEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
 
 
     def on_deactivated(self):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
         view = self.view
         winid = view.window().id()
-        # sbot_common.trace('HighlightEvent.on_deactivated', view.id(), winid)
+        trace(TraceCat.EVENT_ACTIVATE, 'HighlightEvent.on_deactivated', view.id(), winid)
 
         if winid in _hls:
             _save_hls(winid, view.window().project_file_name())
@@ -81,7 +81,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
     def on_close(self):
         ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
         view = self.view
-        sbot_common.trace('HighlightEvent.on_close', view.file_name(), view.id())
+        trace(TraceCat.EVENT_LOAD, 'HighlightEvent.on_close', view.file_name(), view.id())
 
 
 #-----------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit, hl_index):
-        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        settings = sublime.load_settings(SETTINGS_FN)
         highlight_scopes = settings.get('highlight_scopes')
 
         # Get whole word or specific span.
@@ -121,7 +121,7 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
         global _hls
 
         # Clean displayed colors.
-        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        settings = sublime.load_settings(SETTINGS_FN)
         highlight_scopes = settings.get('highlight_scopes')
 
         for i, value in enumerate(highlight_scopes):
@@ -139,7 +139,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
 
     def run(self, edit):
-        settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+        settings = sublime.load_settings(SETTINGS_FN)
         scopes = settings.get('highlight_scopes_to_show')
 
         style_text = []
@@ -151,7 +151,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
 
         for scope in scopes:
             style = self.view.style_for_scope(scope)
-            # sbot_common.trace(scope, style)
+            # trace(scope, style)
             props = '{{ color:{}; '.format(style['foreground'])
             props2 = 'fg:{} '.format(style['foreground'])
             if 'background' in style:
@@ -198,7 +198,7 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 else:
                     break
             if eols:
-                settings = sublime.load_settings(sbot_common.SETTINGS_FN)
+                settings = sublime.load_settings(SETTINGS_FN)
                 self.view.add_regions("eols", eols, settings.get('highlight_eol_scope'))
         else:
             self.view.erase_regions("eols")
@@ -208,7 +208,7 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
 def _save_hls(winid, stp_fn):
     ''' General project saver. '''
     ok = True
-    ppath = sbot_common.get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
+    ppath = get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
 
     if ppath is not None:
         try:
@@ -225,7 +225,7 @@ def _save_hls(winid, stp_fn):
                     json.dump(_hls[winid], fp, indent=4)
 
         except Exception as e:
-            sbot_common.unhandled_exception('Save highlights error', e)
+            unhandled_exception('Save highlights error', e)
             ok = False
 
     return ok
@@ -236,7 +236,7 @@ def _open_hls(winid, stp_fn):
     ''' General project opener. '''
     global _hls
     ok = True
-    ppath = sbot_common.get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
+    ppath = get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
 
     if ppath is not None:
         try:
@@ -250,7 +250,7 @@ def _open_hls(winid, stp_fn):
             _hls[winid] = { }
 
         except Exception as e:
-            sbot_common.unhandled_exception('Open highlights error', e)
+            unhandled_exception('Open highlights error', e)
             ok = False
 
     return ok

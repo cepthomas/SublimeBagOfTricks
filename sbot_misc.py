@@ -2,7 +2,7 @@ import subprocess
 import webbrowser
 import sublime
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 
 # print('Load sbot_misc')
@@ -10,16 +10,16 @@ import sbot_common
 # Misc stuff that doesn't warrant its own module.
 
 
-#-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module global stuff. '''
-    sbot_common.trace('plugin_loaded sbot_misc')
+# #-----------------------------------------------------------------------------------
+# def plugin_loaded():
+#     ''' Initialize module global stuff. '''
+#     trace('plugin_loaded sbot_misc')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    ''' Clean up module global stuff. '''
-    sbot_common.trace('plugin_unloaded sbot_misc')
+# #-----------------------------------------------------------------------------------
+# def plugin_unloaded():
+#     ''' Clean up module global stuff. '''
+#     trace('plugin_unloaded sbot_misc')
 
 
 #-----------------------------------------------------------------------------------
@@ -66,4 +66,4 @@ class SbotCmdLineCommand(sublime_plugin.WindowCommand):
             sout = subprocess.check_output(text, cwd=self.window.extract_variables()['folder'], universal_newlines=True, shell=True)
         except Exception as e:
             sout = 'Error: {}'.format(e.args)
-        sbot_common.create_new_view(self.window, sout)
+        create_new_view(self.window, sout)

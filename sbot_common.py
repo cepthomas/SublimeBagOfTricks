@@ -3,6 +3,7 @@ import sys
 import time
 import datetime
 import traceback
+import enum
 import sublime
 import sublime_plugin
 
@@ -12,45 +13,53 @@ import sublime_plugin
 SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
 
 # Debug.
+class TraceCat(enum.Flag):
+    ALWAYS_ERR = enum.auto()
+    ALWAYS_INFO = enum.auto()
+    EVENT_ACTIVATE = enum.auto()
+    EVENT_LOAD = enum.auto()
+
+_trace_cat = TraceCat.ALWAYS_ERR | TraceCat.ALWAYS_INFO | TraceCat.EVENT_ACTIVATE | TraceCat.EVENT_LOAD
 _trace_fn = None
 
+# #-----------------------------------------------------------------------------------
+# def plugin_loaded():
+#     ''' Initialize module global stuff. '''
+#     trace(TraceCat.PLUGIN_LOAD, 'plugin_loaded sbot_common')
+
+
+# #-----------------------------------------------------------------------------------
+# def plugin_unloaded():
+#     ''' Clean up module global stuff. '''
+#     trace(TraceCat.PLUGIN_LOAD, 'plugin_unloaded sbot_common')
+
 
 #-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module global stuff. '''
-    trace('plugin_loaded sbot_common')
-
-
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    ''' Clean up module global stuff. '''
-    trace('plugin_unloaded sbot_common')
-
-
-#-----------------------------------------------------------------------------------
-def trace(*args, cat=''):
+def trace(cat, *args):
     ''' Trace debugging. '''
-    global _trace_fn
-    if _trace_fn is None:
-        _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
+    if cat & _trace_cat:
+        global _trace_fn
+        if _trace_fn is None:
+            _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
 
-    s = '{} {}{}'.format(datetime.datetime.now().time(), cat, ' | '.join(map(str, args)))
+        scat = 'ERROR!!! ' if cat & TraceCat.ALWAYS_ERR else ''
+        s = '{} {}{}'.format(datetime.datetime.now().time(), scat, ' | '.join(map(str, args)))
 
-    with open(_trace_fn, "a+") as f:
-        f.write(s + '\n')
+        with open(_trace_fn, "a+") as f:
+            f.write(s + '\n')
 
-    # Check for file size limit.
-    if os.path.getsize(_trace_fn) > 100000:
-        os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
-        os.remove(_trace_fn)
+        # Check for file size limit.
+        if os.path.getsize(_trace_fn) > 100000:
+            os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
+            os.remove(_trace_fn)
 
 
 #-----------------------------------------------------------------------------------
 def unhandled_exception(info, exc):
     ''' Trace debugging. '''
     st = traceback.format_exc()#limit=None, chain=True)
-    trace(info, exc.args, cat='ERROR!!!')
-    trace(st, cat='ERROR!!!')
+    trace(TraceCat.ALWAYS_ERR, info, exc.args)
+    trace(TraceCat.ALWAYS_ERR, st)
     sublime.error_message(info + '\n' + st)
 
 
@@ -108,7 +117,7 @@ def dump_view(preamble, view):
         s.append('project_file_name:')
         s.append('None' if window is None or window.project_file_name() is None else os.path.split(window.project_file_name())[1])
 
-    trace(" ".join(s))
+    trace(TraceCat.ALWAYS_INFO, " ".join(s))
 
 
 #-----------------------------------------------------------------------------------

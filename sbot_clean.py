@@ -1,27 +1,27 @@
 import re
 #import sublime
 import sublime_plugin
-import sbot_common
+from sbot_common import *
 
 # print('Load sbot_clean')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_loaded():
-    ''' Initialize module global stuff. '''
-    sbot_common.trace('plugin_loaded sbot_clean')
+# #-----------------------------------------------------------------------------------
+# def plugin_loaded():
+#     ''' Initialize module global stuff. '''
+#    trace('plugin_loaded sbot_clean')
 
 
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    ''' Clean up module global stuff. '''
-    sbot_common.trace('plugin_unloaded sbot_clean')
+# #-----------------------------------------------------------------------------------
+# def plugin_unloaded():
+#     ''' Clean up module global stuff. '''
+#    trace('plugin_unloaded sbot_clean')
 
 
 #-----------------------------------------------------------------------------------
 def _do_sub(view, edit, reo, sub):
     # Generic substitution function.
-    sels = sbot_common.get_sel_regions(view)
+    sels = get_sel_regions(view)
     for sel in sels:
         orig = view.substr(sel)
         new = reo.sub(sub, orig)
@@ -33,6 +33,7 @@ class SbotTrimCommand(sublime_plugin.TextCommand):
     '''sbot_trim how=leading|trailing|both'''
 
     def run(self, edit, how):
+        # breakpoint()
         if how == 'leading':
             reo = re.compile('^[ \t]+', re.MULTILINE)
             sub = ''
@@ -87,7 +88,7 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
         width = len(str(line_count))
         offset = 0
 
-        for region in sbot_common.get_sel_regions(self.view):
+        for region in get_sel_regions(self.view):
             line_num = 1
             offset = 0
             for line_region in self.view.split_by_newlines(region):
