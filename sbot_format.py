@@ -2,6 +2,7 @@ import sys
 import json
 import string
 import re
+import enum
 import xml
 import xml.dom.minidom
 import sublime_plugin
@@ -39,16 +40,16 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
     def _do_one(self, s):
         ''' Clean and reformat the string. Returns the new string. '''
 
-        # TODOST4 Use enum ScanState { SS_STRING, SS_COMMENT, SS_DEFAULT, SS_DONE } 
-        SS_DEFAULT = 0    # Idle
-        SS_STRING = 1     # Process a quoted string
-        SS_COMMENT = 2    # Processing a comment
-        SS_DONE = 3       # Finito
+        class ScanState(enum.IntFlag):
+            DEFAULT = enum.auto()  # Idle
+            STRING = enum.auto()   # Process a quoted string
+            COMMENT = enum.auto()  # Processing a comment
+            DONE = enum.auto()     # Finito
 
         # tabWidth = 4
         comment_count = 0
         sreg = []
-        state = SS_DEFAULT
+        state = ScanState.DEFAULT
         current_comment = []
         current_char = -1
         next_char = -1
@@ -63,17 +64,17 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                 next_char = s[i + 1] if i < slen-1 else -1
 
                 # Remove whitespace and transform comments into legal json.
-                if state == SS_STRING:
+                if state == ScanState.STRING:
                     sreg.append(current_char)
                     # Handle escaped chars.
                     if current_char == '\\':
                         escaped = True
                     elif current_char == '\"':
-                        if not escaped: state = SS_DEFAULT
+                        if not escaped: state = ScanState.DEFAULT
                         escaped = False
                     else:
                         escaped = False
-                elif state == SS_COMMENT:
+                elif state == ScanState.COMMENT:
                     # Handle comments.
                     if current_char == '\n':
                         # End of comment.
@@ -91,17 +92,17 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                         if current_char == '\"' or current_char == '\\':
                             current_comment.append('\\')
                         current_comment.append(current_char)
-                elif state == SS_DEFAULT:
+                elif state == ScanState.DEFAULT:
                     # Check for start of a comment.
                     if current_char == '/' and next_char == '/':
-                        state = SS_COMMENT
+                        state = ScanState.COMMENT
                         current_comment.clear()
                         # Skip next char.
                         i += 1
                     # Skip ws.
                     elif current_char not in string.whitespace:
                         sreg.append(current_char)
-                else: # state == SS_DONE:
+                else: # state == ScanState.DONE:
                     pass
                 i += 1 # next
 
