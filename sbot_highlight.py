@@ -31,7 +31,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
         winid = view.window().id()
         fn = view.file_name()
 
-        trace(TraceCat.EVENT_ACTIVATE, 'HighlightEvent.on_activated', fn, vid, winid, _views_inited)
+        trace(TraceCat.ACTV, 'HighlightEvent.on_activated', fn, vid, winid, _views_inited)
 
         # Lazy init.
         if fn is not None: # Sometimes this happens...
@@ -53,14 +53,14 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
     def on_load(self):
         ''' Called when file loaded. Doesn't work when starting up! TODOST4 Maybe improved? '''
         view = self.view
-        trace(TraceCat.EVENT_LOAD, 'HighlightEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
+        trace(TraceCat.LOAD, 'HighlightEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
 
 
     def on_deactivated(self):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
         view = self.view
         winid = view.window().id()
-        trace(TraceCat.EVENT_ACTIVATE, 'HighlightEvent.on_deactivated', view.id(), winid)
+        trace(TraceCat.ACTV, 'HighlightEvent.on_deactivated', view.id(), winid)
 
         if winid in _hls:
             _save_hls(winid, view.window().project_file_name())
@@ -69,7 +69,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
     def on_close(self):
         ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
         view = self.view
-        trace(TraceCat.EVENT_LOAD, 'HighlightEvent.on_close', view.file_name(), view.id())
+        trace(TraceCat.LOAD, 'HighlightEvent.on_close', view.file_name(), view.id())
 
 
 #-----------------------------------------------------------------------------------

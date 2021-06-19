@@ -14,12 +14,12 @@ SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
 
 # Debug.
 class TraceCat(enum.Flag):
-    ALWAYS_ERR = enum.auto()
-    ALWAYS_INFO = enum.auto()
-    EVENT_ACTIVATE = enum.auto()
-    EVENT_LOAD = enum.auto()
+    ERROR_ERROR_ERROR = enum.auto()
+    INFO = enum.auto()
+    ACTV = enum.auto() # on_activated, on_deactivated
+    LOAD = enum.auto() # on_load, on_close
 
-_trace_cat = TraceCat.ALWAYS_ERR | TraceCat.ALWAYS_INFO | TraceCat.EVENT_ACTIVATE | TraceCat.EVENT_LOAD
+_trace_cat = TraceCat.ERROR_ERROR_ERROR | TraceCat.INFO | TraceCat.ACTV | TraceCat.LOAD
 _trace_fn = None
 
 
@@ -31,8 +31,8 @@ def trace(cat, *args):
         if _trace_fn is None:
             _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
 
-        scat = 'ERROR!!! ' if cat & TraceCat.ALWAYS_ERR else ''
-        s = '{} {}{}'.format(datetime.datetime.now().time(), scat, ' | '.join(map(str, args)))
+        scat = str(cat).replace('TraceCat.', '')
+        s = '{} {} {}'.format(datetime.datetime.now().time(), scat, ' | '.join(map(str, args)))
 
         with open(_trace_fn, "a+") as f:
             f.write(s + '\n')
@@ -47,8 +47,8 @@ def trace(cat, *args):
 def unhandled_exception(info, exc):
     ''' Trace debugging. '''
     st = traceback.format_exc()#limit=None, chain=True)
-    trace(TraceCat.ALWAYS_ERR, info, exc.args)
-    trace(TraceCat.ALWAYS_ERR, st)
+    trace(TraceCat.ERROR_ERROR_ERROR, info, exc.args)
+    trace(TraceCat.ERROR_ERROR_ERROR, st)
     sublime.error_message(info + '\n' + st)
 
 
@@ -106,7 +106,7 @@ def dump_view(preamble, view):
         s.append('project_file_name:')
         s.append('None' if window is None or window.project_file_name() is None else os.path.split(window.project_file_name())[1])
 
-    trace(TraceCat.ALWAYS_INFO, " ".join(s))
+    trace(TraceCat.INFO, " ".join(s))
 
 
 #-----------------------------------------------------------------------------------

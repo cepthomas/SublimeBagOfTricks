@@ -11,13 +11,13 @@ from sbot_common import *
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Initialize module global stuff. This fires only once for all instances of sublime. '''
-    trace(TraceCat.ALWAYS_INFO, '===================== Starting {} ======================='.format(datetime.datetime.now()))
-    trace(TraceCat.ALWAYS_INFO, 'Using python', sys.version)
+    trace(TraceCat.INFO, '===================== Starting {} ======================='.format(datetime.datetime.now()))
+    trace(TraceCat.INFO, 'Using python', sys.version)
 
 
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
-    trace(TraceCat.ALWAYS_INFO, "plugin_unloaded()")
+    trace(TraceCat.INFO, "plugin_unloaded()")
 
 
 #-----------------------------------------------------------------------------------

@@ -33,7 +33,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
         winid = view.window().id()
         fn = view.file_name()
 
-        trace(TraceCat.EVENT_ACTIVATE, 'SignetEvent.on_activated', fn, vid, winid)
+        trace(TraceCat.ACTV, 'SignetEvent.on_activated', fn, vid, winid)
 
         # Lazy init.
         if fn is not None: # Sometimes this happens...
@@ -60,7 +60,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
     def on_load(self):
         ''' Called when file loaded. Doesn't work when starting up! TODOST4 Maybe improved? '''
         view = self.view
-        trace(TraceCat.EVENT_LOAD, 'SignetEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
+        trace(TraceCat.LOAD, 'SignetEvent.on_load', view.file_name(), view.id(), view.window().project_file_name())
         # if view.file_name() is not None:
 
 
@@ -68,7 +68,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
         ''' When focus/tab lost. Save to file. Crude, but on_close is not reliable so we take the conservative approach. '''
         view = self.view
         winid = view.window().id()
-        trace(TraceCat.EVENT_ACTIVATE, 'SignetEvent.on_deactivated', view.id(), winid)
+        trace(TraceCat.ACTV, 'SignetEvent.on_deactivated', view.id(), winid)
 
         if winid in _sigs:
             _save_sigs(winid, view.window().project_file_name())
@@ -77,7 +77,7 @@ class SignetEvent(sublime_plugin.ViewEventListener):
     def on_close(self):
         ''' Called when a view is closed (note, there may still be other views into the same buffer). '''
         view = self.view
-        trace(TraceCat.EVENT_LOAD, 'SignetEvent.on_close', view.file_name(), view.id())
+        trace(TraceCat.LOAD, 'SignetEvent.on_close', view.file_name(), view.id())
 
 
 #-----------------------------------------------------------------------------------

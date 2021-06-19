@@ -7,7 +7,7 @@ from sbot_common import *
 
 # print('Load sbot_misc')
 
-# Misc stuff that doesn't warrant its own module. TODO?
+# Misc commands that don't warrant its own module. TODO?
 
 
 #-----------------------------------------------------------------------------------
