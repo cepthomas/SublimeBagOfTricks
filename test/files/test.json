@@ -27,8 +27,12 @@
         "Original": 0,
         "Value": 36
     },
+    
 
     "RepeatLength": {
+  /* here is
+        a block comment!
+        */
         "Original": 0,"Value": 479.425
     },
     "SpecLimits": {

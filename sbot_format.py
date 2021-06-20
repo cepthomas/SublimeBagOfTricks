@@ -41,10 +41,11 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         ''' Clean and reformat the string. Returns the new string. '''
 
         class ScanState(enum.IntFlag):
-            DEFAULT = enum.auto()  # Idle
-            STRING = enum.auto()   # Process a quoted string
-            COMMENT = enum.auto()  # Processing a comment
-            DONE = enum.auto()     # Finito
+            DEFAULT = enum.auto()   # Idle
+            STRING = enum.auto()    # Process a quoted string
+            LCOMMENT = enum.auto()  # Processing a single line comment
+            BCOMMENT = enum.auto()  # Processing a block/multiline comment
+            DONE = enum.auto()      # Finito
 
         # tabWidth = 4
         comment_count = 0
@@ -57,6 +58,8 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
 
         # Index is in cleaned version, value is in original.
         pos_map = []
+
+        #{"sublime_text": "*", "dependencies": [], "version": "1.1.9", "url": "https://github.com/wadetb/Sublime-Text-Advanced-CSV", "description": "Efficiently format, edit, arrange, and evaluate cells in CSV files", "platforms": ["*"]}
 
         # Iterate the string.
         try:
@@ -78,8 +81,9 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                         escaped = False
                     else:
                         escaped = False
-                elif state == ScanState.COMMENT:
-                    # Handle comments.
+                
+                elif state == ScanState.LCOMMENT:
+                    # Handle line comments.
                     if current_char == '\n':
                         # End of comment.
                         scom = ''.join(current_comment)
@@ -97,17 +101,48 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                         if current_char == '\"' or current_char == '\\':
                             current_comment.append('\\')
                         current_comment.append(current_char)
-                elif state == ScanState.DEFAULT:
-                    # Check for start of a comment. TODO also C block style!
-                    if current_char == '/' and next_char == '/':
-                        state = ScanState.COMMENT
+
+                elif state == ScanState.BCOMMENT:
+                    # Handle block comments.
+                    if current_char == '*' and next_char == '/':
+                        # End of comment.
+                        scom = ''.join(current_comment)
+                        stag = f'\"//{comment_count}\":\"{scom}\",'
+                        comment_count += 1
+                        sreg.append(stag)
+                        pos_map.append(i)
+                        state = ScanState.DEFAULT
                         current_comment.clear()
-                        # Skip next char.
-                        i += 1
+                        i += 1 # Skip next char.
+                    elif current_char == '\n' or current_char == '\r':
+                        # ignore
+                        pass
+                    else:
+                        # Maybe escape.
+                        if current_char == '\"' or current_char == '\\':
+                            current_comment.append('\\')
+                        current_comment.append(current_char)
+
+                elif state == ScanState.DEFAULT:
+                    # Check for start of a line comment.
+                    if current_char == '/' and next_char == '/':
+                        state = ScanState.LCOMMENT
+                        current_comment.clear()
+                        i += 1 # Skip next char.
+                    # Check for start of a block comment.
+                    elif current_char == '/' and next_char == '*':
+                        state = ScanState.BCOMMENT
+                        current_comment.clear()
+                        i += 1 # Skip next char.
+                    elif current_char == '\"':
+                        sreg.append(current_char)
+                        pos_map.append(i)
+                        state = ScanState.STRING
                     # Skip ws.
                     elif current_char not in string.whitespace:
                         sreg.append(current_char)
                         pos_map.append(i)
+
                 else: # state == ScanState.DONE:
                     pass
                 i += 1 # next

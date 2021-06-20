@@ -29,12 +29,6 @@ class TestFormat(unittest.TestCase):
             res = cmd._do_one(s)
             self.assertEqual(res[:50], "Json Error: Expecting property name enclosed in do")
 
-        #with open(r'.\files\bad.json', 'r') as fp:
-            #s = fp.read()
-            #cmd = sbot_format.SbotFormatJsonCommand(v)
-            #res = cmd._do_one(s)
-            #self.assertEqual(res[:50], 'xxxxxxxxxxxxxxxx')
-
 
     def test_format_xml(self):
         v = sublime.View(602)

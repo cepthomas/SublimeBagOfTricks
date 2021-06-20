@@ -115,7 +115,7 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_format_json         | Format json content and show in new view - makes C++ (not C!) comments into valid json elements and removes any trailing commas |
+| sbot_format_json         | Format json content and show in new view - makes C/C++ comments into valid json elements and removes any trailing commas |
 | sbot_format_xml          | Format xml content and show in new view |
 
 
