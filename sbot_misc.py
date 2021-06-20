@@ -50,7 +50,8 @@ class SbotCmdLineCommand(sublime_plugin.WindowCommand):
 
     def on_done(self, text):
         try:
-            sout = subprocess.check_output(text, cwd=self.window.extract_variables()['folder'], universal_newlines=True, shell=True)
+            cp = subprocess.run(text, cwd=self.window.extract_variables()['folder'], universal_newlines=True, capture_output=True, shell=True)
+            sout = cp.stdout
         except Exception as e:
             sout = f'Error: {e.args}'
         create_new_view(self.window, sout)

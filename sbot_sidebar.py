@@ -34,7 +34,7 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
         if len(paths) > 0:
             path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
             cmd = f'wt -d "{path}"'
-            subprocess.call(cmd, shell=True)
+            subprocess.run(cmd, shell=True)
 
 
 #-----------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ class SbotSidebarOpenFolderCommand(sublime_plugin.WindowCommand):
         if len(paths) > 0:
             path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
             cmd = f'explorer "{path}"'
-            subprocess.call(cmd, shell=True)
+            subprocess.run(cmd, shell=True)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 # and os.path.isdir(paths[0])
@@ -59,11 +59,9 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            # cmd = f'tree "{path}" /a /f | clip'
-            # subprocess.call(cmd, shell=True)
             cmd = f'tree "{path}" /a /f'
-            sout = subprocess.check_output(cmd, universal_newlines=True, shell=True)
-            create_new_view(self.window, sout)
+            cp = subprocess.run(cmd, universal_newlines=True, capture_output=True, shell=True)
+            create_new_view(self.window, cp.stdout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 # and os.path.isdir(paths[0])
@@ -76,8 +74,8 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         if len(paths) > 0:
-            sout = subprocess.check_output([paths[0]], universal_newlines=True, shell=True)
-            create_new_view(self.window, sout)
+            cp = subprocess.run([paths[0]], universal_newlines=True, capture_output=True, shell=True)
+            create_new_view(self.window, cp.stdout)
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']
