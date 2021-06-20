@@ -51,8 +51,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             # self.view.hide_popup()
         else:
             if self.rows % 100 == 0:
-                self.view.set_status('render', 'Render {} of {}'.format(self.row_num, self.rows))
-                # self.view.update_popup('Render {} of {}'.format(self.row_num, self.rows))
+                self.view.set_status('render', f'Render {self.row_num} of {self.rows}')
 
             # sublime.set_timeout(lambda: self._update_status(), 100)
             sublime.set_timeout(self._update_status, 100)
@@ -194,15 +193,15 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         ## Create css.
         style_text = ""
         for style, stid in all_styles.items():
-            props = '{{ color:{}; '.format(style[0])
+            props = f'{{ color:{style[0]}; '
             if style[1] is not None:
-                props += 'background-color:{}; '.format(style[1])
+                props += f'background-color:{style[1]}; '
             if style[2]:
-                props += 'font-weight:bold; '
+                props += f'font-weight:bold; '
             if style[3]:
-                props += 'font-style:italic; '
+                props += f'font-style:italic; '
             props += '}'
-            style_text += '.st{} {}\n'.format(stid, props)
+            style_text += f'.st{stid} {props}\n'
 
         ## Content text.
         content = []
@@ -226,7 +225,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 # Locate the style.
                 stid = _get_style(style)
                 if stid >= 0:
-                    content.append('<span class=st{}>{}</span>'.format(stid, escape(text)))
+                    content.append(f'<span class=st{stid}>{escape(text)}</span>')
                 else:
                     content.append(text) # plain text
 

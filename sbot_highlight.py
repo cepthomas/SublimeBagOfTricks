@@ -141,11 +141,11 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
         for scope in scopes:
             style = self.view.style_for_scope(scope)
             # trace(scope, style)
-            props = '{{ color:{}; '.format(style['foreground'])
-            props2 = 'fg:{} '.format(style['foreground'])
+            props = f'{{ color:{style["foreground"]}; '
+            props2 = f'fg:{style["foreground"]} '
             if 'background' in style:
-                props += 'background-color:{}; '.format(style['background'])
-                props2 += 'bg:{} '.format(style['background'])
+                props += f'background-color:{style["background"]}; '
+                props2 += f'bg:{style["background"]} '
             if style['bold']:
                 props += 'font-weight:bold; '
                 props2 += 'bold '
@@ -155,8 +155,8 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
             props += '}'
 
             i = len(style_text)
-            style_text.append('.st{} {}'.format(i, props))
-            content.append('<p><span class=st{}>{}  {}</span></p>'.format(i, scope, props2))
+            style_text.append(f'.st{i} {props}')
+            content.append(f'<p><span class=st{i}>{scope}  {props2}</span></p>')
 
         # Do popup
         html = '''

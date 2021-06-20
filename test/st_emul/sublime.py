@@ -111,7 +111,7 @@ class View():
         #     return Window(window_id)
 
     def file_name(self):
-        return 'test_file_name_{}'.format(self.view_id)
+        return f'test_file_name_{self.view_id}'
         # name = sublime_api.view_file_name(self.view_id)
         # if len(name) == 0:
         #     return None

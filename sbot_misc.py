@@ -52,5 +52,5 @@ class SbotCmdLineCommand(sublime_plugin.WindowCommand):
         try:
             sout = subprocess.check_output(text, cwd=self.window.extract_variables()['folder'], universal_newlines=True, shell=True)
         except Exception as e:
-            sout = 'Error: {}'.format(e.args)
+            sout = f'Error: {e.args}'
         create_new_view(self.window, sout)

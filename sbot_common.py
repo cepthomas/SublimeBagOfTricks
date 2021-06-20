@@ -32,8 +32,10 @@ def trace(cat, *args):
         if _trace_fn is None:
             _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
 
+        now = datetime.datetime.now().time()
         scat = str(cat).replace('TraceCat.', '')
-        s = '{} {} {}'.format(datetime.datetime.now().time(), scat, ' | '.join(map(str, args)))
+        content = ' | '.join(map(str, args))
+        s = f'{now} {scat} {content}'
 
         with open(_trace_fn, "a+") as f:
             f.write(s + '\n')
@@ -173,7 +175,7 @@ class SbotPerfCounter():
         s = self.id + ': '
         if len(self.vals) > 0:
             s += str(avg)
-            s += ' ({})'.format(len(self.vals))
+            s += f' ({len(self.vals)})'
         else:
             s += 'No data'
         return s

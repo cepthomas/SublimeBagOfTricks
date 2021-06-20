@@ -33,7 +33,7 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            cmd = 'wt -d "{}"'.format(path)
+            cmd = f'wt -d "{path}"'
             subprocess.call(cmd, shell=True)
 
 
@@ -44,7 +44,7 @@ class SbotSidebarOpenFolderCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            cmd = 'explorer "{}"'.format(path)
+            cmd = f'explorer "{path}"'
             subprocess.call(cmd, shell=True)
 
     def is_visible(self, paths):
@@ -59,9 +59,9 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         if len(paths) > 0:
             path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
-            # cmd = 'tree "{}" /a /f | clip'.format(path)
+            # cmd = f'tree "{path}" /a /f | clip'
             # subprocess.call(cmd, shell=True)
-            cmd = 'tree "{}" /a /f'.format(path)
+            cmd = f'tree "{path}" /a /f'
             sout = subprocess.check_output(cmd, universal_newlines=True, shell=True)
             create_new_view(self.window, sout)
 
