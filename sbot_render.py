@@ -26,7 +26,8 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         super(SbotRenderToHtmlCommand, self).__init__(view)
         self.view = view
 
-    def run(self, edit):
+    def run(self, edit, line_numbers):
+        self.line_numbers = line_numbers
         render_max_file = self.settings.get('render_max_file')
 
         fsize = self.view.size() / 1024.0 / 1024.0
@@ -67,8 +68,6 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         ## Get prefs.
         html_font_size = self.settings.get('html_font_size')
         html_font_face = self.settings.get('html_font_face')
-        html_background = self.settings.get('html_background')
-        html_line_numbers = self.settings.get('html_line_numbers') # TODO separate commands for w/wo line numbers
         html_background = self.settings.get('html_background')
 
         # Use tuples for everything as they can be hashable keys.
@@ -215,7 +214,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         padding2 = padding1
 
         for line_styles in region_styles:
-            if html_line_numbers:
+            if self.line_numbers:
                 content.append("<p>{:0{size}}  ".format(line_num, size=gutter_size))
             else:
                 content.append("<p>")

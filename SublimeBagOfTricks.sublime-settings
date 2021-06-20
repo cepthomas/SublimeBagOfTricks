@@ -11,8 +11,6 @@
     "html_font_size": 14,
     // If you need to change the bg color. Not done automatically from color scheme.
     "html_background": "GhostWhite",
-    // Optionally add line numbers.
-    "html_line_numbers": true,
     // One of: clipboard, file, show.
     "render_output": "show",
     // Max file size to render in Mb.

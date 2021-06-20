@@ -120,7 +120,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         #    ret = 'Error: {}'.format(je.args)
         except Exception as e:
             ret = 'Error: {}'.format(e.args)
-            # TODO help the user with the problem print(ret)
+            # TODO help the user with the problem print(ret) - use bad.json
 
         return ret
 

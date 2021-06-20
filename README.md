@@ -47,7 +47,7 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_render_to_html      | Render current open file including scope colors and highlights to html |
+| sbot_render_to_html      | Render current open file including scope colors and highlights to html, arg is include line numbers |
 | sbot_render_markdown     | Render current open markdown file to html |
 
 
@@ -56,7 +56,6 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 | html_font_face           | For rendered html/markdown |
 | html_font_size           | For rendered html/markdown |
 | html_background          | Color name if you need to change the bg color (not done automatically from color scheme) |
-| html_line_numbers        | Optionally add line numbers |
 | render_output            | Where to render to.<br/>`'clipboard'`<br/>`'file'` original fn or temp + .html<br/>`'show'`in browser |
 | render_max_file          | Max file size in Mb to render |
 
