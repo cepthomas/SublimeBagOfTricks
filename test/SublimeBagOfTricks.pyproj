@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0c4c78da-4a9f-4ff6-a2f1-9b2599edcac7}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>test_common.py</StartupFile>
+    <StartupFile>test_format.py</StartupFile>
     <SearchPath>st_emul;..\..\SublimeBagOfTricks</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

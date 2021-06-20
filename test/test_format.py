@@ -2,16 +2,17 @@ import sys
 import unittest
 from unittest.mock import MagicMock
 import sublime
+import sbot
 import sbot_format
 
 
 class TestFormat(unittest.TestCase):
 
     def setUp(self):
-        sbot_format.plugin_loaded()
+        sbot.plugin_loaded()
 
     def tearDown(self):
-        sbot_format.plugin_unloaded()
+        sbot.plugin_unloaded()
 
     def test_format_json(self):
         v = sublime.View(601)
@@ -26,7 +27,14 @@ class TestFormat(unittest.TestCase):
             # Make it a bad file.
             s = s.replace('\"Original\"', '')
             res = cmd._do_one(s)
-            self.assertEqual(res[:50], "Error: ('Expecting property name enclosed in doubl")
+            self.assertEqual(res[:50], "Json Error: Expecting property name enclosed in do")
+
+        #with open(r'.\files\bad.json', 'r') as fp:
+            #s = fp.read()
+            #cmd = sbot_format.SbotFormatJsonCommand(v)
+            #res = cmd._do_one(s)
+            #self.assertEqual(res[:50], 'xxxxxxxxxxxxxxxx')
+
 
     def test_format_xml(self):
         v = sublime.View(602)

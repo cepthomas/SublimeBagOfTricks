@@ -55,6 +55,9 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         next_char = -1
         escaped = False
 
+        # Index is in cleaned version, value is in original.
+        pos_map = []
+
         # Iterate the string.
         try:
             slen = len(s)
@@ -66,6 +69,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                 # Remove whitespace and transform comments into legal json.
                 if state == ScanState.STRING:
                     sreg.append(current_char)
+                    pos_map.append(i)
                     # Handle escaped chars.
                     if current_char == '\\':
                         escaped = True
@@ -79,10 +83,11 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                     if current_char == '\n':
                         # End of comment.
                         scom = ''.join(current_comment)
-                        stag = '\"//{}\":\"{}\",'.format(comment_count, scom)
+                        stag = f'\"//{comment_count}\":\"{scom}\",'
                         comment_count += 1
                         sreg.append(stag)
-                        state = SS_DEFAULT
+                        pos_map.append(i)
+                        state = ScanState.DEFAULT
                         current_comment.clear()
                     elif current_char == '\r':
                         # ignore
@@ -93,7 +98,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                             current_comment.append('\\')
                         current_comment.append(current_char)
                 elif state == ScanState.DEFAULT:
-                    # Check for start of a comment.
+                    # Check for start of a comment. TODO also C block style!
                     if current_char == '/' and next_char == '/':
                         state = ScanState.COMMENT
                         current_comment.clear()
@@ -102,6 +107,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                     # Skip ws.
                     elif current_char not in string.whitespace:
                         sreg.append(current_char)
+                        pos_map.append(i)
                 else: # state == ScanState.DONE:
                     pass
                 i += 1 # next
@@ -116,11 +122,19 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
             # Run it through the formatter.
             ret = json.loads(ret)
             ret = json.dumps(ret, indent=4)
-        #except json.JSONDecodeError as je:
-        #    ret = 'Error: {}'.format(je.args)
+        except json.JSONDecodeError as je:
+            # Get some context from the original string.
+            context = []
+            original_pos = pos_map[je.pos]
+            start_pos = max(0, original_pos - 40)
+            end_pos = min(len(s) - 1, original_pos + 40)
+            context.append(f'Json Error: {je.msg} pos: {original_pos}')
+            context.append(s[start_pos:original_pos])
+            context.append('---------here----------')
+            context.append(s[original_pos:end_pos])
+            ret = '\n'.join(context)
         except Exception as e:
-            ret = 'Error: {}'.format(e.args)
-            # TODO help the user with the problem print(ret) - use bad.json
+            ret = f'Other Error: {e.args}'
 
         return ret
 
@@ -162,6 +176,6 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
             top.normalize()
             ret = top.toprettyxml(indent=INDENT)
         except Exception as e:
-            ret = 'Error: {}'.format(e.args)
+            ret = f'Error: {e.args}'
 
         return ret
