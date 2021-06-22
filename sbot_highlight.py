@@ -166,7 +166,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
             </body>
         '''.format('\n'.join(style_text), '\n'.join(content))
 
-        self.view.show_popup(html, max_width=512)
+        self.view.show_popup(html, max_width=512, max_height=600)
 
         # Could also: sublime.set_clipboard(html1 + '\n'.join(style_text) + html2 + '\n'.join(content) + html3)
 

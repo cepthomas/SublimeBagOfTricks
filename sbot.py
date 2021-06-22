@@ -6,6 +6,7 @@ from sbot_common import *
 # print('Load sbot')
 
 # The core and system stuff.
+# TODO Make into package and/or multiple plugins. https://packagecontrol.io/docs/submitting_a_package
 
 
 #-----------------------------------------------------------------------------------
