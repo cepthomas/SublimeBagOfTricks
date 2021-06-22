@@ -32,7 +32,7 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
         winid = view.window().id()
         fn = view.file_name()
 
-        trace(TraceCat.ACTV_XXX, 'HighlightEvent.on_activated', fn, vid, winid, _views_inited)
+        trace(TraceCat.ACTV, 'HighlightEvent.on_activated', fn, vid, winid, _views_inited)
 
         # Lazy init.
         if fn is not None: # Sometimes this happens...
