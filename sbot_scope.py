@@ -14,7 +14,7 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         settings = sublime.load_settings(SETTINGS_FN)
-        scopes = settings.get('highlight_scopes_to_show')
+        scopes = settings.get('scopes_to_show')
         _render_scopes(scopes, self.view)
 
 

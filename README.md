@@ -30,20 +30,32 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 | sbot_clear_highlight     | Remove highlight in selection |
 | sbot_clear_all_highlights| Remove all highlights |
 | sbot_show_scopes         | Popup that shows style for scopes |
-| sbot_show_eol            | Toggles showing EOLs |
 
 
 | Setting                  | Description |
 |:--------                 |:-------     |
 | highlight_scopes         | List of scope names for marking text - index corresponds to `sbot_highlight_text` arg |
-| highlight_scopes_to_show | List of scope names for `sbot_show_scopes` command |
-| highlight_eol_scope      | Scope name for coloring eols |
+
+
+## Scopes
+- Show scope stack with styles for selection or all common ones. Useful for figuring out color-schemes.
+
+| Command                  | Description |
+|:--------                 |:-------     |
+| sbot_show_scopes         | Popup that shows style for all common scopes |
+| sbot_scope_info          | Like builtin show_scope_name but with style info added |
+
+
+| Setting                  | Description |
+|:--------                 |:-------     |
+| scopes_to_show           | List of scope names for `sbot_show_scopes` command |
 
 
 ## Render To Html
 - Simple render to html with styles, primarily for printing.
 - Line wrap with optional line numbers.
-- Version to render markdown file to html using [Markdeep](https://casual-effects.com/markdeep/).
+- Version to render markdown file to html using [Markdeep](https://casual-effects.com/markdeep/). Note that relative links
+  are probably broken.
 
 | Command                  | Description |
 |:--------                 |:-------     |
@@ -78,7 +90,8 @@ Enhanced bookmarks:
 | sbot_next_signet         | Goto next |
 | sbot_previous_signet     | Goto previous |
 | sbot_clear_signets       | Clear all |
-  
+
+
 | Setting                  | Description |
 |:--------                 |:-------     |
 | signet_scope             | Scope name for gutter icon color |
@@ -124,6 +137,12 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 |:--------                 |:-------     |
 | sbot_split_view          | Toggles simple horizontal split screen |
 | sbot_cmd_line            | Simple way to run a quick command |
+| sbot_show_eol            | Toggles showing EOLs |
+
+
+| Setting                  | Description |
+|:--------                 |:-------     |
+| eol_scope                | Scope name for coloring eols |
 
 
 # Implementation

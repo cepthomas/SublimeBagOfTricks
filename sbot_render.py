@@ -11,9 +11,6 @@ from sbot_common import *
 # print('Load sbot_render')
 
 
-HIGHLIGHT_REGION_NAME = 'highlight_%s' # Duplicated from sbot_highlight. My bad.
-
-
 #-----------------------------------------------------------------------------------
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
     ''' Make a pretty. '''
@@ -117,11 +114,11 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         highlight_regions.sort(key=lambda r: r[0].a)
 
         ## Tokenize selection by syntax scope.
-        pc = SbotPerfCounter('render_html')
+        # pc = SbotPerfCounter('render_html')
 
         for region in get_sel_regions(self.view):
             for line_region in self.view.split_by_newlines(region):
-                pc.start()
+                # pc.start()
                 self.row_num += 1
 
                 if self.row_num % 100 == 0:
@@ -183,7 +180,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
                 # Add to master list.
                 region_styles.append(line_styles)
-                pc.stop()
+                # pc.stop()
 
         # Done all lines.
         

@@ -31,8 +31,6 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 | Setting                  | Description |
 |:--------                 |:-------     |
 | highlight_scopes         | List of scope names for marking text - index corresponds to `sbot_highlight_text` arg |
-| highlight_scopes_to_show | List of scope names for `sbot_show_scopes` command |
-| highlight_eol_scope      | Scope name for coloring eols |
 
 
 ## Signets (bookmarks)
