@@ -7,7 +7,7 @@ from sbot_common import *
 
 # print('Load sbot_misc')
 
-# Misc commands that don't warrant its own module.
+# Misc commands that don't warrant their own module.
 
 
 #-----------------------------------------------------------------------------------
@@ -55,3 +55,25 @@ class SbotCmdLineCommand(sublime_plugin.WindowCommand):
         except Exception as e:
             sout = f'Error: {e.args}'
         create_new_view(self.window, sout)
+
+
+#-----------------------------------------------------------------------------------
+class SbotShowEolCommand(sublime_plugin.TextCommand):
+    ''' Show line ends. '''
+
+    def run(self, edit):
+        if not self.view.get_regions("eols"):
+            eols = []
+            ind = 0
+            while 1:
+                freg = self.view.find('[\n\r]', ind)
+                if freg is not None and not freg.empty(): # second condition is not documented!!
+                    eols.append(freg)
+                    ind = freg.end() + 1
+                else:
+                    break
+            if eols:
+                settings = sublime.load_settings(SETTINGS_FN)
+                self.view.add_regions("eols", eols, settings.get('highlight_eol_scope'))
+        else:
+            self.view.erase_regions("eols")

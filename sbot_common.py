@@ -151,34 +151,3 @@ def get_persistence_path(stp_fn, ext):
             ppath = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'store', stp_fn)
 
     return ppath
-
-
-#-----------------------------------------------------------------------------------
-class SbotPerfCounter():
-    ''' Container for perf counter. All times in msec. '''
-
-    def __init__(self, cid):
-        self.id = cid
-        self.vals = []
-        self.start_time = 0.0
-
-    def start(self):
-        self.start_time = time.perf_counter() * 1000.0
-
-    def stop(self):
-        if self.start_time != 0:
-            self.vals.append(time.perf_counter() * 1000.0 - self.start_time)
-            self.start_time = 0.0
-
-    def dump(self):
-        avg = sum(self.vals) / len(self.vals)
-        s = self.id + ': '
-        if len(self.vals) > 0:
-            s += str(avg)
-            s += f' ({len(self.vals)})'
-        else:
-            s += 'No data'
-        return s
-
-    def clear(self):
-        self.vals = []
