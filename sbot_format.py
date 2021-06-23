@@ -9,7 +9,7 @@ import sublime_plugin
 from sbot_common import *
 
 
-# print('Load sbot_format')
+print('Python load sbot_format')
 
 INDENT = '    '
 

@@ -8,7 +8,7 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-# print('Load sbot_render') TODO writing to temp doesn't handle links like embedded images.
+print('Python load sbot_render')
 
 
 #-----------------------------------------------------------------------------------
@@ -54,20 +54,18 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             sublime.set_timeout(self._update_status, 100)
 
     def _do_work(self):
-        ''' The worker thread. '''
-
-        # html render msec per line:
-        # - medium (5k dense lines) 1.248921079999997 (5000)
-        # - small (1k sparse lines) 0.4043940577246477 (1178)
-        # - biggish (20k dense lines = 3Mb) 1.3607864668223 (20616)
+        '''
+        The worker thread.
+        html render msec per line:
+        - medium (5000 dense lines) 1.25
+        - small (1178 sparse lines) 0.40
+        - biggish (20616 dense lines = 3Mb) 1.36
+        '''
 
         ## Get prefs.
         html_font_size = self.settings.get('html_font_size')
         html_font_face = self.settings.get('html_font_face')
         html_background = self.settings.get('html_background')
-
-        # Use tuples for everything as they can be hashable keys.
-        # my_style = (foreground, background, bold, italic)
 
         ## Collect scope/style info.
         all_styles = {} # k:style v:id
@@ -303,7 +301,7 @@ def _output_html(view, content=None):
     #     view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
     elif output_type in ('file', 'show'):
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'
-        fn = os.path.join(get_temp_path(), basefn)
+        fn = os.path.join(get_temp_path(), basefn) # TODO breaks on relative links like embedded images
         with open(fn, 'w', encoding='utf-8') as f: # need to explicitly set encoding because default windows is ascii
             f.write(s)
         if output_type == 'show':

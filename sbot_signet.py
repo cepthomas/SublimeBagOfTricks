@@ -4,7 +4,7 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-# print('Load sbot_signet')
+print('Python load sbot_signet')
 
 
 # Definitions.
@@ -251,17 +251,6 @@ def _go_to_signet(view, direction):
             if window.find_open_file(fn) is None and os.path.exists(fn) and len(rows) > 0:
                 vv = window.open_file(fn)
                 endrow = rows[array_end]
-
-
-                #The name sort_key in the body of the lambda will be looked up when the function is actually called, so it will see
-                #the value sort_key had most recently. Since you are calling sort immediately, the value of sort_key will not change
-                #before the resulting function object is used, so you can safely ignore the warning. To silence it, you can make sort_key
-                #the default value of a parameter to the lambda:
-                #results.sort(key=lambda k: get_from_dot_path(k, sort_key), reverse=(order == -1))
-                #results.sort(key=lambda k, sk=sort_key: get_from_dot_path(k, sk), reverse=(order == -1))
-
-
-
                 sublime.set_timeout(lambda r=endrow: wait_load_file(vv, r), 10) # already 1-based in file
                 window.focus_view(vv)
                 done = True

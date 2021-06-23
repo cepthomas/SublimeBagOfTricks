@@ -5,7 +5,7 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-# print('Load sbot_highlight')
+print('Python load sbot_highlight')
 
 
 # Definitions.

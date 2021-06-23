@@ -5,7 +5,8 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-# print('Load sbot')
+print('Python load sbot')
+
 
 # The core and system stuff. TODO Make into package and/or multiple plugins. https://packagecontrol.io/docs/submitting_a_package
 
@@ -21,10 +22,10 @@ def plugin_loaded():
     settings = sublime.load_settings(SETTINGS_FN)
     stdio_hook = settings.get('stdio_hook')
     if stdio_hook:
-        print('This should appear in ST console.')
+        print('This should appear in ST console only.')
         sys.stdout = StdHook(sys.stdout)
         sys.stderr = StdHook(sys.stderr)
-        print('This should appear in trace log.')
+        print('This should appear in trace log and ST console.')
 
     # Normal startup stuff.
     trace(TraceCat.INFO, f'===================== Starting {datetime.datetime.now()} =======================')

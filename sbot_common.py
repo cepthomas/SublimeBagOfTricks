@@ -7,7 +7,7 @@ import enum
 import sublime
 import sublime_plugin
 
-# print('Load sbot_common')
+print('Python load sbot_common')
 
 
 # Definitions.
@@ -86,41 +86,6 @@ def create_new_view(window, text):
     vnew.set_scratch(True)
     vnew.run_command('append', {'characters': text }) # insert has some odd behavior - indentation
     return vnew
-
-
-#-----------------------------------------------------------------------------------
-def write_to_console(text):
-    ''' This is crude but works. Sublime also adds an extra eol when writing to the console. '''
-    for b in text:
-        if b == r'\n':
-            sys.stdout.write('\n')
-        elif b == r'\r':
-            pass
-        else:
-            sys.stdout.write(chr(b))
-
-
-#-----------------------------------------------------------------------------------
-def dump_view(preamble, view):
-    ''' Helper util. '''
-    s = []
-    s.append('view')
-    s.append(preamble)
-
-    s.append('view_id:')
-    s.append('None' if view is None else str(view.id()))
-
-    if view is not None:
-        window = view.window()
-        fn = view.file_name()
-
-        s.append('file_name:')
-        s.append('None' if fn is None else os.path.split(fn)[1])
-
-        s.append('project_file_name:')
-        s.append('None' if window is None or window.project_file_name() is None else os.path.split(window.project_file_name())[1])
-
-    trace(TraceCat.INFO, " ".join(s))
 
 
 #-----------------------------------------------------------------------------------
