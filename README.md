@@ -17,6 +17,7 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 |:--------                 |:-------     |
 | persistence_path         | Where to store signet and highlight persistence.<br/>`'local'` is sublime-project location<br/>`'store'` is package store<br/>`''` is none
 | sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
+| stdio_hook               | Experimental stdout/stderr capture - default is false. |
 
 
 ## Highlighting
@@ -206,9 +207,8 @@ ST: reloading plugin SublimeBagOfTricks.sbot_common
 Python: load sbot_common
 ```
 
-The problem is that sbot_common gets reloaded but other modules are not aware. This makes handling globals
-difficult.
+The problem is that sbot_common gets reloaded but other modules are not aware. This makes handling globals difficult.
 
 From ST: For the specific case of Sublime plugins, when your plugin modules are loaded by sublime it invokes the dir function on the
 loaded module to find all of the symbols it contains and ignores everything that’s not a subclass of one of the special
- plugin classes (i.e. ApplicationCommand, WindowCommand, TextCommand, EventListener and ViewEventListener).
+plugin classes (i.e. ApplicationCommand, WindowCommand, TextCommand, EventListener and ViewEventListener).

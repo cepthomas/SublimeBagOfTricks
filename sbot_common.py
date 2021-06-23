@@ -14,14 +14,18 @@ import sublime_plugin
 SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 
-# Debug.
-class TraceCat(enum.Flag):
-    ERROR_ERROR_ERROR = enum.auto()
-    INFO = enum.auto()
-    ACTV = enum.auto() # on_activated, on_deactivated
-    LOAD = enum.auto() # on_load, on_close
 
-_trace_cat = TraceCat.ERROR_ERROR_ERROR | TraceCat.INFO | TraceCat.LOAD
+#-----------------------------------------------------------------------------------
+# Debug/trace stuff.
+class TraceCat(enum.Flag):
+    ERROR = enum.auto()
+    LOOK  = enum.auto() # stand out in file
+    INFO  = enum.auto()
+    ACTV  = enum.auto() # on_activated, on_deactivated
+    LOAD  = enum.auto() # on_load, on_close
+    STIO  = enum.auto() # stdio/stderr
+
+_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO | TraceCat.LOAD | TraceCat.STIO
 _trace_fn = None
 
 
@@ -31,10 +35,16 @@ def trace(cat, *args):
     if cat & _trace_cat:
         global _trace_fn
         if _trace_fn is None:
-            _trace_fn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp', 'trace.txt')
+            _trace_fn = os.path.join(get_temp_path(), 'trace.txt')
 
         now = datetime.datetime.now().time()
+
         scat = str(cat).replace('TraceCat.', '')
+        if cat == TraceCat.ERROR:
+            scat = '!!!!!!!!!!!!!!!!!!!! ERROR'
+        elif cat == TraceCat.LOOK:
+            scat = '>>>>>>>>>>>>>>>>>>>>'
+
         content = ' | '.join(map(str, args))
         s = f'{now} {scat} {content}'
 
@@ -51,8 +61,8 @@ def trace(cat, *args):
 def unhandled_exception(info, exc):
     ''' Trace debugging. '''
     st = traceback.format_exc()#limit=None, chain=True)
-    trace(TraceCat.ERROR_ERROR_ERROR, info, exc.args)
-    trace(TraceCat.ERROR_ERROR_ERROR, st)
+    trace(TraceCat.ERROR, info, exc.args)
+    trace(TraceCat.ERROR, st)
     sublime.error_message(info + '\n' + st)
 
 
@@ -138,7 +148,7 @@ def trim_all(s):
 
 #-----------------------------------------------------------------------------------
 def get_persistence_path(stp_fn, ext):
-    ''' General file name maker. '''
+    ''' General file name maker. Uses settings.persistence_path to determine path. '''
     ppath = None
     settings = sublime.load_settings(SETTINGS_FN)
 
@@ -152,3 +162,11 @@ def get_persistence_path(stp_fn, ext):
             ppath = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'store', stp_fn)
 
     return ppath
+
+
+
+#-----------------------------------------------------------------------------------
+def get_temp_path():
+    ''' General file name maker. '''
+    tfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp')
+    return tfn
