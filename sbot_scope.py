@@ -56,11 +56,13 @@ def _render_scopes(scopes, view):
         content.append(f'<p><span class=st{i}>{scope}  {props2}</span></p>')
 
     # Do popup
-    html = '''
+    st = '\n'.join(style_text)
+    ct = '\n'.join(content)
+
+    html = f'''
         <body>
-            <style> p {{ margin: 0em; }} {} </style>
-            {}
-        </body>
-    '''.format('\n'.join(style_text), '\n'.join(content))
+            <style> p {{ margin: 0em; }} {st} </style>
+            {ct}
+        </body>'''
 
     view.show_popup(html, max_width=512, max_height=600)

@@ -60,7 +60,7 @@ def trace(cat, *args):
 #-----------------------------------------------------------------------------------
 def unhandled_exception(info, exc):
     ''' Trace debugging. '''
-    st = traceback.format_exc()#limit=None, chain=True)
+    st = traceback.format_exc()
     trace(TraceCat.ERROR, info, exc.args)
     trace(TraceCat.ERROR, st)
     sublime.error_message(info + '\n' + st)
@@ -133,20 +133,6 @@ def wait_load_file(view, line):
 
 
 #-----------------------------------------------------------------------------------
-def trim_all(s):
-    ''' Remove lead/trail ws and empty lines.'''
-    # lead/trail ws
-    reo = re.compile('^[ \t]+|[\t ]+$', re.MULTILINE)
-    s = reo.sub('', s)
-
-    # empty lines
-    reo = re.compile('^[ \t]*$\r?\n', re.MULTILINE)
-    s = reo.sub('', s)
-
-    return s
-
-
-#-----------------------------------------------------------------------------------
 def get_persistence_path(stp_fn, ext):
     ''' General file name maker. Uses settings.persistence_path to determine path. '''
     ppath = None
@@ -162,7 +148,6 @@ def get_persistence_path(stp_fn, ext):
             ppath = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'store', stp_fn)
 
     return ppath
-
 
 
 #-----------------------------------------------------------------------------------

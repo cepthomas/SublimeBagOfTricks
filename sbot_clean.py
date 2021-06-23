@@ -80,7 +80,7 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
             line_num = 1
             offset = 0
             for line_region in self.view.split_by_newlines(region):
-                s = "{:0{size}} ".format(line_num, size=width)
+                s = f'{line_num:0{width}} '
                 self.view.insert(edit, line_region.a + offset, s)
                 line_num += 1
                 # Adjust for inserts.

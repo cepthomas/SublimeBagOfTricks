@@ -8,7 +8,7 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-# print('Load sbot_render')
+# print('Load sbot_render') TODO writing to temp doesn't handle links like embedded images.
 
 
 #-----------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         for line_styles in region_styles:
             if self.line_numbers:
-                content.append("<p>{:0{size}}  ".format(line_num, size=gutter_size))
+                content.append(f'<p>{line_num:0{gutter_size}} ')
             else:
                 content.append("<p>")
 
@@ -231,15 +231,15 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             line_num += 1
 
         ## Output html.
-        html1 = textwrap.dedent('''
+        html1 = textwrap.dedent(f'''
             <!DOCTYPE html>
             <html>
             <head>
             <meta charset="utf-8">
             <style  type="text/css">
-            .contentpane {{ font-family: {}; font-size: {}em; background-color: {}; text-indent: -{}em; padding-left: {}em; }}
+            .contentpane {{ font-family: {html_font_face}; font-size: {html_font_size/16}em; background-color: {html_background}; text-indent: -{padding1}em; padding-left: {padding2}em; }}
             p {{ white-space: pre-wrap; margin: 0em; }}
-            '''.format(html_font_face, html_font_size / 16, html_background, padding1, padding2))
+            ''')
 
         html2 = textwrap.dedent('''
             </style>
@@ -272,7 +272,7 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
 
         html = []
         html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
-        html.append("<style>body {{ background-color:{}; font-family:{}; font-size:{}; }}".format(html_background, html_font_face, html_font_size))
+        html.append(f"<style>body {{ background-color:{html_background}; font-family:{html_font_face}; font-size:{html_font_size}; }}")
         html.append("</style></head><body>")
         # To support Unicode input, you must add <meta charset="utf-8"> to the *top* of your document (in the first 512 bytes).
 
