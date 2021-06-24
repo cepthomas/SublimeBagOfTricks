@@ -1,6 +1,7 @@
 import sys
 import datetime
 import io
+import webbrowser
 import sublime
 import sublime_plugin
 from sbot_common import *
@@ -8,7 +9,7 @@ from sbot_common import *
 print('Python load sbot')
 
 
-# The core and system stuff. TODO Make into package and/or multiple plugins. https://packagecontrol.io/docs/submitting_a_package
+# The core and system stuff.
 
 
 #-----------------------------------------------------------------------------------
@@ -38,6 +39,14 @@ def plugin_unloaded():
 
 
 #-----------------------------------------------------------------------------------
+class SbotAboutCommand(sublime_plugin.WindowCommand):
+    ''' Open a web page. Mainly for internal use. '''
+
+    def run(self, url):
+        webbrowser.open_new_tab("https://github.com/cepthomas/SublimeBagOfTricks/blob/master/README.md")
+
+
+#-----------------------------------------------------------------------------------
 class StdHook(io.TextIOBase):
     '''
     Experimental hook to capture ST's monopolization of the console.
@@ -52,7 +61,7 @@ class StdHook(io.TextIOBase):
         b = self.buf
         self.buf = None
         if b is not None and len(b):
-            # TODO sniff for things like exceptions
+            # TODO sniff/process things like exceptions
             trace(TraceCat.STDO, b.rstrip())
             # Echo to console.
             self.std.write(b)

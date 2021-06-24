@@ -1,5 +1,4 @@
 import subprocess
-import webbrowser
 import sublime
 import sublime_plugin
 from sbot_common import *
@@ -7,7 +6,7 @@ from sbot_common import *
 
 print('Python load sbot_misc')
 
-# Misc commands that don't warrant their own module. TODO
+# Misc commands that don't currently warrant their own module.
 
 
 #-----------------------------------------------------------------------------------
@@ -30,14 +29,6 @@ class SbotSplitViewCommand(sublime_plugin.WindowCommand):
             window.run_command("clone_file")
             window.run_command("move_to_group", { "group": 1 } )
             window.active_view().run_command("goto_line", {"line": sel_row})
-
-
-#-----------------------------------------------------------------------------------
-class SbotOpenUrlCommand(sublime_plugin.WindowCommand):
-    ''' Open a web page. Mainly for internal use. '''
-
-    def run(self, url):
-        webbrowser.open_new_tab(url)
 
 
 #-----------------------------------------------------------------------------------
