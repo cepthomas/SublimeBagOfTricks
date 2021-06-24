@@ -119,10 +119,6 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 # pc.start()
                 self.row_num += 1
 
-                if self.row_num % 100 == 0:
-                    time.sleep(0.01)
-                    self.view.show_popup('!!!!!')
-
                 line_styles = [] # (Region, style))
 
                 # Start a new line.
@@ -208,21 +204,19 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         padding2 = padding1
 
         for line_styles in region_styles:
-            if self.line_numbers:
-                content.append(f'<p>{line_num:0{gutter_size}} ')
+            # Start line.
+            content.append(f'<p>{line_num:0{gutter_size}} ' if self.line_numbers else "<p>" )
+
+            if len(line_styles) == 0:
+                content.append('<br>')
             else:
-                content.append("<p>")
+                for region, style in line_styles:
+                    #[(Region, style(ref))]
+                    text = self.view.substr(region)
 
-            for region, style in line_styles:
-                #[(Region, style(ref))]
-                text = self.view.substr(region)
-
-                # Locate the style.
-                stid = _get_style(style)
-                if stid >= 0:
-                    content.append(f'<span class=st{stid}>{escape(text)}</span>')
-                else:
-                    content.append(text) # plain text
+                    # Locate the style.
+                    stid = _get_style(style)
+                    content.append(f'<span class=st{stid}>{escape(text)}</span>' if stid >= 0 else text)
 
             # Done line.
             content.append('</p>\n')
@@ -266,11 +260,11 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
         settings = sublime.load_settings(SETTINGS_FN)
         html_background = settings.get('html_background')
         html_font_size = settings.get('html_font_size')
-        html_font_face = settings.get('html_font_face')
+        html_md_font_face = settings.get('html_md_font_face')
 
         html = []
         html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
-        html.append(f"<style>body {{ background-color:{html_background}; font-family:{html_font_face}; font-size:{html_font_size}; }}")
+        html.append(f"<style>body {{ background-color:{html_background}; font-family:{html_md_font_face}; font-size:{html_font_size}; }}")
         html.append("</style></head><body>")
         # To support Unicode input, you must add <meta charset="utf-8"> to the *top* of your document (in the first 512 bytes).
 

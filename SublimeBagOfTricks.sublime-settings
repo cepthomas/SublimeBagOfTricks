@@ -10,6 +10,7 @@
     ///// Render settings /////
     // Html cosmetics.
     "html_font_face": "Consolas",
+    "html_md_font_face": "Tahoma",
     "html_font_size": 14,
     // If you need to change the bg color. Not done automatically from color scheme.
     "html_background": "GhostWhite",

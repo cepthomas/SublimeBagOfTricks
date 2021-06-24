@@ -66,7 +66,8 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 
 | Setting                  | Description |
 |:--------                 |:-------     |
-| html_font_face           | For rendered html/markdown |
+| html_font_face           | For rendered html - usually monospace |
+| html_md_font_face        | For rendered markdown - usually prettier than html_font_face |
 | html_font_size           | For rendered html/markdown |
 | html_background          | Color name if you need to change the bg color (not done automatically from color scheme) |
 | render_output            | Where to render to.<br/>`'clipboard'`<br/>`'file'` original fn or temp + .html<br/>`'show'`in browser |

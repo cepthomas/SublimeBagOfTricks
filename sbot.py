@@ -53,7 +53,7 @@ class StdHook(io.TextIOBase):
         self.buf = None
         if b is not None and len(b):
             # TODO sniff for things like exceptions
-            trace(TraceCat.STIO, b.rstrip())
+            trace(TraceCat.STDO, b.rstrip())
             # Echo to console.
             self.std.write(b)
 

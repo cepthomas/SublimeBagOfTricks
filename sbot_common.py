@@ -24,9 +24,9 @@ class TraceCat(enum.Flag):
     INFO  = enum.auto()
     ACTV  = enum.auto() # on_activated, on_deactivated
     LOAD  = enum.auto() # on_load, on_close
-    STIO  = enum.auto() # stdio/stderr
+    STDO  = enum.auto() # stdio/stderr
 
-_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO | TraceCat.LOAD | TraceCat.STIO
+_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO | TraceCat.LOAD | TraceCat.STDO
 _trace_fn = None
 
 
@@ -54,8 +54,11 @@ def trace(cat, *args):
 
         # Check for file size limit.
         if os.path.getsize(_trace_fn) > 100000:
-            os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
-            os.remove(_trace_fn)
+            try:
+                os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
+                os.remove(_trace_fn)
+            except Exception as e:
+                pass
 
 
 #-----------------------------------------------------------------------------------
