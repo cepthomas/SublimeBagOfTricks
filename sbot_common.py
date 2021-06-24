@@ -20,13 +20,13 @@ HIGHLIGHT_REGION_NAME = 'highlight_%s'
 # Debug/trace stuff.
 class TraceCat(enum.Flag):
     ERROR = enum.auto()
-    LOOK  = enum.auto() # stand out in file
     INFO  = enum.auto()
+    LOOK  = enum.auto() # make it stand out in file
     ACTV  = enum.auto() # on_activated, on_deactivated
     LOAD  = enum.auto() # on_load, on_close
     STDO  = enum.auto() # stdio/stderr
 
-_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO | TraceCat.LOAD | TraceCat.STDO
+_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO | TraceCat.STDO # | TraceCat.LOAD | TraceCat.ACTV
 _trace_fn = None
 
 

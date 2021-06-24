@@ -61,8 +61,14 @@ class StdHook(io.TextIOBase):
         b = self.buf
         self.buf = None
         if b is not None and len(b):
-            # TODO sniff/process things like exceptions
-            trace(TraceCat.STDO, b.rstrip())
+            b = b.rstrip()
+            trace(TraceCat.STDO, b)
+
+            # Sniff/process things like exceptions.
+            if 'Traceback (most recent call last)' in b:
+                sublime.error_message(b)
+                # sublime.status_message(b)
+
             # Echo to console.
             self.std.write(b)
 
