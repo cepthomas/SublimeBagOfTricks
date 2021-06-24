@@ -172,7 +172,10 @@ Plugin files.
 - If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
 
 ## Event Handling
-`ViewEventListener` is instantiated once per view and:
+There are some idiosyncrasies with ST event generation.
+
+### ViewEventListener
+Is instantiated once per view and:
 - `on_load()` is normally called when the file is loaded. However it is not called if ST startup shows previously opened files,
   or if it is shown as a (single-click) preview.
 - `on_close()` is normally called when a view is closed but it does not appear to be consistent. Perhaps if ST is closed
@@ -185,29 +188,53 @@ less-than-beautiful hacks happen:
   some stuff to track if it's been initialized.
 - `on_deactivated()` is used in place of `on_close()` to save the persistence file every time the view loses focus. Good enough.
 
+### EventListener
+Is instantiated once per window (ST instance):
+- `on_load_project()` doesn't fire on startup (last) project load.
+- `on_exit()` called once after the API has shut down, immediately before the plugin_host process exits.
+- `on_pre_close_window()` seems to work.
+
+
 ## Module Loading
 ST doesn't load modules like plain python and can cause some surprises.
 
 Here's a startup sequence:
 ```
+...
+ST: reloading plugin Default.*
+ST: reloading plugin SublimeBagOfTricks.__init__
+ST: reloading plugin SublimeBagOfTricks.sbot
 ST: reloading plugin SublimeBagOfTricks.__init__
 ST: reloading plugin SublimeBagOfTricks.sbot
 Python: load sbot_common
 Python: load sbot
+ST: reloading plugin SublimeBagOfTricks.sbot_clean
 Python: load sbot_clean
-Python: load sbot_common
-Python: load sbot_format
-Python: load sbot_highlight
-Python: load sbot_misc
-Python: load sbot_render
-Python: load sbot_sidebar
-Python: load sbot_signet
->>> Re-saved sbot_common.py
 ST: reloading plugin SublimeBagOfTricks.sbot_common
 Python: load sbot_common
+ST: reloading plugin SublimeBagOfTricks.sbot_format
+Python: load sbot_format
+ST: reloading plugin SublimeBagOfTricks.sbot_highlight
+Python: load sbot_highlight
+ST: reloading plugin SublimeBagOfTricks.sbot_misc
+Python: load sbot_misc
+ST: reloading plugin SublimeBagOfTricks.sbot_render
+Python: load sbot_render
+ST: reloading plugin SublimeBagOfTricks.sbot_scope
+Python: load sbot_scope
+ST: reloading plugin SublimeBagOfTricks.sbot_sidebar
+Python: load sbot_sidebar
+ST: reloading plugin SublimeBagOfTricks.sbot_signet
+Python: load sbot_signet
+ST: reloading python 3.X plugin my-other-plugins
+>>> Manually re-saved sbot_common.py
+ST: reloading plugin SublimeBagOfTricks.sbot_common
+Python: load sbot_common
+...
 ```
 
-The problem is that sbot_common gets reloaded but other modules are not aware. This makes handling globals difficult.
+The problem is that sbot_common gets reloaded but it is a different module from the one linked to by the other modules.
+This makes handling globals difficult.
 
 From ST: For the specific case of Sublime plugins, when your plugin modules are loaded by sublime it invokes the dir function on the
 loaded module to find all of the symbols it contains and ignores everything that’s not a subclass of one of the special

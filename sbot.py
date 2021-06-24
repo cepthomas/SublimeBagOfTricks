@@ -33,6 +33,11 @@ def plugin_loaded():
 
 
 #-----------------------------------------------------------------------------------
+def plugin_unloaded():
+    trace(TraceCat.INFO, "plugin_unloaded()")
+
+
+#-----------------------------------------------------------------------------------
 class StdHook(io.TextIOBase):
     '''
     Experimental hook to capture ST's monopolization of the console.
@@ -59,11 +64,6 @@ class StdHook(io.TextIOBase):
             self.buf += s
         if '\n' in s or '\r' in s:
             self.flush()
-
-
-#-----------------------------------------------------------------------------------
-def plugin_unloaded():
-    trace(TraceCat.INFO, "plugin_unloaded()")
 
 
 #-----------------------------------------------------------------------------------

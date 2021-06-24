@@ -15,6 +15,7 @@ SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 
 
+
 #-----------------------------------------------------------------------------------
 # Debug/trace stuff.
 class TraceCat(enum.Flag):
