@@ -9,9 +9,7 @@ import sublime_plugin
 from sbot_common import *
 
 
-print('Python load sbot_format')
-
-INDENT = '    '
+print('Python: load sbot_format')
 
 
 #-----------------------------------------------------------------------------------
@@ -209,7 +207,7 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
             top = xml.dom.minidom.parseString(s)
             clean(top)
             top.normalize()
-            ret = top.toprettyxml(indent=INDENT)
+            ret = top.toprettyxml(indent='    ')
         except Exception as e:
             ret = f'Error: {e.args}'
 

@@ -15,7 +15,7 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 
 | Setting                  | Description |
 |:--------                 |:-------     |
-| persistence_path         | Where to store signet and highlight persistence.<br/>`'local'` is sublime-project location<br/>`'store'` is package store<br/>`''` is none
+| persistence_path         | Where to store signet and highlight persistence.<br/>`'local'` is sublime-project location<br/>`'store'` is package store<br/>`''` is transient |
 | sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
 | stdio_hook               | Experimental stdout/stderr capture - default is false. |
 
@@ -30,7 +30,6 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 | sbot_highlight_text      | Highlight text 1 through 6 from `highlight_scopes` |
 | sbot_clear_highlight     | Remove highlight in selection |
 | sbot_clear_all_highlights| Remove all highlights |
-| sbot_show_scopes         | Popup that shows style for scopes |
 
 
 | Setting                  | Description |
@@ -70,7 +69,7 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 | html_md_font_face        | For rendered markdown - usually prettier than html_font_face |
 | html_font_size           | For rendered html/markdown |
 | html_background          | Color name if you need to change the bg color (not done automatically from color scheme) |
-| render_output            | Where to render to.<br/>`'clipboard'`<br/>`'file'` original fn or temp + .html<br/>`'show'`in browser |
+| render_output            | Where to render to.<br/>`'clipboard'`<br/>`'file'` fn/temp + .html<br/>`'show'`in browser |
 | render_max_file          | Max file size in Mb to render |
 
 
@@ -195,6 +194,10 @@ Is instantiated once per window (ST instance):
 - `on_exit()` called once after the API has shut down, immediately before the plugin_host process exits.
 - `on_pre_close_window()` seems to work.
 
+### Global
+ST says `plugin_loaded()` fires only once for all instances of sublime. However you can add this to each module and they all
+get called. Safest is to only use it once.
+
 
 ## Module Loading
 ST doesn't load modules like plain python and can cause some surprises.
@@ -228,15 +231,11 @@ Python: load sbot_sidebar
 ST: reloading plugin SublimeBagOfTricks.sbot_signet
 Python: load sbot_signet
 ST: reloading python 3.X plugin my-other-plugins
->>> Manually re-saved sbot_common.py
+>>>>>>>>> Manually re-saved sbot_common.py
 ST: reloading plugin SublimeBagOfTricks.sbot_common
 Python: load sbot_common
 ...
 ```
 
-The problem is that sbot_common gets reloaded but it is a different module from the one linked to by the other modules.
-This makes handling globals difficult.
-
-From ST: For the specific case of Sublime plugins, when your plugin modules are loaded by sublime it invokes the dir function on the
-loaded module to find all of the symbols it contains and ignores everything that’s not a subclass of one of the special
-plugin classes (i.e. ApplicationCommand, WindowCommand, TextCommand, EventListener and ViewEventListener).
+The problem is that sbot_common gets reloaded but it appears to be a different module from the one linked to by the other modules.
+This makes handling globals difficult. Modules that are common cannot store meaningful state.

@@ -6,7 +6,7 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-print('Python load sbot')
+print('Python: load sbot')
 
 
 # The core and system stuff.
@@ -14,21 +14,6 @@ print('Python load sbot')
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
-    '''
-    Initialize module global stuff. This fires only once for all instances of sublime.
-    There is one global context and all plugins share the same process.
-    '''
-
-    # Hook the default outputs.
-    settings = sublime.load_settings(SETTINGS_FN)
-    stdio_hook = settings.get('stdio_hook')
-    if stdio_hook:
-        print('This should appear in ST console only.')
-        sys.stdout = StdHook(sys.stdout)
-        sys.stderr = StdHook(sys.stderr)
-        print('This should appear in trace log and ST console.')
-
-    # Normal startup stuff.
     trace(TraceCat.INFO, f'===================== Starting {datetime.datetime.now()} =======================')
     trace(TraceCat.INFO, 'Using python', sys.version)
 
@@ -40,45 +25,10 @@ def plugin_unloaded():
 
 #-----------------------------------------------------------------------------------
 class SbotAboutCommand(sublime_plugin.WindowCommand):
-    ''' Open a web page. Mainly for internal use. '''
+    ''' Open a web page. '''
 
     def run(self, url):
         webbrowser.open_new_tab("https://github.com/cepthomas/SublimeBagOfTricks/blob/master/README.md")
-
-
-#-----------------------------------------------------------------------------------
-class StdHook(io.TextIOBase):
-    '''
-    Experimental hook to capture ST's monopolization of the console.
-    Also tried sys.excepthook but it seems ST captures unhandled exceptions.
-    '''
-
-    def __init__(self, std):
-        self.buf = None
-        self.std = std
-
-    def flush(self):
-        b = self.buf
-        self.buf = None
-        if b is not None and len(b):
-            b = b.rstrip()
-            trace(TraceCat.STDO, b)
-
-            # Sniff/process things like exceptions.
-            if 'Traceback (most recent call last)' in b:
-                sublime.error_message(b)
-                # sublime.status_message(b)
-
-            # Echo to console.
-            self.std.write(b)
-
-    def write(self, s):
-        if self.buf is None:
-            self.buf = s
-        else:
-            self.buf += s
-        if '\n' in s or '\r' in s:
-            self.flush()
 
 
 #-----------------------------------------------------------------------------------

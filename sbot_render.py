@@ -8,7 +8,7 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-print('Python load sbot_render')
+print('Python: load sbot_render')
 
 
 #-----------------------------------------------------------------------------------
@@ -31,9 +31,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         if fsize > render_max_file:
             sublime.message_dialog('File too large to render. If you really want to, change your settings')
         else:
-            self._do_work()
+            self._do_render()
             # Actually would like to run in a thread but takes 10x time, probably the GIL.
-            # t = threading.Thread(target=self._do_work)
+            # t = threading.Thread(target=self._do_render)
             # t.start()
 
     def _update_status(self):
@@ -53,7 +53,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             # sublime.set_timeout(lambda: self._update_status(), 100)
             sublime.set_timeout(self._update_status, 100)
 
-    def _do_work(self):
+    def _do_render(self):
         '''
         The worker thread.
         html render msec per line:
@@ -296,6 +296,7 @@ def _output_html(view, content=None):
     elif output_type in ('file', 'show'):
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'
         fn = os.path.join(get_temp_path(), basefn) # TODO breaks on relative links like embedded images - render in origin?
+        # fn = basefn
         with open(fn, 'w', encoding='utf-8') as f: # need to explicitly set encoding because default windows is ascii
             f.write(s)
         if output_type == 'show':

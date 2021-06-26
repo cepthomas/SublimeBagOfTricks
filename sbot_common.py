@@ -4,10 +4,11 @@ import time
 import datetime
 import traceback
 import enum
+import pathlib
 import sublime
 import sublime_plugin
 
-print('Python load sbot_common')
+print('Python: load sbot_common')
 
 
 # Definitions.
@@ -15,8 +16,6 @@ SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 
 
-
-#-----------------------------------------------------------------------------------
 # Debug/trace stuff.
 class TraceCat(enum.Flag):
     ERROR = enum.auto()
@@ -26,39 +25,50 @@ class TraceCat(enum.Flag):
     LOAD  = enum.auto() # on_load, on_close
     STDO  = enum.auto() # stdio/stderr
 
-_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO | TraceCat.STDO # | TraceCat.LOAD | TraceCat.ACTV
+
+# Stuff to hang on to.
+_temp_path = None
+_store_path = None
 _trace_fn = None
+_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO | TraceCat.STDO # | TraceCat.LOAD | TraceCat.ACTV
 
 
 #-----------------------------------------------------------------------------------
 def trace(cat, *args):
-    ''' Trace debugging. '''
-    if cat & _trace_cat:
-        global _trace_fn
-        if _trace_fn is None:
-            _trace_fn = os.path.join(get_temp_path(), 'trace.txt')
+    ''' Trace for debugging. '''
 
-        now = datetime.datetime.now().time()
+    global _trace_fn, _temp_path, _store_path
 
-        scat = str(cat).replace('TraceCat.', '')
-        if cat == TraceCat.ERROR:
-            scat = '!!!!!!!!!!!!!!!!!!!! ERROR'
-        elif cat == TraceCat.LOOK:
-            scat = '>>>>>>>>>>>>>>>>>>>>'
+    if _trace_fn is None:
+        # First time = initialize. Make sure paths exist.
+        _temp_path = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp')
+        pathlib.Path(_temp_path).mkdir(parents=True, exist_ok=True)
+        _store_path = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'store')
+        pathlib.Path(_store_path).mkdir(parents=True, exist_ok=True)
+        # The trace file.
+        _trace_fn = os.path.join(_temp_path, 'trace.txt')
 
-        content = ' | '.join(map(str, args))
-        s = f'{now} {scat} {content}'
+    now = datetime.datetime.now().time()
 
-        with open(_trace_fn, "a+") as f:
-            f.write(s + '\n')
+    scat = str(cat).replace('TraceCat.', '')
+    if cat == TraceCat.ERROR:
+        scat = '!!!!!!!! ERROR !!!!!!!!!!!!'
+    elif cat == TraceCat.LOOK:
+        scat = '>>>>>>>>> LOOK >>>>>>>>>>>>'
 
-        # Check for file size limit.
-        if os.path.getsize(_trace_fn) > 100000:
-            try:
-                os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
-                os.remove(_trace_fn)
-            except Exception as e:
-                pass
+    content = ' | '.join(map(str, args))
+    s = f'{now} {scat} {content}'
+
+    with open(_trace_fn, "a+") as f:
+        f.write(s + '\n')
+
+    # Check for file size limit.
+    if os.path.getsize(_trace_fn) > 100000:
+        try:
+            os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
+            os.remove(_trace_fn)
+        except Exception as e:
+            pass
 
 
 #-----------------------------------------------------------------------------------
@@ -114,13 +124,12 @@ def get_persistence_path(stp_fn, ext):
             ppath = stp_fn
         elif spp == 'store':
             stp_fn = os.path.basename(stp_fn)
-            ppath = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'store', stp_fn)
+            ppath = os.path.join(_store_path, stp_fn)
 
     return ppath
 
 
 #-----------------------------------------------------------------------------------
 def get_temp_path():
-    ''' General file name maker. '''
-    tfn = os.path.join(sublime.packages_path(), 'SublimeBagOfTricks', 'temp')
-    return tfn
+    ''' Accessor. '''
+    return _temp_path
