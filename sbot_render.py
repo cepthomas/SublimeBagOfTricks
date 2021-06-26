@@ -302,7 +302,7 @@ def _output_html(view, content=None):
     #     view.set_syntax_file('Packages/HTML/HTML.tmLanguage')
     elif output_type in ('file', 'show'):
         basefn = 'default.html' if view.file_name() is None else os.path.basename(view.file_name()) + '.html'
-        fn = os.path.join(get_temp_path(), basefn) # TODO breaks on relative links like embedded images - render in origin?
+        fn = os.path.join(get_temp_path(), basefn)
         # fn = basefn
         with open(fn, 'w', encoding='utf-8') as f: # need to explicitly set encoding because default windows is ascii
             f.write(s)

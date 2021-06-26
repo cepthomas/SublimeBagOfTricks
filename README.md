@@ -54,8 +54,8 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 ## Render To Html
 - Simple render to html with styles, primarily for printing.
 - Line wrap with optional line numbers.
-- Version to render markdown file to html using [Markdeep](https://casual-effects.com/markdeep/). Note that relative links
-  are probably broken.
+- Version to render markdown file to html using [Markdeep](https://casual-effects.com/markdeep/).
+- Note that relative links (like graphics) are currently broken. If it's important, you can manually copy them to the temp directory.
 
 | Command                  | Description |
 |:--------                 |:-------     |
@@ -149,13 +149,13 @@ Prettify json and xml. Was also going to handle html but it's easier to just to 
 # Implementation
 
 ## Files
-Plugin files.
+Plugin directory files.
 
 | Directory                | Description |
 |:--------                 |:-------     |
 | .                        | Standard plugin stuff - menus, commands, scripts, ... |
-| store                    | `.*-hls` and `.*-sigs` files if persistence_path is `store` |
-| temp                     | Trace files and rendered html |
+| store                    | Generated dir: `.*-hls` and `.*-sigs` files if persistence_path is `store` |
+| temp                     | Generated dir: Trace files and rendered html |
 | test                     | VS solution to do some basic unit testing of sbot functions |
 | test\st_emul             | Stubs for the sublime api |
 | test\files               | Misc files for testing |
