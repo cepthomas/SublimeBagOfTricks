@@ -48,36 +48,39 @@ def trace(cat, *args):
         # The trace file.
         _trace_fn = os.path.join(_temp_path, 'trace.txt')
 
-    now = datetime.datetime.now().time()
+    if cat in _trace_cat:
+        now = datetime.datetime.now().time()
 
-    scat = str(cat).replace('TraceCat.', '')
-    if cat == TraceCat.ERROR:
-        scat = '!!!!!!!! ERROR !!!!!!!!!!!!'
-    elif cat == TraceCat.LOOK:
-        scat = '>>>>>>>>> LOOK >>>>>>>>>>>>'
+        scat = str(cat).replace('TraceCat.', '')
+        if cat == TraceCat.ERROR:
+            scat = '!!!!!!!! ERROR !!!!!!!!!!!!'
+        elif cat == TraceCat.LOOK:
+            scat = '>>>>>>>>> LOOK >>>>>>>>>>>>'
 
-    content = ' | '.join(map(str, args))
-    s = f'{now} {scat} {content}'
+        content = ' | '.join(map(str, args))
+        s = f'{now} {scat} {content}'
 
-    with open(_trace_fn, "a+") as f:
-        f.write(s + '\n')
+        with open(_trace_fn, "a+") as f:
+            f.write(s + '\n')
 
-    # Check for file size limit.
-    if os.path.getsize(_trace_fn) > 100000:
-        try:
-            os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
-            os.remove(_trace_fn)
-        except Exception as e:
-            pass
+        # Check for file size limit.
+        if os.path.getsize(_trace_fn) > 100000:
+            try:
+                os.replace(_trace_fn, _trace_fn.replace('trace.txt', 'trace_old.txt'))
+                os.remove(_trace_fn)
+            except Exception as e:
+                pass
 
 
 #-----------------------------------------------------------------------------------
-def unhandled_exception(info, exc):
-    ''' Trace debugging. '''
+def plugin_exception(exc):
+    '''
+    Handling of runtime exceptions generated in ST callbacks.
+    This gives us a chance to do something before they are swallowed and dumped to the console.
+    '''
     st = traceback.format_exc()
-    trace(TraceCat.ERROR, info, exc.args)
-    trace(TraceCat.ERROR, st)
-    sublime.error_message(info + '\n' + st)
+    # trace(TraceCat.ERROR, st)
+    sublime.error_message(f'Runtime error\n{st}')
 
 
 #-----------------------------------------------------------------------------------

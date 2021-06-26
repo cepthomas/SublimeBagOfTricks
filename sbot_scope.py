@@ -13,9 +13,12 @@ class SbotShowScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
 
     def run(self, edit):
-        settings = sublime.load_settings(SETTINGS_FN)
-        scopes = settings.get('scopes_to_show')
-        _render_scopes(scopes, self.view)
+        try:
+            settings = sublime.load_settings(SETTINGS_FN)
+            scopes = settings.get('scopes_to_show')
+            _render_scopes(scopes, self.view)
+        except Exception as e:
+            plugin_exception(e)
 
 
 #-----------------------------------------------------------------------------------
@@ -23,9 +26,12 @@ class SbotScopeInfoCommand(sublime_plugin.TextCommand):
     ''' Like builtin ShowScopeNameCommand but with coloring added. '''
 
     def run(self, edit):
-        scope = self.view.scope_name(self.view.sel()[-1].b).rstrip()
-        scopes = scope.split()
-        _render_scopes(scopes, self.view)
+        try:
+            scope = self.view.scope_name(self.view.sel()[-1].b).rstrip()
+            scopes = scope.split()
+            _render_scopes(scopes, self.view)
+        except Exception as e:
+            plugin_exception(e)
 
 
 #-----------------------------------------------------------------------------------

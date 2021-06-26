@@ -21,19 +21,22 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
         return True
 
     def run(self, edit):
-        sres = []
-        err = False
+        try:
+            sres = []
+            err = False
 
-        reg = get_sel_regions(self.view)[0]
-        s = self.view.substr(reg)
-        s = self._do_one(s)
-        sres.append(s)
-        if s.startswith('Error'):
-            err = True
+            reg = get_sel_regions(self.view)[0]
+            s = self.view.substr(reg)
+            s = self._do_one(s)
+            sres.append(s)
+            if s.startswith('Error'):
+                err = True
 
-        vnew = create_new_view(self.view.window(), '\n'.join(sres))
-        if not err:
-            vnew.set_syntax_file('Packages/JavaScript/JSON.sublime-syntax')
+            vnew = create_new_view(self.view.window(), '\n'.join(sres))
+            if not err:
+                vnew.set_syntax_file('Packages/JavaScript/JSON.sublime-syntax')
+        except Exception as e:
+            plugin_exception(e)
 
     def _do_one(self, s):
         ''' Clean and reformat the string. Returns the new string. '''
@@ -167,7 +170,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
             context.append(s[original_pos:end_pos])
             ret = '\n'.join(context)
         except Exception as e:
-            ret = f'Other Error: {e.args}'
+            plugin_exception(e)
 
         return ret
 
@@ -180,17 +183,20 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
         return self.view.settings().get('syntax').endswith('XML.sublime-syntax')
 
     def run(self, edit):
-        err = False
+        try:
+            err = False
 
-        reg = get_sel_regions(self.view)[0]
-        s = self.view.substr(reg)
-        s = self._do_one(s)
-        if s.startswith('Error'):
-            err = True
+            reg = get_sel_regions(self.view)[0]
+            s = self.view.substr(reg)
+            s = self._do_one(s)
+            if s.startswith('Error'):
+                err = True
 
-        vnew = create_new_view(self.view.window(), s)
-        if not err:
-            vnew.set_syntax_file('Packages/XML/XML.sublime-syntax')
+            vnew = create_new_view(self.view.window(), s)
+            if not err:
+                vnew.set_syntax_file('Packages/XML/XML.sublime-syntax')
+        except Exception as e:
+            plugin_exception(e)
 
     def _do_one(self, s):
         ''' Clean and reformat the string. Returns the new string. '''
@@ -203,12 +209,9 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
                 elif n.nodeType == xml.dom.minidom.Node.ELEMENT_NODE:
                     clean(n)
 
-        try:
-            top = xml.dom.minidom.parseString(s)
-            clean(top)
-            top.normalize()
-            ret = top.toprettyxml(indent='    ')
-        except Exception as e:
-            ret = f'Error: {e.args}'
+        top = xml.dom.minidom.parseString(s)
+        clean(top)
+        top.normalize()
+        ret = top.toprettyxml(indent='    ')
 
         return ret

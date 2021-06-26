@@ -171,6 +171,14 @@ Plugin files.
 - Commands can't end with `<underscore numeral>` e.g. `my_cmd_1` should be `stpt_cmd1`.
 - If you pass a dict as value in View.settings().set(name, value), it seems that the dict key must be a string.
 
+## Error Handling
+Because ST takes ownership of the python module loading and execution, it just dumps any load/parse and runtime exceptions
+to the console. This can be annoying because it means you have to have the console open pretty much all the time.
+First attempt was to hook the console stdout but it was not very cooperative. So now there are try/except around all the
+ST callback functions and this works to catch runtime errors and pop up a message box. Import/parse errors still go to the
+console so you have to keep an eye open there while developing but they should disappear quickly.
+
+
 ## Event Handling
 There are some idiosyncrasies with ST event generation.
 

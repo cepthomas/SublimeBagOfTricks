@@ -27,34 +27,37 @@ class SignetEvent(sublime_plugin.ViewEventListener):
 
     def on_activated(self):
         ''' When focus/tab received. '''
-        view = self.view
-        global _views_inited
-        vid = view.id()
-        winid = view.window().id()
-        fn = view.file_name()
+        try:
+            view = self.view
+            global _views_inited
+            vid = view.id()
+            winid = view.window().id()
+            fn = view.file_name()
 
-        trace(TraceCat.ACTV, 'SignetEvent.on_activated', fn, vid, winid)
+            trace(TraceCat.ACTV, 'SignetEvent.on_activated', fn, vid, winid)
 
-        # Lazy init.
-        if fn is not None: # Sometimes this happens...
-            # Is the persist file read yet?
-            if winid not in _sigs:
-                _open_sigs(winid, view.window().project_file_name())
+            # Lazy init.
+            if fn is not None: # Sometimes this happens...
+                # Is the persist file read yet?
+                if winid not in _sigs:
+                    _open_sigs(winid, view.window().project_file_name())
 
-            # Init the view, maybe.
-            if vid not in _views_inited:
-                _views_inited.add(vid)
+                # Init the view, maybe.
+                if vid not in _views_inited:
+                    _views_inited.add(vid)
 
-                # Init the view with any persist values.
-                rows = _get_persist_rows(view, False)
-                if rows is not None:
-                    # Update visual signets, brutally. This is the ST way.
-                    regions = []
-                    for r in rows:
-                        pt = view.text_point(r-1, 0) # ST is 0-based
-                        regions.append(sublime.Region(pt, pt))
-                    settings = sublime.load_settings(SETTINGS_FN)
-                    view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
+                    # Init the view with any persist values.
+                    rows = _get_persist_rows(view, False)
+                    if rows is not None:
+                        # Update visual signets, brutally. This is the ST way.
+                        regions = []
+                        for r in rows:
+                            pt = view.text_point(r-1, 0) # ST is 0-based
+                            regions.append(sublime.Region(pt, pt))
+                        settings = sublime.load_settings(SETTINGS_FN)
+                        view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
+        except Exception as e:
+            plugin_exception(e)
 
 
     def on_load(self):
@@ -66,12 +69,15 @@ class SignetEvent(sublime_plugin.ViewEventListener):
 
     def on_deactivated(self):
         ''' Save to file when focus/tab lost. '''
-        view = self.view
-        winid = view.window().id()
-        trace(TraceCat.ACTV, 'SignetEvent.on_deactivated', view.id(), winid)
+        try:
+            view = self.view
+            winid = view.window().id()
+            trace(TraceCat.ACTV, 'SignetEvent.on_deactivated', view.id(), winid)
 
-        if winid in _sigs:
-            _save_sigs(winid, view.window().project_file_name())
+            if winid in _sigs:
+                _save_sigs(winid, view.window().project_file_name())
+        except Exception as e:
+            plugin_exception(e)
 
 
     def on_close(self):
@@ -82,36 +88,40 @@ class SignetEvent(sublime_plugin.ViewEventListener):
 
 #-----------------------------------------------------------------------------------
 class SbotToggleSignetCommand(sublime_plugin.TextCommand):
+    ''' Flip the signet. '''
 
     def run(self, edit):
-        # Get current row.
-        sel_row, _ = self.view.rowcol(self.view.sel()[0].a)
+        try:
+            # Get current row.
+            sel_row, _ = self.view.rowcol(self.view.sel()[0].a)
 
-        drows = _get_display_signet_rows(self.view)
+            drows = _get_display_signet_rows(self.view)
 
-        if sel_row != -1:
-            # Is there one currently at the selected row?
-            existing = sel_row in drows
-            if existing:
-                drows.remove(sel_row)
-            else:
-                drows.append(sel_row)
+            if sel_row != -1:
+                # Is there one currently at the selected row?
+                existing = sel_row in drows
+                if existing:
+                    drows.remove(sel_row)
+                else:
+                    drows.append(sel_row)
 
-        # Update collection.
-        crows = _get_persist_rows(self.view, True)
-        if crows is not None:
-            crows.clear()
+            # Update collection.
+            crows = _get_persist_rows(self.view, True)
+            if crows is not None:
+                crows.clear()
+                for r in drows:
+                    crows.append(r + 1)
+
+            # Update visual signets, brutally. This is the ST way.
+            regions = []
             for r in drows:
-                crows.append(r + 1)
+                pt = self.view.text_point(r, 0) # 0-based
+                regions.append(sublime.Region(pt, pt))
 
-        # Update visual signets, brutally. This is the ST way.
-        regions = []
-        for r in drows:
-            pt = self.view.text_point(r, 0) # 0-based
-            regions.append(sublime.Region(pt, pt))
-
-        settings = sublime.load_settings(SETTINGS_FN)
-        self.view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
+            settings = sublime.load_settings(SETTINGS_FN)
+            self.view.add_regions(SIGNET_REGION_NAME, regions, settings.get('signet_scope'), SIGNET_ICON)
+        except Exception as e:
+            plugin_exception(e)
 
 
 #-----------------------------------------------------------------------------------
@@ -119,7 +129,10 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        _go_to_signet(self.view, NEXT_SIG)
+        try:
+            _go_to_signet(self.view, NEXT_SIG)
+        except Exception as e:
+            plugin_exception(e)
 
 
 #-----------------------------------------------------------------------------------
@@ -127,7 +140,10 @@ class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
     ''' Navigate to signet in whole collection. '''
 
     def run(self, edit):
-        _go_to_signet(self.view, PREV_SIG)
+        try:
+            _go_to_signet(self.view, PREV_SIG)
+        except Exception as e:
+            plugin_exception(e)
 
 
 #-----------------------------------------------------------------------------------
@@ -135,71 +151,58 @@ class SbotClearSignetsCommand(sublime_plugin.TextCommand):
     ''' Clear all signets. '''
 
     def run(self, edit):
-        # Remove from collection.
-        rows = _get_persist_rows(self.view, False)
-        if rows is not None:
-            rows.clear()
+        try:
+            # Remove from collection.
+            rows = _get_persist_rows(self.view, False)
+            if rows is not None:
+                rows.clear()
 
-        # Clear visuals in open views.
-        for vv in self.view.window().views():
-            vv.erase_regions(SIGNET_REGION_NAME)
+            # Clear visuals in open views.
+            for vv in self.view.window().views():
+                vv.erase_regions(SIGNET_REGION_NAME)
+        except Exception as e:
+            plugin_exception(e)
 
 
 #-----------------------------------------------------------------------------------
 def _save_sigs(winid, stp_fn):
     ''' General project saver. '''
-    ok = True
+
     ppath = get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
-    if ppath is not None:
-        try:
-            # Remove invalid files and any empty values.
-            if winid in _sigs:
-                for fn, _ in _sigs[winid].items():
-                    if not os.path.exists(fn):
-                        del _sigs[winid][fn]
-                    elif len(_sigs[winid][fn]) == 0:
-                        del _sigs[winid][fn]
+    # Remove invalid files and any empty values.
+    if winid in _sigs:
+        for fn, _ in _sigs[winid].items():
+            if not os.path.exists(fn):
+                del _sigs[winid][fn]
+            elif len(_sigs[winid][fn]) == 0:
+                del _sigs[winid][fn]
 
-                # Now save.
-                with open(ppath, 'w') as fp:
-                    json.dump(_sigs[winid], fp, indent=4)
-
-        except Exception as e:
-            unhandled_exception('Save signets error', e)
-            ok = False
-
-    return ok
-
+        # Now save.
+        with open(ppath, 'w') as fp:
+            json.dump(_sigs[winid], fp, indent=4)
 
 #-----------------------------------------------------------------------------------
 def _open_sigs(winid, stp_fn):
     ''' General project opener. '''
+
     global _sigs
-    ok = True
     ppath = get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
-    if ppath is not None:
-        try:
-            with open(ppath, 'r') as fp:
-                values = json.load(fp)
-                _sigs[winid] = values
-
-        except FileNotFoundError as fe:
-            # Assumes new file.
-            sublime.status_message('Creating new signets file')
-            _sigs[winid] = { }
-
-        except Exception as e:
-            unhandled_exception('Open signets error', e)
-            ok = False
-
-    return ok
+    if os.path.isfile(ppath):
+        with open(ppath, 'r') as fp:
+            values = json.load(fp)
+            _sigs[winid] = values
+    else:
+        # Assumes new file.
+        sublime.status_message('Creating new signets file')
+        _sigs[winid] = { }
 
 
 #-----------------------------------------------------------------------------------
 def _go_to_signet(view, direction):
     ''' Navigate to signet in whole collection. direction is NEXT_SIG or PREV_SIG. '''
+
     window = view.window()
 
     settings = sublime.load_settings(SETTINGS_FN)
@@ -274,6 +277,7 @@ def _go_to_signet(view, direction):
 #-----------------------------------------------------------------------------------
 def _get_display_signet_rows(view):
     ''' Get all the signet row numbers in the view. Returns a sorted list. '''
+
     sig_rows = []
     for reg in view.get_regions(SIGNET_REGION_NAME):
         row, _ = view.rowcol(reg.a)
@@ -285,6 +289,7 @@ def _get_display_signet_rows(view):
 #-----------------------------------------------------------------------------------
 def _get_persist_rows(view, init_empty):
     ''' General helper to get the data values from collection. If init_empty and there are none, add a default value. '''
+    
     global _sigs
 
     vals = None # Default

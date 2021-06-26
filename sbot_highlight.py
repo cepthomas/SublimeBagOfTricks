@@ -26,29 +26,32 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
 
     def on_activated(self):
         ''' When focus/tab received. '''
-        view = self.view
-        global _views_inited
-        vid = view.id()
-        winid = view.window().id()
-        fn = view.file_name()
+        try:
+            view = self.view
+            global _views_inited
+            vid = view.id()
+            winid = view.window().id()
+            fn = view.file_name()
 
-        trace(TraceCat.ACTV, 'HighlightEvent.on_activated', fn, vid, winid, _views_inited)
+            trace(TraceCat.ACTV, 'HighlightEvent.on_activated', fn, vid, winid, _views_inited)
 
-        # Lazy init.
-        if fn is not None: # Sometimes this happens...
-            # Is the persist file read yet?
-            if winid not in _hls:
-                _open_hls(winid, view.window().project_file_name())
+            # Lazy init.
+            if fn is not None: # Sometimes this happens...
+                # Is the persist file read yet?
+                if winid not in _hls:
+                    _open_hls(winid, view.window().project_file_name())
 
-            # Init the view, maybe.
-            if vid not in _views_inited:
-                _views_inited.add(vid)
+                # Init the view, maybe.
+                if vid not in _views_inited:
+                    _views_inited.add(vid)
 
-                # Init the view with any persist values.
-                tokens = _get_persist_tokens(view, False)
-                if tokens is not None:
-                    for token, tparams in tokens.items():
-                        _highlight_view(view, token, tparams['whole_word'], tparams['scope'])
+                    # Init the view with any persist values.
+                    tokens = _get_persist_tokens(view, False)
+                    if tokens is not None:
+                        for token, tparams in tokens.items():
+                            _highlight_view(view, token, tparams['whole_word'], tparams['scope'])
+        except Exception as e:
+            plugin_exception(e)
 
 
     def on_load(self):
@@ -59,12 +62,15 @@ class HighlightEvent(sublime_plugin.ViewEventListener):
 
     def on_deactivated(self):
         ''' Save to file when focus/tab lost. '''
-        view = self.view
-        winid = view.window().id()
-        trace(TraceCat.ACTV, 'HighlightEvent.on_deactivated', view.id(), winid)
+        try:
+            view = self.view
+            winid = view.window().id()
+            trace(TraceCat.ACTV, 'HighlightEvent.on_deactivated', view.id(), winid)
 
-        if winid in _hls:
-            _save_hls(winid, view.window().project_file_name())
+            if winid in _hls:
+                _save_hls(winid, view.window().project_file_name())
+        except Exception as e:
+            plugin_exception(e)
 
 
     def on_close(self):
@@ -82,24 +88,27 @@ class SbotHighlightTextCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit, hl_index):
-        settings = sublime.load_settings(SETTINGS_FN)
-        highlight_scopes = settings.get('highlight_scopes')
+        try:
+            settings = sublime.load_settings(SETTINGS_FN)
+            highlight_scopes = settings.get('highlight_scopes')
 
-        # Get whole word or specific span.
-        region = self.view.sel()[0]
+            # Get whole word or specific span.
+            region = self.view.sel()[0]
 
-        whole_word = region.empty()
-        if whole_word:
-            region = self.view.word(region)
-        token = self.view.substr(region)
+            whole_word = region.empty()
+            if whole_word:
+                region = self.view.word(region)
+            token = self.view.substr(region)
 
-        hl_index %= len(highlight_scopes)
-        scope = highlight_scopes[hl_index]
-        tokens = _get_persist_tokens(self.view, True)
+            hl_index %= len(highlight_scopes)
+            scope = highlight_scopes[hl_index]
+            tokens = _get_persist_tokens(self.view, True)
 
-        if tokens is not None:
-            tokens[token] = { "scope": scope, "whole_word": whole_word }
-        _highlight_view(self.view, token, whole_word, scope)
+            if tokens is not None:
+                tokens[token] = { "scope": scope, "whole_word": whole_word }
+            _highlight_view(self.view, token, whole_word, scope)
+        except Exception as e:
+            plugin_exception(e)
 
 
 #-----------------------------------------------------------------------------------
@@ -107,77 +116,66 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
     ''' Clear all in this file.'''
 
     def run(self, edit):
-        global _hls
+        try:
+            global _hls
 
-        # Clean displayed colors.
-        settings = sublime.load_settings(SETTINGS_FN)
-        highlight_scopes = settings.get('highlight_scopes')
+            # Clean displayed colors.
+            settings = sublime.load_settings(SETTINGS_FN)
+            highlight_scopes = settings.get('highlight_scopes')
 
-        for i, value in enumerate(highlight_scopes):
-            reg_name = HIGHLIGHT_REGION_NAME % value
-            self.view.erase_regions(reg_name)
+            for i, value in enumerate(highlight_scopes):
+                reg_name = HIGHLIGHT_REGION_NAME % value
+                self.view.erase_regions(reg_name)
 
-        # Remove from persist collection.
-        winid = self.view.window().id()
-        fn = self.view.file_name()
-        del _hls[winid][fn]
+            # Remove from persist collection.
+            winid = self.view.window().id()
+            fn = self.view.file_name()
+            del _hls[winid][fn]
+        except Exception as e:
+            plugin_exception(e)
 
 
 #-----------------------------------------------------------------------------------
 def _save_hls(winid, stp_fn):
     ''' General project saver. '''
-    ok = True
+
     ppath = get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
 
-    if ppath is not None:
-        try:
-            # Remove invalid files and any empty values.
-            if winid in _hls:
-                for fn, _ in _hls[winid].items():
-                    if not os.path.exists(fn):
-                        del _hls[winid][fn]
-                    elif len(_hls[winid][fn]) == 0:
-                        del _hls[winid][fn]
+    # Remove invalid files and any empty values.
+    if winid in _hls:
+        for fn, _ in _hls[winid].items():
+            if not os.path.exists(fn):
+                del _hls[winid][fn]
+            elif len(_hls[winid][fn]) == 0:
+                del _hls[winid][fn]
 
-                # Now save.
-                with open(ppath, 'w') as fp:
-                    json.dump(_hls[winid], fp, indent=4)
-
-        except Exception as e:
-            unhandled_exception('Save highlights error', e)
-            ok = False
-
-    return ok
+        # Now save.
+        with open(ppath, 'w') as fp:
+            json.dump(_hls[winid], fp, indent=4)
 
 
 #-----------------------------------------------------------------------------------
 def _open_hls(winid, stp_fn):
     ''' General project opener. '''
+
     global _hls
-    ok = True
+
     ppath = get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
 
-    if ppath is not None:
-        try:
-            with open(ppath, 'r') as fp:
-                values = json.load(fp)
-                _hls[winid] = values
-
-        except FileNotFoundError as fe:
-            # Assumes new file.
-            sublime.status_message('Creating new highlights file')
-            _hls[winid] = { }
-
-        except Exception as e:
-            unhandled_exception('Open highlights error', e)
-            ok = False
-
-    return ok
+    if os.path.isfile(ppath):
+        with open(ppath, 'r') as fp:
+            values = json.load(fp)
+            _hls[winid] = values
+    else:
+        # Assumes new file.
+        sublime.status_message('Creating new highlights file')
+        _hls[winid] = { }
 
 
 #-----------------------------------------------------------------------------------
 def _highlight_view(view, token, whole_word, scope):
     ''' Colorize one token. '''
+
     escaped = re.escape(token)
     if whole_word and escaped[0].isalnum():
         escaped = r'\b%s\b' % escaped
@@ -190,6 +188,7 @@ def _highlight_view(view, token, whole_word, scope):
 #-----------------------------------------------------------------------------------
 def _get_persist_tokens(view, init_empty):
     ''' General helper to get the data values from collection. If init_empty and there are none, add a default value. '''
+    
     global _hls
     vals = None # Default
     winid = view.window().id()

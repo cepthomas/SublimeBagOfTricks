@@ -42,7 +42,7 @@ class TestCommon(unittest.TestCase):
         try:
             raise Exception('arg1', 'arg2', 'arg3')
         except Exception as e:
-            unhandled_exception('test_trace_error', e)
+            plugin_exception(e)
 
 if __name__ == '__main__':
     unittest.main()

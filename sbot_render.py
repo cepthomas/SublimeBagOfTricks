@@ -24,17 +24,20 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         self.view = view
 
     def run(self, edit, line_numbers):
-        self.line_numbers = line_numbers
-        render_max_file = self.settings.get('render_max_file')
+        try:
+            self.line_numbers = line_numbers
+            render_max_file = self.settings.get('render_max_file')
+            fsize = self.view.size() / 1024.0 / 1024.0
+            if fsize > render_max_file:
+                sublime.message_dialog('File too large to render. If you really want to, change your settings')
+            else:
+                self._do_render()
+                # Actually would like to run in a thread but takes 10x time, probably the GIL.
+                # t = threading.Thread(target=self._do_render)
+                # t.start()
+        except Exception as e:
+            plugin_exception(e)
 
-        fsize = self.view.size() / 1024.0 / 1024.0
-        if fsize > render_max_file:
-            sublime.message_dialog('File too large to render. If you really want to, change your settings')
-        else:
-            self._do_render()
-            # Actually would like to run in a thread but takes 10x time, probably the GIL.
-            # t = threading.Thread(target=self._do_render)
-            # t.start()
 
     def _update_status(self):
         ''' Runs in main thread. '''
@@ -256,25 +259,29 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     ''' Turn md into html.'''
 
     def run(self, edit):
-        # Get prefs.
-        settings = sublime.load_settings(SETTINGS_FN)
-        html_background = settings.get('html_background')
-        html_font_size = settings.get('html_font_size')
-        html_md_font_face = settings.get('html_md_font_face')
+        try:
+            # Get prefs.
+            settings = sublime.load_settings(SETTINGS_FN)
+            html_background = settings.get('html_background')
+            html_font_size = settings.get('html_font_size')
+            html_md_font_face = settings.get('html_md_font_face')
 
-        html = []
-        html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
-        html.append(f"<style>body {{ background-color:{html_background}; font-family:{html_md_font_face}; font-size:{html_font_size}; }}")
-        html.append("</style></head><body>")
-        # To support Unicode input, you must add <meta charset="utf-8"> to the *top* of your document (in the first 512 bytes).
+            html = []
+            html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
+            html.append(f"<style>body {{ background-color:{html_background}; font-family:{html_md_font_face}; font-size:{html_font_size}; }}")
+            html.append("</style></head><body>")
+            # To support Unicode input, you must add <meta charset="utf-8"> to the *top* of your document (in the first 512 bytes).
 
-        for region in get_sel_regions(self.view):
-            html.append(self.view.substr(region))
+            for region in get_sel_regions(self.view):
+                html.append(self.view.substr(region))
 
-        html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
-        html.append("</body></html>")
+            html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
+            html.append("</body></html>")
 
-        _output_html(self.view, '\n'.join(html))
+            _output_html(self.view, '\n'.join(html))
+        except Exception as e:
+            plugin_exception(e)
+    
 
     def is_visible(self):
         return self.view.settings().get('syntax').endswith('Markdown.sublime-syntax')
