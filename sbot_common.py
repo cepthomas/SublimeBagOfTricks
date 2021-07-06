@@ -79,7 +79,7 @@ def plugin_exception(exc):
     This gives us a chance to do something before they are swallowed and dumped to the console.
     '''
     st = traceback.format_exc()
-    # trace(TraceCat.ERROR, st)
+    trace(TraceCat.ERROR, st)
     sublime.error_message(f'Runtime error\n{st}')
 
 

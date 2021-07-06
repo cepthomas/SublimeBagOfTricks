@@ -141,17 +141,18 @@ def _save_hls(winid, stp_fn):
 
     ppath = get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
 
-    # Remove invalid files and any empty values.
-    if winid in _hls:
-        for fn, _ in _hls[winid].items():
-            if not os.path.exists(fn):
-                del _hls[winid][fn]
-            elif len(_hls[winid][fn]) == 0:
-                del _hls[winid][fn]
+    if ppath is not None:
+        # Remove invalid files and any empty values.
+        if winid in _hls:
+            for fn, _ in _hls[winid].items():
+                if not os.path.exists(fn):
+                    del _hls[winid][fn]
+                elif len(_hls[winid][fn]) == 0:
+                    del _hls[winid][fn]
 
-        # Now save.
-        with open(ppath, 'w') as fp:
-            json.dump(_hls[winid], fp, indent=4)
+            # Now save.
+            with open(ppath, 'w') as fp:
+                json.dump(_hls[winid], fp, indent=4)
 
 
 #-----------------------------------------------------------------------------------
@@ -159,10 +160,9 @@ def _open_hls(winid, stp_fn):
     ''' General project opener. '''
 
     global _hls
-
     ppath = get_persistence_path(stp_fn, HIGHLIGHT_FILE_EXT)
 
-    if os.path.isfile(ppath):
+    if ppath is not None and os.path.isfile(ppath):
         with open(ppath, 'r') as fp:
             values = json.load(fp)
             _hls[winid] = values

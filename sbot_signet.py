@@ -170,17 +170,18 @@ def _save_sigs(winid, stp_fn):
 
     ppath = get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
-    # Remove invalid files and any empty values.
-    if winid in _sigs:
-        for fn, _ in _sigs[winid].items():
-            if not os.path.exists(fn):
-                del _sigs[winid][fn]
-            elif len(_sigs[winid][fn]) == 0:
-                del _sigs[winid][fn]
+    if ppath is not None:
+        # Remove invalid files and any empty values.
+        if winid in _sigs:
+            for fn, _ in _sigs[winid].items():
+                if not os.path.exists(fn):
+                    del _sigs[winid][fn]
+                elif len(_sigs[winid][fn]) == 0:
+                    del _sigs[winid][fn]
 
-        # Now save.
-        with open(ppath, 'w') as fp:
-            json.dump(_sigs[winid], fp, indent=4)
+            # Now save.
+            with open(ppath, 'w') as fp:
+                json.dump(_sigs[winid], fp, indent=4)
 
 #-----------------------------------------------------------------------------------
 def _open_sigs(winid, stp_fn):
@@ -189,7 +190,7 @@ def _open_sigs(winid, stp_fn):
     global _sigs
     ppath = get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
-    if os.path.isfile(ppath):
+    if ppath is not None and os.path.isfile(ppath):
         with open(ppath, 'r') as fp:
             values = json.load(fp)
             _sigs[winid] = values
