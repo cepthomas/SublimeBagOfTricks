@@ -92,14 +92,15 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         try:
             if len(paths) > 0:
-                cp = subprocess.run([paths[0]], universal_newlines=True, capture_output=True, shell=True)
+                p = ['python', paths[0]] if paths[0].endswith('.py') else [paths[0]]
+                cp = subprocess.run(p, universal_newlines=True, capture_output=True, shell=True)
                 create_new_view(self.window, cp.stdout)
         except Exception as e:
             plugin_exception(e)
 
 
     def is_visible(self, paths):
-        vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat']
+        vis = len(paths) > 0 and os.path.splitext(paths[0])[1] in ['.exe', '.cmd', '.bat', '.py']
         return vis
 
 
