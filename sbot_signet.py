@@ -174,10 +174,11 @@ def _save_sigs(winid, stp_fn):
         # Remove invalid files and any empty values.
         if winid in _sigs:
             for fn, _ in _sigs[winid].items():
-                if not os.path.exists(fn):
-                    del _sigs[winid][fn]
-                elif len(_sigs[winid][fn]) == 0:
-                    del _sigs[winid][fn]
+                if fn is not None:
+                    if not os.path.exists(fn):
+                        del _sigs[winid][fn]
+                    elif len(_sigs[winid][fn]) == 0:
+                        del _sigs[winid][fn]
 
             # Now save.
             with open(ppath, 'w') as fp:
@@ -252,13 +253,14 @@ def _go_to_signet(view, direction):
         winid = window.id()
 
         for fn, rows in _sigs[winid].items():
-            if window.find_open_file(fn) is None and os.path.exists(fn) and len(rows) > 0:
-                vv = window.open_file(fn)
-                endrow = rows[array_end]
-                sublime.set_timeout(lambda r=endrow: wait_load_file(vv, r), 10) # already 1-based in file
-                window.focus_view(vv)
-                done = True
-                break
+            if fn is not None:
+                if window.find_open_file(fn) is None and os.path.exists(fn) and len(rows) > 0:
+                    vv = window.open_file(fn)
+                    endrow = rows[array_end]
+                    sublime.set_timeout(lambda r=endrow: wait_load_file(vv, r), 10) # already 1-based in file
+                    window.focus_view(vv)
+                    done = True
+                    break
 
     # 4) NEXT_SIG: Else >>> find first tab/file with signets, focus tab, goto first signet
     # 4) PREV_SIG: Else >>> find last tab/file with signets, focus tab, goto last signet

@@ -129,8 +129,9 @@ class SbotClearHighlightsCommand(sublime_plugin.TextCommand):
 
             # Remove from persist collection.
             winid = self.view.window().id()
-            fn = self.view.file_name()
-            del _hls[winid][fn]
+            if winid in _hls:
+                fn = self.view.file_name()
+                del _hls[winid][fn]
         except Exception as e:
             plugin_exception(e)
 
@@ -145,10 +146,11 @@ def _save_hls(winid, stp_fn):
         # Remove invalid files and any empty values.
         if winid in _hls:
             for fn, _ in _hls[winid].items():
-                if not os.path.exists(fn):
-                    del _hls[winid][fn]
-                elif len(_hls[winid][fn]) == 0:
-                    del _hls[winid][fn]
+                if fn is not None:
+                    if not os.path.exists(fn):
+                        del _hls[winid][fn]
+                    elif len(_hls[winid][fn]) == 0:
+                        del _hls[winid][fn]
 
             # Now save.
             with open(ppath, 'w') as fp:
