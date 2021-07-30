@@ -126,11 +126,13 @@ Trimming etc.
 
 ## Format
 Prettify json and xml. Was also going to handle html but it's easier to just to used an online formatter for this very occasional need.
+Also C family files using AStyle (must be in your path).
 
 | Command                  | Description |
 |:--------                 |:-------     |
 | sbot_format_json         | Format json content and show in new view - makes C/C++ comments into valid json elements and removes any trailing commas |
 | sbot_format_xml          | Format xml content and show in new view |
+| sbot_format_SRC          | Format C/C++/C# content and show in new view |
 
 
 ## Miscellany

@@ -258,6 +258,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
     ''' Turn md into html.'''
 
+    def is_visible(self):
+        return self.view.settings().get('syntax') == SYNTAX_MD
+
     def run(self, edit):
         try:
             # Get prefs.
@@ -281,10 +284,6 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
             _output_html(self.view, '\n'.join(html))
         except Exception as e:
             plugin_exception(e)
-    
-
-    def is_visible(self):
-        return self.view.settings().get('syntax').endswith('Markdown.sublime-syntax')
 
 
 #-----------------------------------------------------------------------------------

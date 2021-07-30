@@ -15,6 +15,16 @@ print('Python: load sbot_common')
 SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
 HIGHLIGHT_REGION_NAME = 'highlight_%s'
 
+# Syntax defs.
+SYNTAX_C =      'Packages/C++/C.sublime-syntax'
+SYNTAX_CPP =    'Packages/C++/C++.sublime-syntax'
+SYNTAX_CS =     'Packages/C#/C#.sublime-syntax'
+SYNTAX_PYTHON = 'Packages/Python/Python.sublime-syntax'
+SYNTAX_JSON =   'Packages/JSON/JSON.sublime-syntax'
+SYNTAX_TEXT =   'Packages/Text/Plain text.tmLanguage'
+SYNTAX_XML =    'Packages/XML/XML.sublime-syntax'
+SYNTAX_MD =     'Packages/Markdown/Markdown.sublime-syntax'
+
 
 # Debug/trace stuff.
 class TraceCat(enum.Flag):
@@ -136,3 +146,4 @@ def get_persistence_path(stp_fn, ext):
 def get_temp_path():
     ''' Accessor. '''
     return _temp_path
+

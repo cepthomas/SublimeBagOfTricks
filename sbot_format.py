@@ -3,6 +3,7 @@ import json
 import string
 import re
 import enum
+import subprocess
 import xml
 import xml.dom.minidom
 import sublime_plugin
@@ -17,7 +18,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
     ''' sbot_format_json'''
 
     def is_visible(self):
-        # return self.view.settings().get('syntax').endswith('JSON.sublime-syntax')
+        # return self.view.settings().get('syntax') == SYNTAX_JSON
         return True
 
     def run(self, edit):
@@ -34,7 +35,7 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
 
             vnew = create_new_view(self.view.window(), '\n'.join(sres))
             if not err:
-                vnew.set_syntax_file('Packages/JavaScript/JSON.sublime-syntax')
+                vnew.set_syntax_file(SYNTAX_JSON)
         except Exception as e:
             plugin_exception(e)
 
@@ -180,7 +181,7 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
     ''' sbot_format_xml'''
 
     def is_visible(self):
-        return self.view.settings().get('syntax').endswith('XML.sublime-syntax')
+        return self.view.settings().get('syntax') == SYNTAX_XML
 
     def run(self, edit):
         try:
@@ -194,7 +195,7 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
 
             vnew = create_new_view(self.view.window(), s)
             if not err:
-                vnew.set_syntax_file('Packages/XML/XML.sublime-syntax')
+                vnew.set_syntax_file(SYNTAX_XML)
         except Exception as e:
             plugin_exception(e)
 
@@ -215,3 +216,37 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
         ret = top.toprettyxml(indent='    ')
 
         return ret
+
+
+#-----------------------------------------------------------------------------------
+class SbotFormatSrcCommand(sublime_plugin.TextCommand):
+    ''' sbot_format_src'''
+
+    def is_visible(self):
+        syntax = self.view.settings().get('syntax')
+        return syntax in [ SYNTAX_C, SYNTAX_CPP, SYNTAX_CS ]
+
+    def run(self, edit):
+        try:
+            syntax = self.view.settings().get('syntax')
+
+            reg = get_sel_regions(self.view)[0]
+            s = self.view.substr(reg)
+
+            # Build the command.
+            p = ['astyle', '-A1', '-s4', '-Y', '-X' ]
+            if syntax == SYNTAX_CS:
+                p.append('--mode=cs')
+            # type tin.c | astyle -A1 -s4 -Y -X > tout.c
+            # --style=allman -A1
+            # --indent=spaces=4  -s4
+            # --indent-col1-comments -Y
+            # --verbose -v
+            # --errors-to-stdout -X
+            # --mode=c or --mode=cs
+
+            cp = subprocess.run(p, input=s, text=True, universal_newlines=True, capture_output=True, shell=True)
+            vnew = create_new_view(self.view.window(), cp.stdout)
+            vnew.set_syntax_file(syntax)
+        except Exception as e:
+            plugin_exception(e)
