@@ -28,16 +28,19 @@ class SignetEvent(sublime_plugin.ViewEventListener):
     def on_activated(self):
         ''' When focus/tab received. '''
         try:
-            view = self.view
             global _views_inited
-            vid = view.id()
-            winid = view.window().id()
+
+            view = self.view
             fn = view.file_name()
 
-            trace(TraceCat.ACTV, 'SignetEvent.on_activated', fn, vid, winid)
+            # Ignore transient views.
+            if view.is_scratch() is False and fn is not None:
+                vid = view.id()
+                winid = view.window().id()
 
-            # Lazy init.
-            if fn is not None: # Sometimes this happens...
+                trace(TraceCat.ACTV, 'SignetEvent.on_activated', fn, vid, winid)
+
+                # Lazy init.
                 # Is the persist file read yet?
                 if winid not in _sigs:
                     _open_sigs(winid, view.window().project_file_name())
@@ -90,6 +93,11 @@ class SignetEvent(sublime_plugin.ViewEventListener):
 class SbotToggleSignetCommand(sublime_plugin.TextCommand):
     ''' Flip the signet. '''
 
+    def is_visible(self):
+        ''' Don't allow signets in temp views. '''
+        return self.view.is_scratch() is False and self.view.file_name() is not None
+
+
     def run(self, edit):
         try:
             # Get current row.
@@ -126,7 +134,7 @@ class SbotToggleSignetCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotNextSignetCommand(sublime_plugin.TextCommand):
-    ''' Navigate to signet in whole collection. '''
+    ''' Navigate to next signet in whole collection. '''
 
     def run(self, edit):
         try:
@@ -137,7 +145,7 @@ class SbotNextSignetCommand(sublime_plugin.TextCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotPreviousSignetCommand(sublime_plugin.TextCommand):
-    ''' Navigate to signet in whole collection. '''
+    ''' Navigate to previous signet in whole collection. '''
 
     def run(self, edit):
         try:
@@ -189,6 +197,7 @@ def _open_sigs(winid, stp_fn):
     ''' General project opener. '''
 
     global _sigs
+
     ppath = get_persistence_path(stp_fn, SIGNET_FILE_EXT)
 
     if ppath is not None and os.path.isfile(ppath):
@@ -203,7 +212,7 @@ def _open_sigs(winid, stp_fn):
 
 #-----------------------------------------------------------------------------------
 def _go_to_signet(view, direction):
-    ''' Navigate to signet in whole collection. direction is NEXT_SIG or PREV_SIG. '''
+    ''' Common navigate to signet in whole collection. direction is NEXT_SIG or PREV_SIG. '''
 
     window = view.window()
 
