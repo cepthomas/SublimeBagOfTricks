@@ -17,7 +17,11 @@
 
 void common_uint32ToBytes(uint32_t val, uint8_t* bytes, bool lend){
     if(lend)    {
-    bytes[0] = (val) & 0xFF;
+    bytes[0] = (val) & 0xFF; /*
+
+c style comment
+*/    
+
     bytes[1] = (val >> 8) & 0xFF;
     bytes[2] = (val >> 16) & 0xFF;
     bytes[3] = (val >> 24) & 0xFF;

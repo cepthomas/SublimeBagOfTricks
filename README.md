@@ -132,7 +132,7 @@ Also C family files using AStyle (must be in your path).
 |:--------                 |:-------     |
 | sbot_format_json         | Format json content and show in new view - makes C/C++ comments into valid json elements and removes any trailing commas |
 | sbot_format_xml          | Format xml content and show in new view |
-| sbot_format_SRC          | Format C/C++/C# content and show in new view |
+| sbot_format_cx_src       | Format C/C++/C# content and show in new view |
 
 
 ## Miscellany

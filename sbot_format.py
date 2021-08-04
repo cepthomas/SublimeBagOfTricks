@@ -219,7 +219,7 @@ class SbotFormatXmlCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotFormatSrcCommand(sublime_plugin.TextCommand):
+class SbotFormatCxSrcCommand(sublime_plugin.TextCommand):
     ''' sbot_format_src'''
 
     def is_visible(self):
