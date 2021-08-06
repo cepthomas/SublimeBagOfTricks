@@ -17,7 +17,6 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 |:--------                 |:-------     |
 | persistence_path         | Where to store signet and highlight persistence.<br/>`'local'` is sublime-project location<br/>`'store'` is package store<br/>`''` is transient |
 | sel_all                  | Option for selection defaults: if true and no user selection, assumes the whole document (like ST) |
-| stdio_hook               | Experimental stdout/stderr capture - default is false. |
 
 
 ## Highlighting
@@ -125,14 +124,15 @@ Trimming etc.
 
 
 ## Format
-Prettify json and xml. Was also going to handle html but it's easier to just to used an online formatter for this very occasional need.
+Prettify json and xml and show in a new view.
+Was also going to handle html but it's easier to use external or online formatter for this very occasional need.
 Also C family files using AStyle (must be in your path).
 
 | Command                  | Description |
 |:--------                 |:-------     |
-| sbot_format_json         | Format json content and show in new view - makes C/C++ comments into valid json elements and removes any trailing commas |
-| sbot_format_xml          | Format xml content and show in new view |
-| sbot_format_cx_src       | Format C/C++/C# content and show in new view |
+| sbot_format_json         | Format json content - makes C/C++ comments into valid json elements and removes any trailing commas |
+| sbot_format_xml          | Format xml content |
+| sbot_format_cx_src       | Format C/C++/C# content |
 
 
 ## Miscellany
@@ -178,7 +178,7 @@ Because ST takes ownership of the python module loading and execution, it just d
 to the console. This can be annoying because it means you have to have the console open pretty much all the time.
 First attempt was to hook the console stdout but it was not very cooperative. So now there are try/except around all the
 ST callback functions and this works to catch runtime errors and pop up a message box. Import/parse errors still go to the
-console so you have to keep an eye open there while developing but they should disappear quickly.
+console so you have to keep an eye open there while developing but they should resolve quickly.
 
 
 ## Event Handling
@@ -211,8 +211,10 @@ get called. Safest is to only use it once.
 
 ## Module Loading
 ST doesn't load modules like plain python and can cause some surprises.
+The problem is that sbot_common gets reloaded but it appears to be a different module from the one linked to by the other modules.
+This makes handling globals difficult. Modules that are common cannot store meaningful state.
 
-Here's a startup sequence:
+Here's some startup sequence:
 ```
 ...
 ST: reloading plugin Default.*
@@ -246,6 +248,3 @@ ST: reloading plugin SublimeBagOfTricks.sbot_common
 Python: load sbot_common
 ...
 ```
-
-The problem is that sbot_common gets reloaded but it appears to be a different module from the one linked to by the other modules.
-This makes handling globals difficult. Modules that are common cannot store meaningful state.

@@ -33,14 +33,13 @@ class TraceCat(enum.Flag):
     LOOK  = enum.auto() # make it stand out in file
     ACTV  = enum.auto() # on_activated, on_deactivated
     LOAD  = enum.auto() # on_load, on_close
-    STDO  = enum.auto() # stdio/stderr
 
 
 # Stuff to hang on to.
 _temp_path = None
 _store_path = None
 _trace_fn = None
-_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO | TraceCat.STDO # | TraceCat.LOAD | TraceCat.ACTV
+_trace_cat = TraceCat.ERROR | TraceCat.LOOK | TraceCat.INFO # | TraceCat.LOAD | TraceCat.ACTV
 
 
 #-----------------------------------------------------------------------------------
