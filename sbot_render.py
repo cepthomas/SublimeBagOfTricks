@@ -270,17 +270,13 @@ class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
             html_md_font_face = settings.get('html_md_font_face')
 
             html = []
-            html.append("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
-            html.append(f"<style>body {{ background-color:{html_background}; font-family:{html_md_font_face}; font-size:{html_font_size}; }}")
-            html.append("</style></head><body>")
+            html.append(f"<style>body {{ background-color:{html_background}; font-family:{html_md_font_face}; font-size:{html_font_size}; }}</style>")
             # To support Unicode input, you must add <meta charset="utf-8"> to the *top* of your document (in the first 512 bytes).
 
             for region in get_sel_regions(self.view):
                 html.append(self.view.substr(region))
 
             html.append("<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre}</style><script src=\"markdeep.min.js\" charset=\"utf-8\"></script><script src=\"https://casual-effects.com/markdeep/latest/markdeep.min.js\" charset=\"utf-8\"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>")
-            html.append("</body></html>")
-
             _output_html(self.view, '\n'.join(html))
         except Exception as e:
             plugin_exception(e)
