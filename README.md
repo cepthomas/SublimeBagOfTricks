@@ -105,6 +105,7 @@ Commands added to the sidebar. Like SideBarEnhancements but just the stuff I wan
 |:--------                 |:-------     |
 | sbot_sidebar_copy_name   | Copy file/dir name to clipboard |
 | sbot_sidebar_copy_path   | Copy full file/dir path to clipboard |
+| sbot_sidebar_copy_file   | Copy selected file to a new file in the same folder |
 | sbot_sidebar_terminal    | Open a Windows Terminal here |
 | sbot_sidebar_open_folder | Open a Windows Explorer here |
 | sbot_sidebar_open_browser| Open html file in your browser |

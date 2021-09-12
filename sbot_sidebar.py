@@ -1,6 +1,7 @@
 import os
 import subprocess
 import webbrowser
+import shutil
 import sublime
 import sublime_plugin
 from sbot_common import *
@@ -30,6 +31,33 @@ class SbotSidebarCopyPathCommand(sublime_plugin.WindowCommand):
             sublime.set_clipboard('\n'.join(paths))
         except Exception as e:
             plugin_exception(e)
+
+
+#-----------------------------------------------------------------------------------
+class SbotSidebarCopyFileCommand(sublime_plugin.WindowCommand):
+    ''' Copy selected file to the same dir. '''
+
+    def run(self, paths):
+        ok = False
+        try:
+            fn = paths[0]
+            # Find a valid file name.
+            root, ext = os.path.splitext(fn)
+            for i in range(1, 9):
+                newfn = f'{root}_{i}.{ext}'
+                if not os.path.isfile(newfn):
+                    shutil.copyfile(fn, newfn)
+                    ok = True
+                    break
+        except Exception as e:
+            plugin_exception(e)
+
+        if not ok:
+            sublime.status_message("Couldn't copy file")    
+
+    def is_visible(self, paths):
+        vis = len(paths) > 0 and os.path.isfile(paths[0])
+        return vis
 
 
 #-----------------------------------------------------------------------------------
