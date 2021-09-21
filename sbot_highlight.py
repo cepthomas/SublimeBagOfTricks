@@ -152,9 +152,12 @@ def _save_hls(winid, stp_fn):
                     elif len(_hls[winid][fn]) == 0:
                         del _hls[winid][fn]
 
-            # Now save.
-            with open(ppath, 'w') as fp:
-                json.dump(_hls[winid], fp, indent=4)
+            # Now save, or delete if empty.
+            if len(_hls[winid]) > 0:
+                with open(ppath, 'w') as fp:
+                    json.dump(_hls[winid], fp, indent=4)
+            elif os.path.isfile(ppath):
+                os.remove(ppath)
 
 
 #-----------------------------------------------------------------------------------

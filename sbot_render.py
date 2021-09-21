@@ -181,9 +181,6 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
         # Done all lines.
         
-        # trace('loop:', pc.dump())
-        # return
-
         ## Create css.
         style_text = ""
         for style, stid in all_styles.items():

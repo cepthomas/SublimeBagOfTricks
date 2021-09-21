@@ -167,7 +167,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
                 if found:
                     self.window.set_project_data(pdata)
                 else:
-                    trace('not found:', paths[0])
+                    trace(TraceCat.ERROR, 'not found:', paths[0]) # Fails if folder moved.
         except Exception as e:
             plugin_exception(e)
 

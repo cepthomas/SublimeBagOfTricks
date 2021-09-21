@@ -43,7 +43,6 @@ def _render_scopes(scopes, view):
 
     for scope in scopes:
         style = view.style_for_scope(scope)
-        # trace(scope, style)
         props = f'{{ color:{style["foreground"]}; '
         props2 = f'fg:{style["foreground"]} '
         if 'background' in style:

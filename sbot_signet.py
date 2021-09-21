@@ -188,9 +188,13 @@ def _save_sigs(winid, stp_fn):
                     elif len(_sigs[winid][fn]) == 0:
                         del _sigs[winid][fn]
 
-            # Now save.
-            with open(ppath, 'w') as fp:
-                json.dump(_sigs[winid], fp, indent=4)
+            # Now save, or delete if empty.
+            if len(_sigs[winid]) > 0:
+                with open(ppath, 'w') as fp:
+                    json.dump(_sigs[winid], fp, indent=4)
+            elif os.path.isfile(ppath):
+                os.remove(ppath)
+
 
 #-----------------------------------------------------------------------------------
 def _open_sigs(winid, stp_fn):
