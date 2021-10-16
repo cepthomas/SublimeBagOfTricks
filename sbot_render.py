@@ -252,7 +252,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotRenderMarkdownCommand(sublime_plugin.TextCommand):
+class SbotRenderMarkdownCommand(sublime_plugin.TextCommand): # Need a multi-file combining type like Neb.
     ''' Turn md into html.'''
 
     def is_visible(self):

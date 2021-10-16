@@ -11,6 +11,12 @@ print('Python: load sbot_sidebar')
 
 
 #-----------------------------------------------------------------------------------
+def get_dir(paths):
+    path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+    return path
+
+
+#-----------------------------------------------------------------------------------
 class SbotSidebarCopyNameCommand(sublime_plugin.WindowCommand):
     ''' Get file name to clipboard. '''
 
@@ -44,7 +50,7 @@ class SbotSidebarCopyFileCommand(sublime_plugin.WindowCommand):
             # Find a valid file name.
             root, ext = os.path.splitext(fn)
             for i in range(1, 9):
-                newfn = f'{root}_{i}.{ext}'
+                newfn = f'{root}_{i}{ext}'
                 if not os.path.isfile(newfn):
                     shutil.copyfile(fn, newfn)
                     ok = True
@@ -67,7 +73,7 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         try:
             if len(paths) > 0:
-                path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+                path = get_dir(paths)
                 cmd = f'wt -d "{path}"'
                 subprocess.run(cmd, shell=True)
         except Exception as e:
@@ -81,7 +87,7 @@ class SbotSidebarOpenFolderCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         try:
             if len(paths) > 0:
-                path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+                path = get_dir(paths)
                 cmd = f'explorer "{path}"'
                 subprocess.run(cmd, shell=True)
         except Exception as e:
@@ -89,7 +95,7 @@ class SbotSidebarOpenFolderCommand(sublime_plugin.WindowCommand):
 
 
     def is_visible(self, paths):
-        vis = len(paths) > 0 # and os.path.isdir(paths[0])
+        vis = len(paths) > 0
         return vis
 
 
@@ -100,7 +106,7 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         try:
             if len(paths) > 0:
-                path = paths[0] if os.path.isdir(paths[0]) else os.path.split(paths[0])[0]
+                path = get_dir(paths)
                 cmd = f'tree "{path}" /a /f'
                 cp = subprocess.run(cmd, universal_newlines=True, capture_output=True, shell=True)
                 create_new_view(self.window, cp.stdout)
@@ -109,7 +115,7 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
 
 
     def is_visible(self, paths):
-        vis = len(paths) > 0 # and os.path.isdir(paths[0])
+        vis = len(paths) > 0
         return vis
 
 
@@ -120,8 +126,9 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
     def run(self, paths):
         try:
             if len(paths) > 0:
-                p = ['python', paths[0]] if paths[0].endswith('.py') else [paths[0]]
-                cp = subprocess.run(p, universal_newlines=True, capture_output=True, shell=True)
+                path = get_dir(paths)
+                cmd = ['python', paths[0]] if paths[0].endswith('.py') else [paths[0]]
+                cp = subprocess.run(cmd, universal_newlines=True, capture_output=True, shell=True, cwd=path)
                 create_new_view(self.window, cp.stdout)
         except Exception as e:
             plugin_exception(e)
@@ -134,7 +141,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
-    ''' Remove from project. '''
+    ''' Remove from project. Supplements builtin remove_folder. '''
 
     def run(self, paths):
         try:
@@ -142,7 +149,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
                 pdata = self.window.project_data()
 
                 exclude = paths[0]
-                path = exclude if os.path.isdir(exclude) else os.path.split(exclude)[0]
+                path = get_dir(paths)
                 fn = self.window.project_file_name()
 
                 # Locate the folder.
@@ -174,7 +181,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
     def is_visible(self, paths):
         vis = True
         try:
-            # Disallow project folders - they should use builtin remove_folder.
+            # Disallow project folders - should use builtin remove_folder.
             if len(paths) > 0:
                 if os.path.isdir(paths[0]):
                     pdata = self.window.project_data()
