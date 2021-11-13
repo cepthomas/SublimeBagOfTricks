@@ -64,7 +64,7 @@ class SbotShowEolCommand(sublime_plugin.TextCommand):
                 eols = []
                 ind = 0
                 while 1:
-                    freg = self.view.find('[\n\r]', ind)
+                    freg = self.view.find('[\n\r]', ind) # TODO this doesn't work as ST normalizes endings. See what hexviewer does?
                     if freg is not None and not freg.empty(): # second condition is not documented!!
                         eols.append(freg)
                         ind = freg.end() + 1

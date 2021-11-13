@@ -161,7 +161,7 @@ class SbotSidebarExcludeCommand(sublime_plugin.WindowCommand):
                     if path.startswith(apath):
                         # Make a relative ref.
                         rpath = os.path.relpath(exclude, apath)
-                        patfold = "folder_exclude_patterns" if os.path.isdir(exclude) else "file_exclude_patterns"
+                        patfold = "folder_exclude_patterns" if os.path.isdir(exclude) else "file_exclude_patterns" # TODO this doesn't work for subdirs - ST thing - needs combo include/exclude
 
                         try:
                             folder[patfold].append(rpath)
