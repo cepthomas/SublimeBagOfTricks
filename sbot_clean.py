@@ -1,5 +1,5 @@
 import re
-#import sublime
+import sublime
 import sublime_plugin
 from sbot_common import *
 
