@@ -68,7 +68,7 @@ class SbotSidebarCopyFileCommand(sublime_plugin.WindowCommand):
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
-    ''' Open win32 term here. '''
+    ''' Open term here. '''
 
     def run(self, paths):
         try:
@@ -80,9 +80,14 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
             plugin_exception(e)
 
 
+    def is_visible(self, paths):
+        vis = os.name == 'nt'
+        return vis
+
+
 #-----------------------------------------------------------------------------------
 class SbotSidebarOpenFolderCommand(sublime_plugin.WindowCommand):
-    ''' Open current folder win32. '''
+    ''' Open current folder. '''
 
     def run(self, paths):
         try:
@@ -95,13 +100,13 @@ class SbotSidebarOpenFolderCommand(sublime_plugin.WindowCommand):
 
 
     def is_visible(self, paths):
-        vis = len(paths) > 0
+        vis = os.name == 'nt' and len(paths) > 0
         return vis
 
 
 #-----------------------------------------------------------------------------------
 class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
-    ''' Run tree command to clipboard win32. '''
+    ''' Run tree command to clipboard. '''
 
     def run(self, paths):
         try:
@@ -115,7 +120,7 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
 
 
     def is_visible(self, paths):
-        vis = len(paths) > 0
+        vis = os.name == 'nt' and len(paths) > 0
         return vis
 
 
