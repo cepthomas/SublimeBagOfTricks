@@ -8,7 +8,7 @@ import pathlib
 import sublime
 import sublime_plugin
 
-print('Python: load sbot_common')
+# print('Python: load sbot_common')
 
 
 # Definitions.

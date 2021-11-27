@@ -10,7 +10,7 @@ import sublime_plugin
 from sbot_common import *
 
 
-print('Python: load sbot_format')
+# print('Python: load sbot_format')
 
 
 #-----------------------------------------------------------------------------------

@@ -4,7 +4,7 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-print('Python: load sbot_signet')
+# print('Python: load sbot_signet')
 
 
 # Definitions.

@@ -3,7 +3,7 @@ import re
 import sublime_plugin
 from sbot_common import *
 
-print('Python: load sbot_clean')
+# print('Python: load sbot_clean')
 
 
 #-----------------------------------------------------------------------------------

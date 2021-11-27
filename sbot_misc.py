@@ -4,7 +4,7 @@ import sublime_plugin
 from sbot_common import *
 
 
-print('Python: load sbot_misc')
+# print('Python: load sbot_misc')
 
 # Misc commands that don't currently warrant their own module.
 

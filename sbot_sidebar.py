@@ -7,7 +7,7 @@ import sublime_plugin
 from sbot_common import *
 
 
-print('Python: load sbot_sidebar')
+# print('Python: load sbot_sidebar')
 
 
 #-----------------------------------------------------------------------------------
