@@ -180,7 +180,7 @@ def _save_sigs(winid, stp_fn):
 
     if ppath is not None:
         # Remove invalid files and any empty values.
-        if winid in _sigs:
+        if winid in _sigs.copy():
             for fn, _ in _sigs[winid].items():
                 if fn is not None:
                     if not os.path.exists(fn):

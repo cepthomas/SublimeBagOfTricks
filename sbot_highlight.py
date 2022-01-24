@@ -144,7 +144,7 @@ def _save_hls(winid, stp_fn):
 
     if ppath is not None:
         # Remove invalid files and any empty values.
-        if winid in _hls:
+        if winid in _hls.copy():
             for fn, _ in _hls[winid].items():
                 if fn is not None:
                     if not os.path.exists(fn):
