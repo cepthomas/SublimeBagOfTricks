@@ -59,4 +59,10 @@
             },
         ]
     },
+    
+    {
+        "id": "phantoms",
+        "caption": "Phantoms",
+        "command": "sbot_test_phantoms"
+    },
 ]

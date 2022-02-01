@@ -206,13 +206,13 @@ Is instantiated once per window (ST instance):
 - `on_pre_close_window()` seems to work.
 
 ### Global
-ST says `plugin_loaded()` fires only once for all instances of sublime. However you can add this to each module and they all
-get called. Safest is to only use it once.
+ST says `plugin_loaded()` fires only once for all instances of sublime. However you can add this to 
+each module and they all get called. Safest is to only use it once.
 
 
 ## Module Loading
-ST doesn't load modules like plain python and can cause some surprises.
-The problem is that sbot_common gets reloaded but it appears to be a different module from the one linked to by the other modules.
+ST doesn't load modules like plain python and can cause some surprises. The problem is that sbot_common
+gets reloaded but it appears to be a different module from the one linked to by the other modules.
 This makes handling globals difficult. Modules that are common cannot store meaningful state.
 
 Here's some startup sequence:
