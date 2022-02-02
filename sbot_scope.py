@@ -8,9 +8,10 @@ from sbot_common import *
 # print('Python: load sbot_scope')
 
 
+
 #-----------------------------------------------------------------------------------
 class SbotShowScopesCommand(sublime_plugin.TextCommand):
-    ''' Show style info for common scopes. List from https://www.sublimetext.com/docs/3/scope_naming.html. '''
+    ''' Show style info for common scopes. '''
 
     def run(self, edit):
         try:
@@ -32,6 +33,15 @@ class SbotScopeInfoCommand(sublime_plugin.TextCommand):
             _render_scopes(scopes, self.view)
         except Exception as e:
             plugin_exception(e)
+
+
+#-----------------------------------------------------------------------------------
+def _copy_scopes(view, scopes):
+    ''' Copy to clipboard. '''
+
+    sublime.set_clipboard('\n'.join(scopes))
+    view.hide_popup()
+    sublime.status_message('Scope name copied to clipboard')
 
 
 #-----------------------------------------------------------------------------------
@@ -68,6 +78,8 @@ def _render_scopes(scopes, view):
         <body>
             <style> p {{ margin: 0em; }} {st} </style>
             {ct}
-        </body>'''
+        </body>
+        <a href="_copy_scopes">Copy</a>
+        '''
 
-    view.show_popup(html, max_width=512, max_height=600)
+    view.show_popup(html, max_width=512, max_height=600, on_navigate=lambda x: _copy_scopes(view, scopes))
