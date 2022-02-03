@@ -59,10 +59,20 @@
             },
         ]
     },
-    
+
     {
-        "id": "phantoms",
-        "caption": "Phantoms",
-        "command": "sbot_test_phantoms"
+        "id": "dev",
+        "caption": "Dev",
+        "children":
+        [
+            {
+                "caption": "Panel",
+                "command": "sbot_test_panel"
+            },
+            {
+                "caption": "Phantoms",
+                "command": "sbot_test_phantoms"
+            },
+        ]
     },
 ]

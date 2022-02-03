@@ -22,6 +22,7 @@ class SbotSidebarCopyNameCommand(sublime_plugin.WindowCommand):
 
     def run(self, paths):
         try:
+            print(paths)
             names = (os.path.split(path)[1] for path in paths)
             sublime.set_clipboard('\n'.join(names))
         except Exception as e:
