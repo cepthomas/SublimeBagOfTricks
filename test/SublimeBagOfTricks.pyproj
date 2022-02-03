@@ -35,6 +35,7 @@
     <Compile Include="..\sbot_render.py" />
     <Compile Include="..\sbot_sidebar.py" />
     <Compile Include="..\sbot_signet.py" />
+    <Compile Include="sbot_dev.py" />
     <Compile Include="st_emul\sublime.py" />
     <Compile Include="st_emul\sublime_plugin.py" />
     <Compile Include="test_common.py" />

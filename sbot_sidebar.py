@@ -60,7 +60,7 @@ class SbotSidebarCopyFileCommand(sublime_plugin.WindowCommand):
             plugin_exception(e)
 
         if not ok:
-            sublime.status_message("Couldn't copy file")    
+            sublime.status_message("Couldn't copy file")
 
     def is_visible(self, paths):
         vis = len(paths) > 0 and os.path.isfile(paths[0])
@@ -76,7 +76,7 @@ class SbotSidebarTerminalCommand(sublime_plugin.WindowCommand):
             if len(paths) > 0:
                 path = get_dir(paths)
                 cmd = f'wt -d "{path}"'
-                subprocess.run(cmd, shell=True)
+                subprocess.run(cmd, shell=True, check=True)
         except Exception as e:
             plugin_exception(e)
 
@@ -95,7 +95,7 @@ class SbotSidebarOpenFolderCommand(sublime_plugin.WindowCommand):
             if len(paths) > 0:
                 path = get_dir(paths)
                 cmd = f'explorer "{path}"'
-                subprocess.run(cmd, shell=True)
+                subprocess.run(cmd, shell=True, check=True)
         except Exception as e:
             plugin_exception(e)
 
@@ -114,7 +114,7 @@ class SbotSidebarTreeCommand(sublime_plugin.WindowCommand):
             if len(paths) > 0:
                 path = get_dir(paths)
                 cmd = f'tree "{path}" /a /f'
-                cp = subprocess.run(cmd, universal_newlines=True, capture_output=True, shell=True)
+                cp = subprocess.run(cmd, universal_newlines=True, capture_output=True, shell=True, check=True)
                 create_new_view(self.window, cp.stdout)
         except Exception as e:
             plugin_exception(e)
@@ -134,7 +134,7 @@ class SbotSidebarExecCommand(sublime_plugin.WindowCommand):
             if len(paths) > 0:
                 path = get_dir(paths)
                 cmd = ['python', paths[0]] if paths[0].endswith('.py') else [paths[0]]
-                cp = subprocess.run(cmd, universal_newlines=True, capture_output=True, shell=True, cwd=path)
+                cp = subprocess.run(cmd, universal_newlines=True, capture_output=True, shell=True, check=True, cwd=path)
                 create_new_view(self.window, cp.stdout)
         except Exception as e:
             plugin_exception(e)

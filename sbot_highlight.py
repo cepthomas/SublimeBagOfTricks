@@ -156,8 +156,8 @@ def _save_hls(winid, stp_fn):
                         del_els.append((winid, fn))
 
             # Now remove from collection.
-            for (winid, fn) in del_els:
-                del _hls[winid][fn]
+            for (w, fn) in del_els:
+                del _hls[w][fn]
 
             # Now save, or delete if empty.
             if len(_hls[winid]) > 0:
@@ -200,7 +200,7 @@ def _highlight_view(view, token, whole_word, scope):
 #-----------------------------------------------------------------------------------
 def _get_persist_tokens(view, init_empty):
     ''' General helper to get the data values from collection. If init_empty and there are none, add a default value. '''
-    
+
     global _hls
     vals = None # Default
     winid = view.window().id()

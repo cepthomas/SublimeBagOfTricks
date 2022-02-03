@@ -145,4 +145,3 @@ def get_persistence_path(stp_fn, ext):
 def get_temp_path():
     ''' Accessor. '''
     return _temp_path
-

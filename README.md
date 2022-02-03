@@ -214,38 +214,3 @@ each module and they all get called. Safest is to only use it once.
 ST doesn't load modules like plain python and can cause some surprises. The problem is that sbot_common
 gets reloaded but it appears to be a different module from the one linked to by the other modules.
 This makes handling globals difficult. Modules that are common cannot store meaningful state.
-
-Here's some startup sequence:
-```
-...
-ST: reloading plugin Default.*
-ST: reloading plugin SublimeBagOfTricks.__init__
-ST: reloading plugin SublimeBagOfTricks.sbot
-ST: reloading plugin SublimeBagOfTricks.__init__
-ST: reloading plugin SublimeBagOfTricks.sbot
-Python: load sbot_common
-Python: load sbot
-ST: reloading plugin SublimeBagOfTricks.sbot_clean
-Python: load sbot_clean
-ST: reloading plugin SublimeBagOfTricks.sbot_common
-Python: load sbot_common
-ST: reloading plugin SublimeBagOfTricks.sbot_format
-Python: load sbot_format
-ST: reloading plugin SublimeBagOfTricks.sbot_highlight
-Python: load sbot_highlight
-ST: reloading plugin SublimeBagOfTricks.sbot_misc
-Python: load sbot_misc
-ST: reloading plugin SublimeBagOfTricks.sbot_render
-Python: load sbot_render
-ST: reloading plugin SublimeBagOfTricks.sbot_scope
-Python: load sbot_scope
-ST: reloading plugin SublimeBagOfTricks.sbot_sidebar
-Python: load sbot_sidebar
-ST: reloading plugin SublimeBagOfTricks.sbot_signet
-Python: load sbot_signet
-ST: reloading python 3.X plugin my-other-plugins
->>>>>>>>> Manually re-saved sbot_common.py
-ST: reloading plugin SublimeBagOfTricks.sbot_common
-Python: load sbot_common
-...
-```

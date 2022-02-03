@@ -22,6 +22,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         self.row_num = 0
         super(SbotRenderToHtmlCommand, self).__init__(view)
         self.view = view
+        self.line_numbers = False
 
     def run(self, edit, line_numbers):
         try:
@@ -98,7 +99,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
         ## If there are highlights, collect them.
         highlight_scopes = self.settings.get('highlight_scopes')
 
-        for i, value in enumerate(highlight_scopes):
+        for _, value in enumerate(highlight_scopes):
             # Get the style and invert for highlights.
             ss = self.view.style_for_scope(value)
             background = ss['background'] if 'background' in ss else ss['foreground']
@@ -180,7 +181,7 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
                 # pc.stop()
 
         # Done all lines.
-        
+
         ## Create css.
         style_text = ""
         for style, stid in all_styles.items():
@@ -188,9 +189,9 @@ class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):
             if style[1] is not None:
                 props += f'background-color:{style[1]}; '
             if style[2]:
-                props += f'font-weight:bold; '
+                props += 'font-weight:bold; '
             if style[3]:
-                props += f'font-style:italic; '
+                props += 'font-style:italic; '
             props += '}'
             style_text += f'.st{stid} {props}\n'
 

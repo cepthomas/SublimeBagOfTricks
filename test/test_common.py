@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import MagicMock
 import sublime
 import sbot
-from sbot_common import *
+import sbot_common
 
 
 

@@ -24,7 +24,7 @@ class SbotTrimCommand(sublime_plugin.TextCommand):
             _do_sub(self.view, edit, reo, sub)
         except Exception as e:
             plugin_exception(e)
-    
+
 
 #-----------------------------------------------------------------------------------
 class SbotRemoveEmptyLinesCommand(sublime_plugin.TextCommand):
@@ -86,7 +86,7 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
                     offset += width+1
         except Exception as e:
             plugin_exception(e)
-    
+
 
 #-----------------------------------------------------------------------------------
 def _do_sub(view, edit, reo, sub):

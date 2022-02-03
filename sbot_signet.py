@@ -192,8 +192,8 @@ def _save_sigs(winid, stp_fn):
                         del_els.append((winid, fn))
 
             # Now remove from collection.
-            for (winid, fn) in del_els:
-                del _sigs[winid][fn]
+            for (w, fn) in del_els:
+                del _sigs[w][fn]
 
             # Now save, or delete if empty.
             if len(_sigs[winid]) > 0:
@@ -312,7 +312,7 @@ def _get_display_signet_rows(view):
 #-----------------------------------------------------------------------------------
 def _get_persist_rows(view, init_empty):
     ''' General helper to get the data values from collection. If init_empty and there are none, add a default value. '''
-    
+
     global _sigs
 
     vals = None # Default

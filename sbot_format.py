@@ -79,11 +79,12 @@ class SbotFormatJsonCommand(sublime_plugin.TextCommand):
                     if current_char == '\\':
                         escaped = True
                     elif current_char == '\"':
-                        if not escaped: state = ScanState.DEFAULT
+                        if not escaped:
+                            state = ScanState.DEFAULT
                         escaped = False
                     else:
                         escaped = False
-                
+
                 elif state == ScanState.LCOMMENT:
                     # Handle line comments.
                     if current_char == '\n':
@@ -245,7 +246,7 @@ class SbotFormatCxSrcCommand(sublime_plugin.TextCommand):
             # --errors-to-stdout -X
             # --mode=c or --mode=cs
 
-            cp = subprocess.run(p, input=s, text=True, universal_newlines=True, capture_output=True, shell=True)
+            cp = subprocess.run(p, input=s, text=True, universal_newlines=True, capture_output=True, shell=True, check=True)
             vnew = create_new_view(self.view.window(), cp.stdout)
             vnew.set_syntax_file(syntax)
         except Exception as e:

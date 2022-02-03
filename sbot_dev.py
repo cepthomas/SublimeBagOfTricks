@@ -16,7 +16,7 @@ class SbotTestPanelCommand(sublime_plugin.WindowCommand):
 
         items = []
         for l in locations:
-            items.append(sublime.QuickPanelItem(l, details=[f"<i>details</i>", f"<b>more</b>"], annotation=f"look_{l}", kind=sublime.KIND_NAVIGATION))
+            items.append(sublime.QuickPanelItem(l, details=["<i>details</i>", "<b>more</b>"], annotation=f"look_{l}", kind=sublime.KIND_NAVIGATION))
 
             # trigger - A unicode string of the text to match against the user's input.
             # details - An optional unicode string, or list of unicode strings, containing limited inline HTML. Displayed below the trigger.
@@ -66,7 +66,7 @@ class SbotTestPanelCommand_inp(sublime_plugin.WindowCommand):
 
     def on_done(self, text):
         try:
-            cp = subprocess.run(text, cwd=self.window.extract_variables()['folder'], universal_newlines=True, capture_output=True, shell=True)
+            cp = subprocess.run(text, cwd=self.window.extract_variables()['folder'], universal_newlines=True, check=True, capture_output=True, shell=True)
             sout = cp.stdout
             create_new_view(self.window, sout)
         except Exception as e:
@@ -190,7 +190,7 @@ class SbotTestPhantomsCommand(sublime_plugin.TextCommand):
         # sublime.LAYOUT_BLOCK: Display in space below the current line, left-aligned with the beginning of the line.
 
     def nav(self, href):
-        # on_navigate is an optional callback that should accept a single string parameter, 
+        # on_navigate is an optional callback that should accept a single string parameter,
         # that is the href attribute of the link clicked.
         print(f"href:{href}")
 
