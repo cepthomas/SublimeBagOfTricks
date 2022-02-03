@@ -181,12 +181,19 @@ def _save_sigs(winid, stp_fn):
     if ppath is not None:
         # Remove invalid files and any empty values.
         if winid in _sigs.copy():
+            # Safe iteration - accumulate elements to del later.
+            del_els = []
+
             for fn, _ in _sigs[winid].items():
                 if fn is not None:
                     if not os.path.exists(fn):
-                        del _sigs[winid][fn]
+                        del_els.append((winid, fn))
                     elif len(_sigs[winid][fn]) == 0:
-                        del _sigs[winid][fn]
+                        del_els.append((winid, fn))
+
+            # Now remove from collection.
+            for (winid, fn) in del_els:
+                del _sigs[winid][fn]
 
             # Now save, or delete if empty.
             if len(_sigs[winid]) > 0:
