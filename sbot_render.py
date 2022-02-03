@@ -10,6 +10,8 @@ from sbot_common import *
 
 # print('Python: load sbot_render')
 
+# This matches the define in sbot_highlight.py.
+HIGHLIGHT_REGION_NAME = 'highlight_%s'
 
 #-----------------------------------------------------------------------------------
 class SbotRenderToHtmlCommand(sublime_plugin.TextCommand):

@@ -13,7 +13,7 @@ import sublime_plugin
 
 # Definitions.
 SETTINGS_FN = 'SublimeBagOfTricks.sublime-settings'
-HIGHLIGHT_REGION_NAME = 'highlight_%s'
+
 
 # Syntax defs.
 SYNTAX_C =      'Packages/C++/C.sublime-syntax'
