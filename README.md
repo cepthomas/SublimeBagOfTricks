@@ -1,3 +1,5 @@
+# NOTE - this has been split up into separate plugins - see repos Sbot*
+ss
 # What It Is
 A hodge-podge Sublime Text plugin containing odds and ends missing from or over-developed in other packages.
 The focus is not on code development but rather general text processing.
