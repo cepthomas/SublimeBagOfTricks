@@ -9,6 +9,8 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 
 ![logo](felix.jpg)
 
+>>>>>>>> all commands are added into the user Context.sublime-menu. give examples.
+
 
 # SbotUtils
 

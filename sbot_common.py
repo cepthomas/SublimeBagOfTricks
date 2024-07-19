@@ -19,7 +19,7 @@ HighlightInfo = collections.namedtuple('HighlightInfo', 'scope_name, region_name
 _temp_view_id = None
 
 
-### Logger
+### Logger TODO1 integrate/test. Simplify?
 # ??? - The 'A' in the name enforces loading before other Sbot components.
 
 # Standard log categories.
