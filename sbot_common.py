@@ -98,7 +98,7 @@ class SbotALogger(io.TextIOBase):
 
         try:
             # Get the settings.
-            settings = sublime.load_settings(LOGGER_SETTINGS_FILE)
+            settings = sublime.load_settings(SBOT_SETTINGS_FILE)
             self._log_fn = sc.get_store_fn('sbot.log')
             self._file_size = settings.get('file_size')
             self._notify_cats = settings.get('notify_cats')

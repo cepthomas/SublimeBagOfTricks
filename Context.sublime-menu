@@ -1,69 +1,23 @@
 [
-    { "caption": "Split View", "command": "sbot_split_view" },
-    { "caption": "-" },
-    { "caption": "Cmd Line", "command": "sbot_cmd_line" },
-    { "caption": "-" },
-    {
-        "caption": "Signet",
-        "children":
-        [
-            { "caption": "Toggle Signet", "command": "sbot_toggle_signet" },
-            { "caption": "Next Signet", "command": "sbot_next_signet" },
-            { "caption": "Previous Signet", "command": "sbot_previous_signet" },
-            { "caption": "Clear All Signets", "command": "sbot_clear_signets" }
-        ]
-    },
-    { "caption": "-" },
-    {
-        "caption": "Highlight",
-        "children":
-        [
-            { "caption": "HL 1", "command": "sbot_highlight_text", "args" : {"hl_index" : 0} },
-            { "caption": "HL 2", "command": "sbot_highlight_text", "args" : {"hl_index" : 1} },
-            { "caption": "HL 3", "command": "sbot_highlight_text", "args" : {"hl_index" : 2} },
-            { "caption": "HL 4", "command": "sbot_highlight_text", "args" : {"hl_index" : 3} },
-            { "caption": "HL 5", "command": "sbot_highlight_text", "args" : {"hl_index" : 4} },
-            { "caption": "HL 6", "command": "sbot_highlight_text", "args" : {"hl_index" : 5} },
-        ]
-    },
-    { "caption": "Clear Highlights", "command": "sbot_clear_highlights" },
-    { "caption": "Show EOL", "command": "sbot_show_eol" },
 
     { "caption": "-" },
+    { "caption": "Clean",
+        "children":
+        [
+            { "caption": "Trim Leading WS", "command": "sbot_trim", "args" : {"how" : "leading"}  },
+            { "caption": "Trim Trailing WS", "command": "sbot_trim", "args" : {"how" : "trailing"}  },
+            { "caption": "Trim WS", "command": "sbot_trim", "args" : {"how" : "both"}  },
+            { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "remove_all" } },
+            { "caption": "Collapse Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "normalize" } },
+            { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : { "how" : "remove_all" } },
+            { "caption": "Remove WS Except EOL", "command": "sbot_remove_ws", "args" : { "how" : "keep_eol" } },
+            { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : { "how" : "normalize" } },
+            { "caption": "Insert Line Indexes", "command": "sbot_insert_line_indexes" },
+        ]
+    },
 
+    { "caption": "-" },
     { "caption": "Scope Info", "command": "sbot_scope_info" },
-    { "caption": "Show Scopes", "command": "sbot_show_scopes" },
+    { "caption": "All Scopes", "command": "sbot_all_scopes" },
 
-    { "caption": "-" },
-
-    { "caption": "Render Html", "command": "sbot_render_to_html", "args" : {"line_numbers" : false} },
-    { "caption": "Render Html + Lines", "command": "sbot_render_to_html", "args" : {"line_numbers" : true} },
-    { "caption": "Render Markdown", "command": "sbot_render_markdown" },
-
-    { "caption": "-" },
-
-    { "caption": "Format C/C++/C#", "command": "sbot_format_cx_src" },
-    { "caption": "Format json", "command": "sbot_format_json" },
-    { "caption": "Format xml", "command": "sbot_format_xml" },
-
-    { "caption": "-" },
-
-    { "caption": "Trim Leading WS", "command": "sbot_trim", "args" : {"how" : "leading"}  },
-    { "caption": "Trim Trailing WS", "command": "sbot_trim", "args" : {"how" : "trailing"}  },
-    { "caption": "Trim WS", "command": "sbot_trim", "args" : {"how" : "both"}  },
-    
-    // { "caption": "-" },
-
-    { "caption": "Remove Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "remove_all" } },
-    { "caption": "Collapse Empty Lines", "command": "sbot_remove_empty_lines", "args" : { "how" : "normalize" } },
-
-    // { "caption": "-" },
-
-    { "caption": "Remove WS", "command": "sbot_remove_ws", "args" : { "how" : "remove_all" } },
-    { "caption": "Remove WS Except EOL", "command": "sbot_remove_ws", "args" : { "how" : "keep_eol" } },
-    { "caption": "Collapse WS", "command": "sbot_remove_ws", "args" : { "how" : "normalize" } },
-
-    // { "caption": "-" },
-
-    { "caption": "Insert Line Indexes", "command": "sbot_insert_line_indexes" },
 ]

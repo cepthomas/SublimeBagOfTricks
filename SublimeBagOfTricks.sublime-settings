@@ -9,28 +9,30 @@
     "ignore_cats": [],
     "notify_cats": ["EXC", "ERR", "WRN"],
 
-
-
     ///// Scope settings /////
-    // Scope list for sbot_show_scopes command.
+    // Scope list for sbot_all_scopes command. Some from MINIMAL SCOPE COVERAGE.
     "scopes_to_show": [
-        //From MINIMAL SCOPE COVERAGE
-        "comment", "comment.block", "comment.block.documentation", 
-        "constant", "constant.character.escape", "constant.language", "constant.numeric", 
-        "entity", "entity.name", "entity.name.section", "entity.name.tag", "entity.other", "entity.other.attribute-name", "entity.other.inherited-class", 
-        "invalid", "invalid.deprecated", "invalid.illegal", 
-        "keyword", "keyword.control", "keyword.declaration", "keyword.operator", 
-        "markup", "punctuation", "source",
-        "storage", "storage.modifier", "storage.type",
-        "string", "support", "text", "text.documentation",
-        "variable", "variable.function", "variable.language", "variable.parameter", 
-        "markup.inserted.diff", "meta.diff.header.to-file", "markup.deleted.diff", "meta.diff.header.from-file", "meta.link.reference", "markup.underline.link", 
-        //from VS:
-        "meta.xml-processing", "declaration.xml-processing", "meta.doctype", "declaration.doctype", "meta.doctype.DTD", "declaration.doctype.DTD", "meta.tag", "declaration.tag",
-        "entity.name.tag", "entity.other.attribute-name",
-        "string.quoted.double.xml", "string.quoted.double.html",
-        "markup.heading", "markup.quote", "markup.list", "markup.bold"
-        //"region.redish", "region.orangish", "region.yellowish", "region.greenish", "region.cyanish", "region.bluish", "region.purplish", "region.pinkish"
+
+        "markup", "markup.underline", "markup.underline.link",
+        "markup.italic", "markup.bold", "markup.strikethrough",
+        "markup.heading", "markup.paragraph", "markup.other",
+        "markup.raw.inline", "markup.raw.block", "markup.quote",
+        "markup.list", "markup.list.unnumbered", "markup.list.numbered",
+        "markup.inserted.diff", "markup.deleted.diff",
+
+        "meta.table", "meta.table.header", "meta.link.reference",
+        
+        "comment", "comment.block", "comment.block.documentation",
+        "constant", "constant.character.escape", "constant.language", "constant.numeric",
+        "entity", "entity.name", "entity.name.section", "entity.name.tag", "entity.other", "entity.other.attribute-name", "entity.other.inherited-class",
+        "invalid", "invalid.deprecated", "invalid.illegal",
+        "keyword", "keyword.control", "keyword.declaration", "keyword.operator",
+        "variable", "variable.function", "variable.language", "variable.parameter",
+        "punctuation", "source", "storage", "storage.modifier", "storage.type",
+        "string", "string.quoted.single", "string.quoted.double",
+        "support", "text", "text.documentation",
+
+        "region.redish", "region.orangish", "region.yellowish", "region.greenish", "region.cyanish", "region.bluish", "region.purplish", "region.pinkish",
         ],
 
 }

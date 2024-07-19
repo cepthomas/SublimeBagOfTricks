@@ -1,23 +1,4 @@
 [
-    // Add some "bookmark" commands.
-    {
-        "id": "goto",
-        "children":
-        [
-            {
-                "id": "signets",
-                "caption": "Signets",
-                "children":
-                [
-                    { "caption": "Toggle Signet", "command": "sbot_toggle_signet" },
-                    { "caption": "Next Signet", "command": "sbot_next_signet" },
-                    { "caption": "Previous Signet", "command": "sbot_previous_signet" },
-                    { "caption": "Clear Signets", "command": "sbot_clear_signets" },
-                ]
-            },
-        ]
-    },
-
     // Add to existing Preferences menu for package-settings.
     {
         "id": "preferences",
@@ -40,38 +21,9 @@
                                     "default": "{\n$0\n}\n"
                                 }
                             },
-                            {
-                                "caption": "Keymap",
-                                "command": "edit_settings",
-                                "args":
-                                {
-                                    "base_file": "${packages}/SublimeBagOfTricks/Default (Windows).sublime-keymap",
-                                    "default": "{\n$0\n}\n"
-                                }
-                            },
-                            {
-                                "caption": "Documentation",
-                                "command": "sbot_about",
-                            },
                         ]
                     }
                 ]
-            },
-        ]
-    },
-
-    {
-        "id": "dev",
-        "caption": "Dev",
-        "children":
-        [
-            {
-                "caption": "Panel",
-                "command": "sbot_test_panel"
-            },
-            {
-                "caption": "Phantoms",
-                "command": "sbot_test_phantoms"
             },
         ]
     },
