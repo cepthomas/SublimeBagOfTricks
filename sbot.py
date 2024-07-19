@@ -6,10 +6,6 @@ import sublime
 import sublime_plugin
 from sbot_common import *
 
-# print('Python: load sbot')
-
-# The core and system stuff.
-
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
