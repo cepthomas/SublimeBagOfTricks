@@ -10,11 +10,109 @@ Built for Windows and ST4. Other OSes and ST versions will require some hacking.
 ![logo](felix.jpg)
 
 
-# Commands and Settings
+# SbotUtils
+
+Odds and ends in the Sbot family that don't have a better home for now. You can add them to your personal 
+Context and Sidebar menus.
+
+Built for ST4 on Windows and Linux.
+
+For the tree command, Linux needs something like: `sudo apt-get install tree`
+
+- Display absolute text position in status bar next to row/col.
+- One click view splitter that works like VS, Word, etc.
+- Run a script file (py, lua, cmd, bat, sh) and show the output.
+- Open file (html, py, etc) as if you double clicked it.
+- Open terminal in current path.
+- Open path under cursor if formatted like `[tag](C:\my\best\file.txt)`
+
+
+## Commands
+| Command                         | Type                | Description                                            |
+| :--------                       | :-------            | :-------                                               |
+| sbot_split_view                 | Context or Sidebar  | Toggle split view                                      |
+| sbot_copy_name                  | Tab or Sidebar      | Copy file/dir name to clipboard                        |
+| sbot_copy_path                  | Tab or Sidebar      | Copy full file/dir path to clipboard                   |
+| sbot_copy_file                  | Tab or Sidebar      | Copy selected file to a new file in the same directory |
+| sbot_delete_file                | Tab or Context      | Moves the file in current view to recycle/trash bin.   |
+| sbot_run                        | Context or Sidebar  | Run selected script with output to new view            |
+| sbot_open                       | Context or Sidebar  | Like you clicked it in explorer                        |
+| sbot_terminal                   | Context or Sidebar  | Open a terminal here                                   |
+| sbot_tree                       | Context or Sidebar  | Run tree cmd to new view (win only)                    |
+| sbot_open_context_path          | Context             | Open path under cursor                                 |
+| sbot_insert_target_from_clip    | Context             | Insert path target from clipboard                      |
+
+Context and Tab menu items like:
+`{ "caption": "Copy Name", "command": "sbot_copy_name"},`
+
+Sidebar menu items like:
+`{ "caption": "Copy Name", "command": "sbot_copy_name", "args": {"paths": []} },`
+
+
+## Settings
+No internal but the right click stuff works better with this setting:
+```
+"preview_on_click": "only_left",
+```
+
+
+# SbotClean
+
+Sublime Text plugin to perform some common text clean up: removing white space in different ways.
+
+Built for ST4 on Windows and Linux.
+
+## Commands
+| Command                    | Type     | Description               | Args                                                                         |
+| :--------                  | :------- | :-------                  | :-------                                                                     |
+| sbot_trim                  | Context  | Remove ws from Line ends  | how: "leading" OR "trailing" OR "both"                                       |
+| sbot_remove_empty_lines    | Context  | Like it says              | how: "remove_all" (all lines) OR "normalize" (compact to one)                |
+| sbot_remove_ws             | Context  | Like it says              | how: "remove_all" (all ws) OR "keep_eol" OR "normalize" (compact to one ws   |
+
+## Settings
+| Setting            | Description         | Options                                                               |
+| :--------          | :-------            | :------                                                               |
+| sel_all            | Selection default   | if true and no user selection, assumes the whole document (like ST)   |
 
 
 
-# Implementation
+# SbotALogger
+
+A simple logger for use by the sbot family of plugins. It works in conjunction with `def slog(str, message)` in
+`sbot_common.py`. If this plugin is imported, slog() uses it otherwise slog() writes to stdout.
+
+Built for ST4 on Windows and Linux.
+
+- Intercepts the ST console write and copies to a file.
+- Adds timestamp and (three letter) category.
+- If the category appear in `notify_cats`, a dialog is presented. Those in `ignore_cats` are ignored.
+- The 'A' in the name enforces loading before other Sbot components.
+- Log files are in `%data_dir%\Packages\User\.SbotStore`.
+
+## Exceptions
+
+These are the categories of exceptions in the Sublime python implementation:
+- User-handled with the standard `try/except` mechanism.
+- Plugin command syntax and functional errors are intercepted and logged by a custom `sys.excepthook` in `sbot_logger.py`.
+- Errors in scripts that are executed by sublime internals e.g. `load_module()` are not caught by the above hook but go straight
+  to stdout. It *works* but is not as tightly integrated as preferred.
+
+## Commands
+
+None
+
+
+## Settings
+
+| Setting            | Description                     | Options                                       |
+| :--------          | :-------                        | :------                                       |
+| file_size          | Max log file before rollover    | in kbytes (0 means disabled)                  |
+| ignore_cats        | Ignore these user categories    | comma separated strings                       |
+| notify_cats        | Notify user if in categories    | comma separated strings                       |
+
+
+
+# Implementation ==================
 
 ## Files
 Plugin directory files.
