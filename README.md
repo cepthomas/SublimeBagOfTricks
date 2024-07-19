@@ -1,25 +1,24 @@
 
 # What It Is
+Odds and ends in the Sbot family that don't have a better home for now. You can add them to your personal 
+Context and/or Sidebar menus.
+>>>>>>>> all commands are added into the user Context.sublime-menu. give examples.
 A hodge-podge Sublime Text plugin containing odds and ends missing from or over-developed in other packages.
 The focus is not on code development but rather general text processing.
 
-No support as yet for PackageControl.
-
-Built for Windows and ST4. Other OSes and ST versions will require some hacking.
-
 ![logo](felix.jpg)
 
->>>>>>>> all commands are added into the user Context.sublime-menu. give examples.
+
+Built for ST4 on Windows and Linux. Caveats:
+- For the tree command, Linux needs something like: `sudo apt-get install tree`
+
+?? No support as yet for PackageControl.
+
+
+
 
 
 # SbotUtils
-
-Odds and ends in the Sbot family that don't have a better home for now. You can add them to your personal 
-Context and Sidebar menus.
-
-Built for ST4 on Windows and Linux.
-
-For the tree command, Linux needs something like: `sudo apt-get install tree`
 
 - Display absolute text position in status bar next to row/col.
 - One click view splitter that works like VS, Word, etc.
@@ -62,8 +61,6 @@ No internal but the right click stuff works better with this setting:
 
 Sublime Text plugin to perform some common text clean up: removing white space in different ways.
 
-Built for ST4 on Windows and Linux.
-
 ## Commands
 | Command                    | Type     | Description               | Args                                                                         |
 | :--------                  | :------- | :-------                  | :-------                                                                     |
@@ -82,8 +79,6 @@ Built for ST4 on Windows and Linux.
 
 A simple logger for use by the sbot family of plugins. It works in conjunction with `def slog(str, message)` in
 `sbot_common.py`. If this plugin is imported, slog() uses it otherwise slog() writes to stdout.
-
-Built for ST4 on Windows and Linux.
 
 - Intercepts the ST console write and copies to a file.
 - Adds timestamp and (three letter) category.
@@ -113,20 +108,10 @@ None
 | notify_cats        | Notify user if in categories    | comma separated strings                       |
 
 
+# Logging in sbot_common
 
-# Implementation ==================
 
-## Files
-Plugin directory files.
-
-| Directory                | Description |
-|:--------                 |:-------     |
-| .                        | Standard plugin stuff - menus, commands, scripts, ... |
-| store                    | Generated dir: `.*-hls` and `.*-sigs` files if persistence_path is `store` |
-| temp                     | Generated dir: Trace files and rendered html |
-| test                     | VS solution to do some basic unit testing of sbot functions |
-| test\st_emul             | Stubs for the sublime api |
-| test\files               | Misc files for testing |
+# Implementation here? or in a separate doc?
 
 
 ## General Notes
