@@ -17,22 +17,27 @@ _temp_view_id = None
 # The package logger.
 _logger = None
 
+# Data type.
+HighlightInfo = collections.namedtuple('HighlightInfo', 'scope_name, region_name, type')
+
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Called once per ST instance.'''
+
     global _logger
 
     log_fn = get_store_fn('sbot.log')
-    file_size = 50  # TODO1 get from where??
+    file_size = 50000  # should be user config
 
     formatter = logging.Formatter("%(asctime)-15s %(levelname)8s: %(name)s: %(message)s")
-    log_file_handler = logging.handlers.RotatingFileHandler(log_fn, maxBytes=file_size * 1024, backupCount=5)
+    log_file_handler = logging.handlers.RotatingFileHandler(log_fn, maxBytes=file_size, backupCount=5)
     log_file_handler.setFormatter(formatter)
 
     _logger = logging.getLogger(__package__)
     _logger.addHandler(log_file_handler)
-    _logger.setLevel(logging.DEBUG)  # TODO1 get from where??  DEBUG  ERROR
+    _logger.setLevel(logging.DEBUG) #TODO1 get from???
+    _logger.info(f'{__package__} loaded')
 
 
 #-----------------------------------------------------------------------------------
@@ -44,6 +49,7 @@ def plugin_unloaded():
 #-----------------------------------------------------------------------------------
 def _notify_exception(tp, value, tb):
     ''' Process unhandled exceptions and notify user. '''
+
     global _logger
     msg = f'Unhandled exception {tp.__name__}: {value}'
     stb = traceback.format_tb(tb)
@@ -60,6 +66,7 @@ sys.excepthook = _notify_exception
 #-----------------------------------------------------------------------------------
 def get_store_fn(fn):
     ''' General utility to get store simple file name. '''
+
     store_path = os.path.join(sublime.packages_path(), 'User', '.SbotStore')
     pathlib.Path(store_path).mkdir(parents=True, exist_ok=True)
     store_fn = os.path.join(store_path, fn)
@@ -69,6 +76,7 @@ def get_store_fn(fn):
 #-----------------------------------------------------------------------------------
 def get_store_fn_for_project(project_fn, file_ext):
     ''' General utility to get store file name based on ST project name. '''
+
     store_fn = None
     if project_fn is not None:
         fn = os.path.basename(project_fn).replace('.sublime-project', file_ext)
@@ -79,6 +87,7 @@ def get_store_fn_for_project(project_fn, file_ext):
 #-----------------------------------------------------------------------------------
 def get_single_caret(view):
     ''' Get current caret position for one only region. If multiples, return None. '''
+
     if len(view.sel()) == 0:
         raise RuntimeError('No data')
     elif len(view.sel()) == 1:  # single sel
@@ -90,6 +99,7 @@ def get_single_caret(view):
 #-----------------------------------------------------------------------------------
 def get_sel_regions(view, settings):
     ''' Function to get selections or optionally the whole view if sel_all setting is True.'''
+
     regions = []
     if len(view.sel()[0]) > 0:  # user sel
         regions = view.sel()
@@ -102,6 +112,7 @@ def get_sel_regions(view, settings):
 #-----------------------------------------------------------------------------------
 def create_new_view(window, text, reuse=True):
     ''' Creates or reuse existing temp view with text. Returns the view.'''
+
     view = None
     global _temp_view_id
 
@@ -131,6 +142,7 @@ def create_new_view(window, text, reuse=True):
 #-----------------------------------------------------------------------------------
 def wait_load_file(window, fpath, line):
     ''' Open file asynchronously then position at line. Returns the new View or None if failed. '''
+
     global _logger
     vnew = None
 
@@ -152,14 +164,12 @@ def wait_load_file(window, fpath, line):
 
 
 #-----------------------------------------------------------------------------------
-# Data names shared across plugins.
-HighlightInfo = collections.namedtuple('HighlightInfo', 'scope_name, region_name, type')
-
 def get_highlight_info(which='all'):
     ''' Get list of builtin scope names and corresponding region names as list of HighlightInfo. '''
+
     hl_info = []
     if which == 'all' or which == 'user':
-        for i in range(6):  # magical knowledge TODO1 ??
+        for i in range(6):  # magical knowledge TODO1 fix these, maybe tuple too??
             hl_info.append(HighlightInfo(f'markup.user_hl{i + 1}', f'region_user_hl{i + 1}', 'user'))
     if which == 'all' or which == 'fixed':
         for i in range(3):  # magical knowledge
@@ -170,6 +180,7 @@ def get_highlight_info(which='all'):
 #-----------------------------------------------------------------------------------
 def expand_vars(s: str):
     ''' Smarter version of builtin. Returns expanded string or None if bad var name. '''
+
     done = False
     count = 0
     while not done:
@@ -203,6 +214,7 @@ def get_path_parts(window, paths):
     - path is fully expanded path or None if invalid.
     - fn is None for a directory.
     '''
+
     dir = None
     fn = None
     path = None
@@ -232,6 +244,7 @@ def get_path_parts(window, paths):
 #-----------------------------------------------------------------------------------
 def open_path(path):
     ''' Acts as if you had clicked the path in the UI. Honors your file associations.'''
+
     if platform.system() == 'Darwin':
         subprocess.run(('open', path))
     elif platform.system() == 'Windows':
@@ -244,7 +257,8 @@ def open_path(path):
 
 #-----------------------------------------------------------------------------------
 def open_terminal(where):
-    ''' Open a terminal where. '''
+    ''' Open a terminal in where. '''
+
     # This works for gnome. Maybe should support other desktop types?
     # Kde -> konsole
     # xfce4 -> xfce4-terminal

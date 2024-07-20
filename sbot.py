@@ -16,6 +16,7 @@ SBOT_SETTINGS_FILE = "SublimeBagOfTricks.sublime-settings"
 rex = re.compile(r'\[(.*)\]\(([^\)]*)\)')
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.DEBUG)
 
 
 #-----------------------------------------------------------------------------------
@@ -87,20 +88,6 @@ class SbotOpenContextPathCommand(sublime_plugin.TextCommand):
 
     def want_event(self):
         return True
-
-
-#-----------------------------------------------------------------------------------
-class SbotInsertTargetFromClipCommand(sublime_plugin.TextCommand):  #TODO1 remove?
-    ''' Insert target from clipboard in format to match SbotOpenContextPathCommand(). '''
-
-    def run(self, edit):
-        s = f'[]({sublime.get_clipboard()})'
-        caret = sc.get_single_caret(self.view)
-        self.view.insert(edit, caret, s)
-
-    def is_visible(self):
-        v = self.view
-        return sc.get_single_caret(v) is not None and sublime.get_clipboard() != ''
 
 
 #-----------------------------------------------------------------------------------

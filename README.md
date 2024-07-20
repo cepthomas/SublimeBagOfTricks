@@ -1,8 +1,15 @@
 
+TODO1 update these docs
+
+TODO1 update/test the copy script
+
+
 # What It Is
 Odds and ends in the Sbot family that don't have a better home for now. You can add them to your personal 
 Context and/or Sidebar menus.
+
 >>>>>>>> all commands are added into the user Context.sublime-menu. give examples.
+
 A hodge-podge Sublime Text plugin containing odds and ends missing from or over-developed in other packages.
 The focus is not on code development but rather general text processing.
 
