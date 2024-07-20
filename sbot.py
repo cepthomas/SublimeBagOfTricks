@@ -1,5 +1,4 @@
 import os
-# import platform
 import subprocess
 import shutil
 import re
@@ -8,15 +7,15 @@ import sublime
 import sublime_plugin
 from . import sbot_common as sc
 
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.DEBUG)  # TODO1 config?
+
 # Known script file types.
 SCRIPT_TYPES = ['.py', '.lua', '.cmd', '.bat', '.sh']
 
 SBOT_SETTINGS_FILE = "SublimeBagOfTricks.sublime-settings"
 
 rex = re.compile(r'\[(.*)\]\(([^\)]*)\)')
-
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.DEBUG)
 
 
 #-----------------------------------------------------------------------------------
@@ -347,8 +346,7 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
         width = len(str(line_count))
         offset = 0
 
-        settings = sublime.load_settings(SBOT_SETTINGS_FILE)
-        for region in sc.get_sel_regions(self.view, settings):
+        for region in sc.get_sel_regions(self.view):
             line_num = 1
             offset = 0
             for line_region in self.view.split_by_newlines(region):
@@ -362,8 +360,7 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 def _do_sub(view, edit, reo, sub):
     # Generic substitution function.
-    settings = sublime.load_settings(SBOT_SETTINGS_FILE)
-    for region in sc.get_sel_regions(view, settings):
+    for region in sc.get_sel_regions(view):
         orig = view.substr(region)
         new = reo.sub(sub, orig)
         view.replace(edit, region, new)

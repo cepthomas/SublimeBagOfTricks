@@ -36,7 +36,6 @@ def plugin_loaded():
 
     _logger = logging.getLogger(__package__)
     _logger.addHandler(log_file_handler)
-    _logger.setLevel(logging.DEBUG) #TODO1 get from???
     _logger.info(f'{__package__} loaded')
 
 
@@ -97,15 +96,14 @@ def get_single_caret(view):
 
 
 #-----------------------------------------------------------------------------------
-def get_sel_regions(view, settings):
-    ''' Function to get selections or optionally the whole view if sel_all setting is True.'''
+def get_sel_regions(view):
+    ''' Function to get user selection or the whole view if no selection. '''
 
     regions = []
     if len(view.sel()[0]) > 0:  # user sel
         regions = view.sel()
     else:
-        if settings.get('sel_all'):
-            regions = [sublime.Region(0, view.size())]
+        regions = [sublime.Region(0, view.size())]
     return regions
 
 

@@ -78,11 +78,17 @@ Sublime Text plugin to perform some common text clean up: removing white space i
 ## Settings
 | Setting            | Description         | Options                                                               |
 | :--------          | :-------            | :------                                                               |
-| sel_all            | Selection default   | if true and no user selection, assumes the whole document (like ST)   |
+>>>> | scopes_to_show            |    |    |
 
 
 
 # SbotALogger
+
+
+import logging
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.DEBUG)
+
 
 A simple logger for use by the sbot family of plugins. It works in conjunction with `def slog(str, message)` in
 `sbot_common.py`. If this plugin is imported, slog() uses it otherwise slog() writes to stdout.
