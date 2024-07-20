@@ -1,17 +1,22 @@
 import os
-import platform
+# import platform
 import subprocess
 import shutil
 import re
+import logging
 import sublime
 import sublime_plugin
 from . import sbot_common as sc
 
-# Known file types.
+# Known script file types.
 SCRIPT_TYPES = ['.py', '.lua', '.cmd', '.bat', '.sh']
 
-# [optional](my/file.ext)
+SBOT_SETTINGS_FILE = "Sbot.sublime-settings"
+
 rex = re.compile(r'\[(.*)\]\(([^\)]*)\)')
+
+_logger = logging.getLogger(__name__)
+_logger.info("Greetings!")
 
 
 #-----------------------------------------------------------------------------------
@@ -163,7 +168,7 @@ class SbotRunCommand(sublime_plugin.WindowCommand):
                 elif ext in SCRIPT_TYPES:
                     cmd_list.append(f'\"{path}\"')
                 else:
-                    # sc.slog(sc.CAT_WRN, f"Unsupported file type: {path}")
+                    _logger.warning(f"Unsupported file type: {path}")
                     return
 
                 if self.args:
@@ -177,8 +182,8 @@ class SbotRunCommand(sublime_plugin.WindowCommand):
                 if len(errors) > 0:
                     output = output + '============ stderr =============\n' + errors
                 sc.create_new_view(self.window, output)
-            except Exception as e:
-                sc.slog(sc.CAT_ERR, e)
+            except:# Exception as e:
+                logging.exception("Execute script failed")
 
     def is_visible(self, paths=None):
         vis = True
@@ -289,19 +294,14 @@ class SbotDeleteFileCommand(sublime_plugin.WindowCommand):
     Delete the file in the current view.
     Supports context and tab menus.
     '''
-    def run(self): # , paths=None):
+    def run(self):  # , paths=None):
         dir, fn, path = sc.get_path_parts(self.window, None)
         if fn is not None:
             self.window.run_command("delete_file", {"files": [path], "prompt": False})
 
-    def is_visible(self): #, paths=None):
+    def is_visible(self):  #, paths=None):
         dir, fn, path = sc.get_path_parts(self.window, None)
         return fn is not None
-
-
-#-----------------------------------------------------------------------------------
-#----------------------------- clean -----------------------------------------------
-#-----------------------------------------------------------------------------------
 
 
 #-----------------------------------------------------------------------------------
@@ -363,7 +363,7 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
         width = len(str(line_count))
         offset = 0
 
-        settings = sublime.load_settings(CLEAN_SETTINGS_FILE)
+        settings = sublime.load_settings(SBOT_SETTINGS_FILE)
         for region in sc.get_sel_regions(self.view, settings):
             line_num = 1
             offset = 0
@@ -378,18 +378,11 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
 #-----------------------------------------------------------------------------------
 def _do_sub(view, edit, reo, sub):
     # Generic substitution function.
-    settings = sublime.load_settings(CLEAN_SETTINGS_FILE)
+    settings = sublime.load_settings(SBOT_SETTINGS_FILE)
     for region in sc.get_sel_regions(view, settings):
         orig = view.substr(region)
         new = reo.sub(sub, orig)
         view.replace(edit, region, new)
-
-
-
-#-----------------------------------------------------------------------------------
-#----------------------------- scope -----------------------------------------------
-#-----------------------------------------------------------------------------------
-
 
 
 #-----------------------------------------------------------------------------------
@@ -397,7 +390,7 @@ class SbotAllScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. '''
 
     def run(self, edit):
-        settings = sublime.load_settings(SCOPE_SETTINGS_FILE)
+        settings = sublime.load_settings(SBOT_SETTINGS_FILE)
         scopes = settings.get('scopes_to_show')
         _render_scopes(scopes, self.view)
 
