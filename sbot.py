@@ -11,12 +11,11 @@ from . import sbot_common as sc
 # Known script file types.
 SCRIPT_TYPES = ['.py', '.lua', '.cmd', '.bat', '.sh']
 
-SBOT_SETTINGS_FILE = "Sbot.sublime-settings"
+SBOT_SETTINGS_FILE = "SublimeBagOfTricks.sublime-settings"
 
 rex = re.compile(r'\[(.*)\]\(([^\)]*)\)')
 
 _logger = logging.getLogger(__name__)
-_logger.info("Greetings!")
 
 
 #-----------------------------------------------------------------------------------
@@ -60,7 +59,6 @@ class SbotOpenContextPathCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit, event):
-        # print(f'>>> SbotOpenContextPathCommand.run() {event}')
         path = self.find_path(event)
         sc.open_path(path)
 
@@ -92,7 +90,7 @@ class SbotOpenContextPathCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-class SbotInsertTargetFromClipCommand(sublime_plugin.TextCommand):
+class SbotInsertTargetFromClipCommand(sublime_plugin.TextCommand):  #TODO1 remove?
     ''' Insert target from clipboard in format to match SbotOpenContextPathCommand(). '''
 
     def run(self, edit):
@@ -275,7 +273,6 @@ class SbotCopyFileCommand(sublime_plugin.WindowCommand):
             for i in range(1, 9):
                 newfn = f'{root}_{i}{ext}'
                 if not os.path.isfile(newfn):
-                    # print(newfn)
                     shutil.copyfile(path, newfn)
                     ok = True
                     break

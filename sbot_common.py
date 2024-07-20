@@ -17,51 +17,14 @@ _temp_view_id = None
 # The package logger.
 _logger = None
 
-'''
-DEFAULT_LOG_LEVEL = logging.WARNING
-DEFAULT_LOG_LEVEL_NAME = logging.getLevelName(DEFAULT_LOG_LEVEL)
-EVENT_LEVEL = logging.INFO
-
-logging.NOTSET 0 When set on a logger, indicates that ancestor loggers are to be consulted to determine the effective level. If that still resolves to NOTSET, then all events are logged. When set on a handler, all events are handled.
-logging.DEBUG 10  INFO 20  WARNING 30  ERROR 40  CRITICAL 50 
-
-package_logger = logging.getLogger(__package__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter(fmt="[{name}] {levelname}: {message}", style='{')
-handler.setFormatter(formatter)
-package_logger.addHandler(handler)
-package_logger.setLevel(DEFAULT_LOG_LEVEL)
-package_logger.propagate = False  # prevent root logger from catching this
-
-logger = logging.getLogger(__name__)
-
-https://docs.python.org/3/library/logging.handlers.html#streamhandler
-The StreamHandler class, located in the core logging package, sends logging output to streams such as 
-sys.stdout, sys.stderr or any file-like object (or, more precisely, any object which supports write() and flush() methods).
-
-def plugin_loaded():
-    cur_log_level = package_logger.getEffectiveLevel()
-    new_log_level_name = sublime.load_settings("PackageDev.sublime-settings").get('log_level', DEFAULT_LOG_LEVEL_NAME).upper()
-    new_log_level = getattr(logging, new_log_level_name, DEFAULT_LOG_LEVEL)
-
-    if new_log_level != cur_log_level:
-        if cur_log_level > EVENT_LEVEL and new_log_level <= EVENT_LEVEL:
-            # Only set level before emitting log event if it would not be seen otherwise
-            package_logger.setLevel(new_log_level)
-        cur_log_level_name = logging.getLevelName(cur_log_level)
-        logger.log(EVENT_LEVEL, "Changing log level from %r to %r", cur_log_level_name, new_log_level_name)
-        package_logger.setLevel(new_log_level)  # Just set it again to be sure
-
-def plugin_unloaded():
-    package_logger.removeHandler(handler)
-'''    
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
-    # Called once per ST instance.
+    ''' Called once per ST instance.'''
+    global _logger
 
     log_fn = get_store_fn('sbot.log')
-    file_size = 50  # settings.get('file_size')
+    file_size = 50  # TODO1 get from where??
 
     formatter = logging.Formatter("%(asctime)-15s %(levelname)8s: %(name)s: %(message)s")
     log_file_handler = logging.handlers.RotatingFileHandler(log_fn, maxBytes=file_size * 1024, backupCount=5)
@@ -69,7 +32,7 @@ def plugin_loaded():
 
     _logger = logging.getLogger(__package__)
     _logger.addHandler(log_file_handler)
-    # TODO1 get from? _logger.setLevel(log_level)
+    _logger.setLevel(logging.DEBUG)  # TODO1 get from where??  DEBUG  ERROR
 
 
 #-----------------------------------------------------------------------------------
@@ -81,12 +44,13 @@ def plugin_unloaded():
 #-----------------------------------------------------------------------------------
 def _notify_exception(tp, value, tb):
     ''' Process unhandled exceptions and notify user. '''
+    global _logger
+    msg = f'Unhandled exception {tp.__name__}: {value}'
     stb = traceback.format_tb(tb)
-    stb.insert(0, f'Unhandled exception {tp.__name__}: {value}')
+    stb.insert(0, msg)
     stb = '\n'.join(stb)
-    # print(stb)
-    sublime.error_message(stb)
-    # vnew = create_new_view(self.view.window(), stb)
+    _logger.error(stb)
+    sublime.error_message(msg)
 
 
 # Connect the hook.
@@ -96,7 +60,6 @@ sys.excepthook = _notify_exception
 #-----------------------------------------------------------------------------------
 def get_store_fn(fn):
     ''' General utility to get store simple file name. '''
-
     store_path = os.path.join(sublime.packages_path(), 'User', '.SbotStore')
     pathlib.Path(store_path).mkdir(parents=True, exist_ok=True)
     store_fn = os.path.join(store_path, fn)
@@ -106,7 +69,6 @@ def get_store_fn(fn):
 #-----------------------------------------------------------------------------------
 def get_store_fn_for_project(project_fn, file_ext):
     ''' General utility to get store file name based on ST project name. '''
-
     store_fn = None
     if project_fn is not None:
         fn = os.path.basename(project_fn).replace('.sublime-project', file_ext)
@@ -117,7 +79,6 @@ def get_store_fn_for_project(project_fn, file_ext):
 #-----------------------------------------------------------------------------------
 def get_single_caret(view):
     ''' Get current caret position for one only region. If multiples, return None. '''
-
     if len(view.sel()) == 0:
         raise RuntimeError('No data')
     elif len(view.sel()) == 1:  # single sel
@@ -129,7 +90,6 @@ def get_single_caret(view):
 #-----------------------------------------------------------------------------------
 def get_sel_regions(view, settings):
     ''' Function to get selections or optionally the whole view if sel_all setting is True.'''
-
     regions = []
     if len(view.sel()[0]) > 0:  # user sel
         regions = view.sel()
@@ -142,7 +102,6 @@ def get_sel_regions(view, settings):
 #-----------------------------------------------------------------------------------
 def create_new_view(window, text, reuse=True):
     ''' Creates or reuse existing temp view with text. Returns the view.'''
-
     view = None
     global _temp_view_id
 
@@ -172,7 +131,7 @@ def create_new_view(window, text, reuse=True):
 #-----------------------------------------------------------------------------------
 def wait_load_file(window, fpath, line):
     ''' Open file asynchronously then position at line. Returns the new View or None if failed. '''
-
+    global _logger
     vnew = None
 
     def _load(view):
@@ -198,7 +157,6 @@ HighlightInfo = collections.namedtuple('HighlightInfo', 'scope_name, region_name
 
 def get_highlight_info(which='all'):
     ''' Get list of builtin scope names and corresponding region names as list of HighlightInfo. '''
-
     hl_info = []
     if which == 'all' or which == 'user':
         for i in range(6):  # magical knowledge TODO1 ??
@@ -212,7 +170,6 @@ def get_highlight_info(which='all'):
 #-----------------------------------------------------------------------------------
 def expand_vars(s: str):
     ''' Smarter version of builtin. Returns expanded string or None if bad var name. '''
-
     done = False
     count = 0
     while not done:
@@ -275,7 +232,6 @@ def get_path_parts(window, paths):
 #-----------------------------------------------------------------------------------
 def open_path(path):
     ''' Acts as if you had clicked the path in the UI. Honors your file associations.'''
-
     if platform.system() == 'Darwin':
         subprocess.run(('open', path))
     elif platform.system() == 'Windows':
@@ -289,7 +245,6 @@ def open_path(path):
 #-----------------------------------------------------------------------------------
 def open_terminal(where):
     ''' Open a terminal where. '''
-
     # This works for gnome. Maybe should support other desktop types?
     # Kde -> konsole
     # xfce4 -> xfce4-terminal
