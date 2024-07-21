@@ -1,7 +1,13 @@
 
 TODO1 update these docs
 
-TODO1 update/test the copy script
+in each project.: _logger.setLevel(logging.DEBUG)
+settings:
+// Log level: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"
+"log_level": "DEBUG",
+
+
+%APPDATA%
 
 
 # What It Is

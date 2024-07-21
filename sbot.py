@@ -8,19 +8,25 @@ import sublime_plugin
 from . import sbot_common as sc
 
 _logger = logging.getLogger(__name__)
-_logger.setLevel(logging.DEBUG)  # TODO1 config?
 
 # Known script file types.
 SCRIPT_TYPES = ['.py', '.lua', '.cmd', '.bat', '.sh']
 
 SBOT_SETTINGS_FILE = "SublimeBagOfTricks.sublime-settings"
 
-rex = re.compile(r'\[(.*)\]\(([^\)]*)\)')
+_rex = re.compile(r'\[(.*)\]\(([^\)]*)\)')
 
 
 #-----------------------------------------------------------------------------------
-class SbotGeneralEvent(sublime_plugin.EventListener):
+class SbotEvent(sublime_plugin.EventListener):
     ''' Listener for window events of global interest. '''
+
+    def on_init(self, views):
+        ''' First thing that happens when plugin/window created. Initialize everything. '''
+        global _logger
+        settings = sublime.load_settings(SBOT_SETTINGS_FILE)
+        _logger.setLevel(settings.get('log_level'))
+        _logger.info('TODO1')
 
     def on_selection_modified(self, view):
         ''' Show the abs position in the status bar. '''
@@ -72,7 +78,7 @@ class SbotOpenContextPathCommand(sublime_plugin.TextCommand):
         text = self.view.substr(line)
 
         # Test all matches on the line against the one where the cursor is.
-        it = rex.finditer(text)
+        it = _rex.finditer(text)
         for match in it:
             if match.start() <= (pt - line.a) and match.end() >= (pt - line.a):
                 path = match.group(2)

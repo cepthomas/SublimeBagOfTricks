@@ -24,4 +24,7 @@
 
         "region.redish", "region.orangish", "region.yellowish", "region.greenish", "region.cyanish", "region.bluish", "region.purplish", "region.pinkish",
         ],
+
+    // Log level: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"
+    "log_level": "DEBUG",
 }
