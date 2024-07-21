@@ -23,10 +23,11 @@ class SbotEvent(sublime_plugin.EventListener):
 
     def on_init(self, views):
         ''' First thing that happens when plugin/window created. Initialize everything. '''
-        global _logger
+        global _logger #TODO1 needed?
         settings = sublime.load_settings(SBOT_SETTINGS_FILE)
         _logger.setLevel(settings.get('log_level'))
         _logger.info('TODO1')
+        _logger.debug('TODO1')
 
     def on_selection_modified(self, view):
         ''' Show the abs position in the status bar. '''
