@@ -26,8 +26,6 @@ class SbotEvent(sublime_plugin.EventListener):
 
         settings = sublime.load_settings(SBOT_SETTINGS_FILE)
         _logger.setLevel(settings.get('log_level'))
-        _logger.info('TODO1')
-        _logger.debug('TODO1')
 
     def on_selection_modified(self, view):
         ''' Show the abs position in the status bar. '''
@@ -365,15 +363,6 @@ class SbotInsertLineIndexesCommand(sublime_plugin.TextCommand):
 
 
 #-----------------------------------------------------------------------------------
-def _do_sub(view, edit, reo, sub):
-    # Generic substitution function.
-    for region in sc.get_sel_regions(view):
-        orig = view.substr(region)
-        new = reo.sub(sub, orig)
-        view.replace(edit, region, new)
-
-
-#-----------------------------------------------------------------------------------
 class SbotAllScopesCommand(sublime_plugin.TextCommand):
     ''' Show style info for common scopes. '''
 
@@ -393,6 +382,15 @@ class SbotScopeInfoCommand(sublime_plugin.TextCommand):
             scope = self.view.scope_name(caret).rstrip()
             scopes = scope.split()
             _render_scopes(scopes, self.view)
+
+
+#-----------------------------------------------------------------------------------
+def _do_sub(view, edit, reo, sub):
+    # Generic substitution function.
+    for region in sc.get_sel_regions(view):
+        orig = view.substr(region)
+        new = reo.sub(sub, orig)
+        view.replace(edit, region, new)
 
 
 #-----------------------------------------------------------------------------------
