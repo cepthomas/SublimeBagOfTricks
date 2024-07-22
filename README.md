@@ -6,7 +6,7 @@ Odds and ends missing from, or overly complicated in other Sublime Text plugins.
 It consists of two components:
 - `sbot.py` is a sandard ST plugin with a variety of commands that process text, simplify ST internals,
   interact with the OS, etc. Displays absolute text position in status bar next to row/col.
-- `sbot_common.py` contains internal utilities and logging used by the other sbot family plugins. Probably nothing
+- `sbot_common_master.py` contains internal utilities and logging used by the other sbot family plugins. Probably nothing
   of interest to you. Currently it is copied to those directories rather than using git submodules.
 
 The plugin can be installed as is but if you only want a few features it makes sense to snip the
