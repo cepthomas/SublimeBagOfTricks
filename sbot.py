@@ -2,15 +2,9 @@ import os
 import subprocess
 import shutil
 import re
-import logging
 import sublime
 import sublime_plugin
 from . import sbot_common_master as sc
-
-import sys
-
-
-_logger = logging.getLogger(__name__)
 
 # Known script file types.
 SCRIPT_TYPES = ['.py', '.lua', '.cmd', '.bat', '.sh']
@@ -24,50 +18,14 @@ print(f'>>> loaded sbot.py {__package__}')
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Called once per plugin instance. Setup anything global. '''
-
-
-    # Set up logging. TODO1 does this make too many loggers?
-    _logger = sc.init_log(__package__)
-
-    print(f'>>> plugin_loaded() {__package__} {id(_logger)}')
-    _logger.debug(f'plugin_loaded() {__package__} {id(_logger)}')
-
-
-    # _logger = logging.getLogger(__package__)
-    # log_fn = sc.get_store_fn('sbot.log')
-
-    # print(__package__) # SublimeBagOfTricks
-    # print(__name__) # SublimeBagOfTricks.sbot
-
-    # # for h in _logger.handlers:
-    # #     print(f'==={h}')
-    # # print(f'==={dir(logging.handlers)}')
-    # # print(f'==={dir(logging)}')
-    # # print(f'==={dir(_logger.handlers)}')
-
-    # # Main logger.
-    # file_handler = logging.handlers.RotatingFileHandler(log_fn, maxBytes=50000, backupCount=5)  # should be user config
-    # file_handler.setFormatter(logging.Formatter('{asctime} {levelname:.3s}: {name} {message}', style='{'))
-    # _logger.addHandler(file_handler)
-
-    # # For user.
-    # stream_handler = logging.StreamHandler(stream=sys.stdout)
-    # stream_handler.setFormatter(logging.Formatter(fmt='>>> {levelname:.3s} {name} {message}', style='{'))
-    # stream_handler.setLevel(logging.INFO)
-    # _logger.addHandler(stream_handler)
-
-    # for h in _logger.handlers:
-    #     print(f'==={h}')
+    print(f'>>> plugin_loaded() {__package__}')
+    sc.log_debug(f'plugin_loaded() {__package__}')
 
 
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
     ''' Called once per plugin instance. '''
-
-    print(f'>>> plugin_unloaded() {__package__} {id(_logger)}')
-
-    # Clean up logging.
-    sc.deinit_log(_logger)
+    print(f'>>> plugin_unloaded() {__package__}')
 
 
 #-----------------------------------------------------------------------------------
@@ -77,9 +35,9 @@ class SbotEvent(sublime_plugin.EventListener):
     def on_init(self, views):
         ''' First thing that happens when plugin/window created. Initialize everything. '''
         print(f'>>> on_init() {__package__}')
-
         settings = sublime.load_settings(SBOT_SETTINGS_FILE)
-        _logger.setLevel(settings.get('log_level'))
+        sc.set_log_level(settings.get('log_level'))
+        sc.log_info(f'on_init() {__package__}')
 
     def on_selection_modified(self, view):
         ''' Show the abs position in the status bar. '''
@@ -211,7 +169,7 @@ class SbotRunCommand(sublime_plugin.WindowCommand):
                 elif ext in SCRIPT_TYPES:
                     cmd_list.append(f'\"{path}\"')
                 else:
-                    _logger.warning(f"Unsupported file type: {path}")
+                    sc.log_warn(f"Unsupported file type: {path}")
                     return
 
                 if self.args:
@@ -225,8 +183,8 @@ class SbotRunCommand(sublime_plugin.WindowCommand):
                 if len(errors) > 0:
                     output = output + '============ stderr =============\n' + errors
                 sc.create_new_view(self.window, output)
-            except:# Exception as e:
-                logging.exception("Execute script failed")
+            except Exception as e:
+                sc.log_error(f"Execute script failed: {e}")
 
     def is_visible(self, paths=None):
         vis = True
