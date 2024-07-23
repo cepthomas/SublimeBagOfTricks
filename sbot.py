@@ -13,19 +13,17 @@ SBOT_SETTINGS_FILE = "SublimeBagOfTricks.sublime-settings"
 
 _rex = re.compile(r'\[(.*)\]\(([^\)]*)\)')
 
-print(f'>>> loaded sbot.py {__package__}')
 
 #-----------------------------------------------------------------------------------
 def plugin_loaded():
     ''' Called once per plugin instance. Setup anything global. '''
-    print(f'>>> plugin_loaded() {__package__}')
-    sc.log_debug(f'plugin_loaded() {__package__}')
+    pass
 
 
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
     ''' Called once per plugin instance. '''
-    print(f'>>> plugin_unloaded() {__package__}')
+    pass
 
 
 #-----------------------------------------------------------------------------------
@@ -34,10 +32,8 @@ class SbotEvent(sublime_plugin.EventListener):
 
     def on_init(self, views):
         ''' First thing that happens when plugin/window created. Initialize everything. '''
-        print(f'>>> on_init() {__package__}')
         settings = sublime.load_settings(SBOT_SETTINGS_FILE)
         sc.set_log_level(settings.get('log_level'))
-        sc.log_info(f'on_init() {__package__}')
 
     def on_selection_modified(self, view):
         ''' Show the abs position in the status bar. '''
