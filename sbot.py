@@ -9,6 +9,7 @@ from . import sbot_common_master as sc
 
 import sys
 
+
 _logger = logging.getLogger(__name__)
 
 # Known script file types.
@@ -24,8 +25,12 @@ print(f'>>> loaded sbot.py {__package__}')
 def plugin_loaded():
     ''' Called once per plugin instance. Setup anything global. '''
 
+
     # Set up logging. TODO1 does this make too many loggers?
     _logger = sc.init_log(__package__)
+
+    print(f'>>> plugin_loaded() {__package__} {id(_logger)}')
+    _logger.debug(f'plugin_loaded() {__package__} {id(_logger)}')
 
 
     # _logger = logging.getLogger(__package__)
@@ -58,6 +63,8 @@ def plugin_loaded():
 #-----------------------------------------------------------------------------------
 def plugin_unloaded():
     ''' Called once per plugin instance. '''
+
+    print(f'>>> plugin_unloaded() {__package__} {id(_logger)}')
 
     # Clean up logging.
     sc.deinit_log(_logger)

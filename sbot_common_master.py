@@ -48,8 +48,6 @@ def init_log(name):
     logger = logging.getLogger(name)
     log_fn = get_store_fn('sbot.log')
 
-    print(f'>>> plugin_loaded() {name} {id(_logger)}')
-    # _logger.debug(f'plugin_loaded() {__package__} {id(_logger)}')
 
     # print(__package__) # SublimeBagOfTricks
     # print(__name__) # SublimeBagOfTricks.sbot
@@ -71,13 +69,19 @@ def init_log(name):
     stream_handler.setLevel(logging.INFO)
     logger.addHandler(stream_handler)
 
+
+    print(f'>>> handlers in {name}')
+    for h in logger.handlers:
+        print(f'    {h}')
+
     return logger
 
 
 #-----------------------------------------------------------------------------------
 def deinit_log(logger):
     if logger is not None:
-        while logger.hasHandlers():
+        # while logger.hasHandlers():
+        while len(logger.handlers) > 0:
             logger.removeHandler(logger.handlers[0])
 
 
