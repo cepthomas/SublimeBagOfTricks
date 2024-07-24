@@ -6,8 +6,8 @@ Odds and ends missing from, or overly complicated in other Sublime Text plugins.
 It consists of two components:
 - `sbot.py` is a sandard ST plugin with a variety of commands that process text, simplify ST internals,
   interact with the OS, etc. Displays absolute text position in status bar next to row/col.
-- `sbot_common_master.py` contains internal utilities and logging used by the other sbot family plugins. Probably nothing
-  of interest to you. Currently it is copied to those directories rather than using git submodules.
+- `sbot_common_master.py` contains internal utilities and a simple logger used by the other sbot family plugins.
+  Probably nothing of interest to you.
 
 The plugin can be installed as is but if you only want a few features it makes sense to snip the
 parts of interest, as text or fork or whatever.
@@ -37,7 +37,7 @@ Supported menu type is <b>C</b>ontext, <b>S</b>idebar, <b>T</b>ab.
 * S needs `"args": {"paths": []}`.
 
 There are no default `context/tab/sidebar.sublime-menu` files in this plugin.
-Add the ones you like to your own `*..sublime-menu` files. Typical entries are:
+Add the ones you like to your own `*.sublime-menu` files. Typical entries are:
 ``` json
 { "caption": "Copy Name", "command": "sbot_copy_name"},
 { "caption": "Copy Path", "command": "sbot_copy_path"},
