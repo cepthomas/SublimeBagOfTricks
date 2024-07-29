@@ -303,7 +303,7 @@ def _write_log(level, message):
         return
 
     # Get caller info.
-    frame = sys._getframe(2)  # (1)
+    frame = sys._getframe(2)
     fn = os.path.basename(frame.f_code.co_filename)
     line = frame.f_lineno
     # f'func = {frame.f_code.co_name}'
