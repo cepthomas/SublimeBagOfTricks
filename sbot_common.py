@@ -24,6 +24,12 @@ import sublime
 # Data type.
 HighlightInfo = collections.namedtuple('HighlightInfo', 'scope_name, region_name, type')
 
+# Log defs.
+LL_ERROR = 0
+LL_WARN = 1
+LL_INFO = 2
+LL_DEBUG = 3
+
 
 #-----------------------------------------------------------------------------------
 #---------------------------- Private fields ---------------------------------------
@@ -34,17 +40,13 @@ _temp_view_id = None
 
 # Log defs.
 _LOG_FILE_NAME = 'sbot.log'
-_LL_ERROR = 0
-_LL_WARN = 1
-_LL_INFO = 2
-_LL_DEBUG = 3
-_level_to_name = {_LL_ERROR:'ERR', _LL_WARN:'WRN', _LL_INFO:'INF', _LL_DEBUG:'DBG'}
+_level_to_name = {LL_ERROR:'ERR', LL_WARN:'WRN', LL_INFO:'INF', LL_DEBUG:'DBG'}
 _name_to_level = {v: k for k, v in _level_to_name.items()}
-_log_level = _LL_INFO
-_tell_level = _LL_INFO
+_log_level = LL_INFO
+_tell_level = LL_INFO
 _log_fn = None
 
-# Tracedefs.
+# Trace defs.
 _ftrace = None
 _trace_start_time = 0
 
@@ -55,19 +57,19 @@ _trace_start_time = 0
 
 def log_error(message):
     '''Convenience function.'''
-    _write_log(_LL_ERROR, message)
+    _write_log(LL_ERROR, message)
 
 def log_warn(message):
     '''Convenience function.'''
-    _write_log(_LL_WARN, message)
+    _write_log(LL_WARN, message)
 
 def log_info(message):
     '''Convenience function.'''
-    _write_log(_LL_INFO, message)
+    _write_log(LL_INFO, message)
 
 def log_debug(message):
     '''Convenience function.'''
-    _write_log(_LL_DEBUG, message)
+    _write_log(LL_DEBUG, message)
 
 def set_log_level(level):
     '''Set current log level.'''
@@ -85,7 +87,10 @@ def set_tell_level(level):
 #---------------------------------------------------------------------------
 def start_trace(name, clean_file=True):
     '''Enables tracing and optionally clean file (default is True).'''
-    trace_fn = get_store_fn(f'sbot_trace_{__name__}.log')
+    global _ftrace
+    global _trace_start_time
+
+    trace_fn = get_store_fn(f'sbot_trace_{name}.log')
 
     if clean_file:
         with open(trace_fn, 'w'):
@@ -99,6 +104,8 @@ def start_trace(name, clean_file=True):
 #---------------------------------------------------------------------------
 def stop_trace(clean_file=True): 
     '''Stop tracing.'''
+    global _ftrace
+
     if _ftrace is not None:
         _ftrace.flush()
         _ftrace.close()
@@ -116,8 +123,8 @@ def T(msg):
 def traced_function(f):
     '''Decorator to support function entry/exit tracing.'''
     # Check for enabled.
-    if _ftrace is None:
-        return f
+    # if _ftrace is None:
+    #     return f
 
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
@@ -427,6 +434,8 @@ def _trace(msg, stkpos=None):
         s = f'{msec:04}.{usec:03} {func}({frame.f_lineno}) {msg}\n'
     else:
         s = f'{msec:04}.{usec:03} {msg}\n'
+
+    print(s)        
 
     # Write the record. TODO1 if file is locked by other process notify user that trace is one module only.
     _ftrace.write(s)

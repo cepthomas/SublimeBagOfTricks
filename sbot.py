@@ -4,7 +4,7 @@ import shutil
 import re
 import sublime
 import sublime_plugin
-from . import sbot_common_master as sc
+from . import sbot_common as sc
 
 # Known script file types.
 SCRIPT_TYPES = ['.py', '.lua', '.cmd', '.bat', '.sh']
