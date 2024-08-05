@@ -32,19 +32,21 @@ HighlightInfo = collections.namedtuple('HighlightInfo', 'scope_name, region_name
 # Internal flag.
 _temp_view_id = None
 
-# Log categories.
-LL_ERROR = 0
-LL_WARN = 1
-LL_INFO = 2
-LL_DEBUG = 3
-_level_to_name = {LL_ERROR:'ERR', LL_WARN:'WRN', LL_INFO:'INF', LL_DEBUG:'DBG'}
+# Log defs.
+_LOG_FILE_NAME = 'sbot.log'
+_LL_ERROR = 0
+_LL_WARN = 1
+_LL_INFO = 2
+_LL_DEBUG = 3
+_level_to_name = {_LL_ERROR:'ERR', _LL_WARN:'WRN', _LL_INFO:'INF', _LL_DEBUG:'DBG'}
 _name_to_level = {v: k for k, v in _level_to_name.items()}
-_log_level = LL_INFO
-_tell_level = LL_INFO
+_log_level = _LL_INFO
+_tell_level = _LL_INFO
 _log_fn = None
 
-# Trace captures elapsed time.
-_trace_start = 0
+# Tracedefs.
+_ftrace = None
+_trace_start_time = 0
 
 
 #-----------------------------------------------------------------------------------
@@ -53,19 +55,19 @@ _trace_start = 0
 
 def log_error(message):
     '''Convenience function.'''
-    _write_log(LL_ERROR, message)
+    _write_log(_LL_ERROR, message)
 
 def log_warn(message):
     '''Convenience function.'''
-    _write_log(LL_WARN, message)
+    _write_log(_LL_WARN, message)
 
 def log_info(message):
     '''Convenience function.'''
-    _write_log(LL_INFO, message)
+    _write_log(_LL_INFO, message)
 
 def log_debug(message):
     '''Convenience function.'''
-    _write_log(LL_DEBUG, message)
+    _write_log(_LL_DEBUG, message)
 
 def set_log_level(level):
     '''Set current log level.'''
@@ -81,21 +83,42 @@ def set_tell_level(level):
 #-----------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------
-def init_trace(clean_file=False):
-    '''Reset the trace count and optionally clean file.'''
-    _trace_start = _get_ns()
+def start_trace(name, clean_file=True):
+    '''Enables tracing and optionally clean file (default is True).'''
+    trace_fn = get_store_fn(f'sbot_trace_{__name__}.log')
+
+    if clean_file:
+        with open(trace_fn, 'w'):
+            pass
+
+    # Open file now. Doing it on every write is too expensive.
+    _ftrace = open(trace_fn, 'a')
+    _trace_start_time = _get_ns()
+
+
+#---------------------------------------------------------------------------
+def stop_trace(clean_file=True): 
+    '''Stop tracing.'''
+    if _ftrace is not None:
+        _ftrace.flush()
+        _ftrace.close()
+        _ftrace = None
 
 
 #---------------------------------------------------------------------------
 def T(msg):
-    '''Trace function for user sprinkling through code.'''
-    _trace(msg, 2)
-    # print(f'TRACE:{msg}')
+    '''Trace function for user code.'''
+    if _ftrace is not None:
+        _trace(msg, 2)
 
 
 #---------------------------------------------------------------------------
 def traced_function(f):
     '''Decorator to support function entry/exit tracing.'''
+    # Check for enabled.
+    if _ftrace is None:
+        return f
+
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         parts = [f'{f.__name__}(enter)']
@@ -110,7 +133,7 @@ def traced_function(f):
         try:
             res = f(*args, **kwargs)
         except Exception as e:
-            # _trace(str(e))
+            # _trace(e)
             _trace(traceback.format_exc())
             stat = 1
 
@@ -364,7 +387,7 @@ def _write_log(level, message):
 
     # Write the record.
     # I don't think file access needs to be synchronized. ST docs say that API runs on one thread. But?
-    with open(_log_fn, "a") as log:
+    with open(_log_fn, 'a') as log:
         out_line = f'{time_str} {slvl} {fn}:{line} {message}'
         log.write(out_line + '\n')
         log.flush()
@@ -390,7 +413,7 @@ def _get_ns():
 #---------------------------------------------------------------------------
 def _trace(msg, stkpos=None):
     '''Do one trace record. if stkpos not None determine the function/line info too.'''
-    elapsed = _get_ns()
+    elapsed = _get_ns() - _trace_start_time
     msec = elapsed // 1000000
     usec = elapsed // 1000
 
@@ -405,7 +428,7 @@ def _trace(msg, stkpos=None):
     else:
         s = f'{msec:04}.{usec:03} {msg}\n'
 
-    # Write the record.
+    # Write the record. TODO1 if file is locked by other process notify user that trace is one module only.
     _ftrace.write(s)
 
 
@@ -430,15 +453,15 @@ def _notify_exception(exc_type, exc_value, exc_traceback):
 #----------------------- Finish initialization -------------------------------------
 #-----------------------------------------------------------------------------------
 
-_log_fn = get_store_fn('sbot.log')
+_log_fn = get_store_fn(_LOG_FILE_NAME)
 
 # Connect the last chance hook. TODO should be done once/global.
 # sys.excepthook = _notify_exception
 
 # Maybe roll over log now.
 if os.path.exists(_log_fn) and os.path.getsize(_log_fn) > 50000:
-    bup = _log_fn.replace('.log', '_old.log')
+    bup = _log_fn.replace('.', '_old.')
     shutil.copyfile(_log_fn, bup)
     # Clear current log file.
-    with open(_log_fn, "w"):
+    with open(_log_fn, 'w'):
         pass
