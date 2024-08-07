@@ -31,7 +31,7 @@ Supported menu type is <b>C</b>ontext, <b>S</b>idebar, <b>T</b>ab.
 | sbot_remove_empty_lines | C    | Like it says.              | how: remove_all or normalize ( to one)            |
 | sbot_remove_ws          | C    | Like it says.              | how: remove_all or keep_eol or normalize (to one) |
 
-* S needs `"args": {"paths": []}`.
+- <b>S</b> needs `"args": {"paths": []}`.
 
 There are no default `context/tab/sidebar.sublime-menu` files in this plugin.
 Add the ones you like to your own `*.sublime-menu` files. Typical entries are:

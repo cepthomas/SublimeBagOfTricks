@@ -5,6 +5,8 @@ import re
 import sublime
 import sublime_plugin
 from . import sbot_common as sc
+# from .tracker import *  # noqa: F403
+
 
 # Known script file types.
 SCRIPT_TYPES = ['.py', '.lua', '.cmd', '.bat', '.sh']
