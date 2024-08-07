@@ -133,3 +133,4 @@ dmypy.json
 /test/TestResults
 /store/*.sbot-hls
 /store/*.sbot-sigs
+/tracer.log

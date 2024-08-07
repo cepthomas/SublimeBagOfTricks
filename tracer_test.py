@@ -1,13 +1,11 @@
 import sys
 import datetime
-from .tracker import *  # noqa: F403
+from .tracer import *  # noqa: F403
 
 
 #-------------------------- trace test code --------------------------------------
 
 class TestClass(object):
-    name: str
-    tags: []
 
     def __init__(self, name, tags, arg):
         T('making one TestClass', name, tags, arg)
@@ -66,7 +64,7 @@ def error_function(denom):
 
 def do_it():
 
-    trace_fn = os.path.join(os.path.dirname(__file__), 'tracker.log')
+    trace_fn = os.path.join(os.path.dirname(__file__), 'tracer.log')
     # trace_fn = sc.get_store_fn(f'trace_{log_name}.log') TODO support more than one at a time? Doesn't seem useful.
 
     start_trace(trace_fn)
