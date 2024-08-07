@@ -63,7 +63,6 @@ Add the ones you like to your own `*.sublime-menu` files. Typical entries are:
 | Setting            | Description                              | Options                    |
 | :--------          | :-------                                 | :------                    |
 | scopes_to_show     | Scope list for sbot_all_scopes command.  |                            |
-| log_level          | Min level to log                         | ERR WRN INF DBG TRC        |
 
 Right click stuff works best with this global setting:
 ```

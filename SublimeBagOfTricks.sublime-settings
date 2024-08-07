@@ -23,7 +23,4 @@
 
         "region.redish", "region.orangish", "region.yellowish", "region.greenish", "region.cyanish", "region.bluish", "region.purplish", "region.pinkish",
         ],
-
-    // Min level to log - ERR WRN INF DBG
-    "log_level": "INF",
 }

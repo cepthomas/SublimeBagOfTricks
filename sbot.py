@@ -33,7 +33,6 @@ class SbotEvent(sublime_plugin.EventListener):
     def on_init(self, views):
         ''' First thing that happens when plugin/window created. Initialize everything. '''
         settings = sublime.load_settings(SBOT_SETTINGS_FILE)
-        sc.set_log_level(settings.get('log_level'))
 
     def on_selection_modified(self, view):
         ''' Show the abs position in the status bar. '''
@@ -114,7 +113,7 @@ class SbotTreeCommand(sublime_plugin.WindowCommand):
             cp = subprocess.run(cmd, universal_newlines=True, capture_output=True, shell=True, check=True)
             sc.create_new_view(self.window, cp.stdout)
         except Exception as e:
-            sc.create_new_view(self.window, f'Well, that did not go well: {e}\n{cp.stderr}')
+            sc.create_new_view(self.window, f'Well, that did not go well: {e}', e.__traceback__)
 
     def is_visible(self, paths=None):
         dir, fn, path = sc.get_path_parts(self.window, paths)
@@ -165,7 +164,7 @@ class SbotRunCommand(sublime_plugin.WindowCommand):
                 elif ext in SCRIPT_TYPES:
                     cmd_list.append(f'\"{path}\"')
                 else:
-                    sc.log_warn(f"Unsupported file type: {path}")
+                    sc.log_info(f"Unsupported file type: {path}")
                     return
 
                 if self.args:
@@ -180,7 +179,7 @@ class SbotRunCommand(sublime_plugin.WindowCommand):
                     output = output + '============ stderr =============\n' + errors
                 sc.create_new_view(self.window, output)
             except Exception as e:
-                sc.log_error(f"Execute script failed: {e}")
+                sc.log_error(f"Execute script failed: {e}", e.__traceback__)
 
     def is_visible(self, paths=None):
         vis = True
